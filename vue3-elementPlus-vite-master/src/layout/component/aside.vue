@@ -1,5 +1,5 @@
 <template>
-  <el-aside class="layout-aside" :class="setCollapseWidth" v-if="clientWidth > 1000">
+  <el-aside class="layout-aside" :class="setCollapseWidth" v-if="Number(clientWidth) > 1000">
     <Logo v-if="setShowLogo" />
     <el-scrollbar class="flex-auto" ref="layoutAsideScrollbarRef">
       <SubBar :menuList="menuList" :class="setCollapseWidth" />
@@ -91,8 +91,6 @@ export default {
         }
       }
     })
-
-    console.log(store.state.routesList.routesList)
 
     // 设置/过滤路由（非静态路由/是否显示在菜单中）
     const setFilterRoutes = () => {

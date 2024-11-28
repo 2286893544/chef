@@ -1,7 +1,7 @@
 <template>
 	<div class="layout-navbars-container">
 		<BreadcrumbIndex />
-		<TagsView  />
+		<TagsView />
 	</div>
 </template>
 
@@ -11,7 +11,7 @@ import TagsView from './tagsView/tagsView.vue';
 
 export default {
 	name: 'layoutNavBars',
-	components: { BreadcrumbIndex ,TagsView},
+	components: { BreadcrumbIndex, TagsView },
 	setup() {
 		return {};
 	},

@@ -1,18 +1,17 @@
 <template>
 	<div class="layout-navbars-breadcrumb" v-show="getThemeConfig.isBreadcrumb">
-		<i
-			class="layout-navbars-breadcrumb-icon"
-			:class="getThemeConfig.isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
-			@click="onThemeConfigChange"
-		></i>
+		<i class="layout-navbars-breadcrumb-icon" :class="getThemeConfig.isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
+			@click="onThemeConfigChange"></i>
 		<el-breadcrumb class="layout-navbars-breadcrumb-hide">
 			<transition-group name="breadcrumb" mode="out-in">
 				<el-breadcrumb-item v-for="(v, k) in breadcrumbList" :key="v.meta.title">
 					<span v-if="k === breadcrumbList.length - 1" class="layout-navbars-breadcrumb-span">
-						<i :class="v.meta.icon" class="layout-navbars-breadcrumb-iconfont" v-if="getThemeConfig.isBreadcrumbIcon"></i>{{ (v.meta.title) }}
+						<i :class="v.meta.icon" class="layout-navbars-breadcrumb-iconfont"
+							v-if="getThemeConfig.isBreadcrumbIcon"></i>{{ (v.meta.title) }}
 					</span>
 					<a v-else @click.prevent="onBreadcrumbClick(v)">
-						<i :class="v.meta.icon" class="layout-navbars-breadcrumb-iconfont" v-if="getThemeConfig.isBreadcrumbIcon"></i>{{ (v.meta.title) }}
+						<i :class="v.meta.icon" class="layout-navbars-breadcrumb-iconfont"
+							v-if="getThemeConfig.isBreadcrumbIcon"></i>{{ (v.meta.title) }}
 					</a>
 				</el-breadcrumb-item>
 			</transition-group>
@@ -22,15 +21,15 @@
 
 <script lang="ts">
 import { toRefs, reactive, computed, getCurrentInstance, onMounted } from 'vue';
-import { onBeforeRouteUpdate, useRoute, useRouter,RouteRecordRaw } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute, useRouter, RouteRecordRaw } from 'vue-router';
 import { useStore } from 'store/index';
 import type { AppRouteRecordRaw } from 'store/interface/index';
-  interface State {
-		breadcrumbList:AppRouteRecordRaw[]
-		routeSplit:string[]
-		routeSplitFirst: string
-		routeSplitIndex: number
-  }
+interface State {
+	breadcrumbList: AppRouteRecordRaw[]
+	routeSplit: string[]
+	routeSplitFirst: string
+	routeSplitIndex: number
+}
 export default {
 	name: 'layoutBreadcrumb',
 	setup() {
@@ -51,6 +50,7 @@ export default {
 		// 面包屑点击时
 		const onBreadcrumbClick = (v: any) => {
 			const { redirect, path } = v;
+			if (v.children) return
 			if (redirect) router.push(redirect);
 			else router.push(path);
 		};
@@ -65,7 +65,7 @@ export default {
 				state.routeSplit.map((v: any, k: number, arrs: any) => {
 					if (state.routeSplitFirst === item.path) {
 						state.routeSplitFirst += `/${arrs[state.routeSplitIndex]}`;
-						state.breadcrumbList.push(item);
+						if (!item.children) state.breadcrumbList.push(item);
 						state.routeSplitIndex++;
 						if (item.children) getBreadcrumbList(item.children);
 					}
@@ -107,20 +107,24 @@ export default {
 	display: flex;
 	align-items: center;
 	padding-left: 15px;
+
 	.layout-navbars-breadcrumb-icon {
 		cursor: pointer;
 		font-size: 18px;
 		margin-right: 15px;
 		color: var(--bg-topBarColor);
 	}
+
 	.layout-navbars-breadcrumb-span {
 		opacity: 0.7;
 		color: var(--bg-topBarColor);
 	}
+
 	.layout-navbars-breadcrumb-iconfont {
 		font-size: 14px;
 		margin-right: 5px;
 	}
+
 	::v-deep(.el-breadcrumb__separator) {
 		opacity: 0.7;
 		color: var(--bg-topBarColor);

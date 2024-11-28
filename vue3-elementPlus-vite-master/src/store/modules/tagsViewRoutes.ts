@@ -1,12 +1,12 @@
 import { Module } from 'vuex';
 // 此处加上 `.ts` 后缀报错，具体原因不详
 import { TagsViewRoutesState, RootStateTypes } from 'store/interface/index';
-import type {  AppRouteRecordRaw } from 'store/interface/index';
+import type { AppRouteRecordRaw } from 'store/interface/index';
 
 const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
-	namespaced: true,
-	state: {
-		tagsViewRoutes: [
+  namespaced: true,
+  state: {
+    tagsViewRoutes: [
       {
         meta: {
           auth: ['admin', 'test'],
@@ -58,21 +58,63 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
         },
         name: 'elementIcon',
         path: '/elementIcon'
+      },
+      {
+        meta: {
+          auth: ['admin', 'test'],
+          icon: 'iconfont el-icon-s-grid',
+          isAffix: false,
+          isHide: false,
+          isKeepAlive: true,
+          title: 'person',
+          index: '5'
+        },
+        name: 'person',
+        path: '/person',
+        children: [
+          {
+            meta: {
+              auth: ['admin', 'test'],
+              icon: 'iconfont el-icon-s-grid',
+              isAffix: false,
+              isHide: false,
+              isKeepAlive: true,
+              title: 'personInfo',
+              index: '6'
+            },
+            name: 'er',
+            path: '/person/er'
+          },
+          {
+            meta: {
+              auth: ['admin', 'test'],
+              icon: 'iconfont el-icon-s-grid',
+              isAffix: false,
+              isHide: false,
+              isKeepAlive: true,
+              title: 'personTwo',
+              index: '5-2'
+            },
+            name: 'tw',
+            path: '/person/Two'
+          },
+        ]
       }
+
     ],
-	},
-	mutations: {
-		// 设置 TagsView 路由
-		getTagsViewRoutes(state: any, data: Array<AppRouteRecordRaw>) {
-			state.tagsViewRoutes = data;
-		},
-	},
-	actions: {
-		// 设置 TagsView 路由
-		async setTagsViewRoutes({ commit }, data: Array<AppRouteRecordRaw>) {
-			commit('getTagsViewRoutes', data);
-		},
-	},
+  },
+  mutations: {
+    // 设置 TagsView 路由
+    getTagsViewRoutes(state: any, data: Array<AppRouteRecordRaw>) {
+      state.tagsViewRoutes = data;
+    },
+  },
+  actions: {
+    // 设置 TagsView 路由
+    async setTagsViewRoutes({ commit }, data: Array<AppRouteRecordRaw>) {
+      commit('getTagsViewRoutes', data);
+    },
+  },
 };
 
 export default tagsViewRoutesModule;

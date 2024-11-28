@@ -14,29 +14,19 @@ const router = createRouter({
     {
       path: '/',
       component: Layout,
-      redirect:'/home',
+      redirect: '/home',
       children: [
+        { path: '/home', name: 'home', component: () => import('views/home/index.vue'), },
+        { path: '/demo', name: 'demo', component: () => import('views/demo/index.vue'), },
+        { path: '/icon', name: 'icon', component: () => import('views/icon/index.vue'), },
+        { path: '/elementIcon', name: 'elementIcon', component: () => import('views/elementIcon/index.vue'), },
         {
-          path: '/home',
-          name:'home',
-          component: ()=>import('views/home/index.vue'),
-        },
-        {
-          path: '/demo',
-          name:'demo',
-          component: ()=>import('views/demo/index.vue'),
-        },
-        {
-          path: '/icon',
-          name:'icon',
-          component: ()=>import('views/icon/index.vue'),
-        },
-        {
-          path: '/elementIcon',
-          name:'elementIcon',
-          component: ()=>import('views/elementIcon/index.vue'),
+          path: '/person', name: 'person', component: () => import('views/person/person.vue'),
+          children: [
+            { path: 'er', name: "er", component: () => import('views/person/index.vue') },
+            { path: 'Two', name: "tw", component: () => import('views/person/Two.vue') },
+          ]
         }
-        
       ]
     }
   ]

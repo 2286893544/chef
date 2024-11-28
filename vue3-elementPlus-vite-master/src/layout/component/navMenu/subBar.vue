@@ -6,7 +6,7 @@
     :default-active="defaultActive"
     :unique-opened="getThemeConfig.isUniqueOpened"
     :collapse-transition="false"
-  >	
+  >
     <template v-for="val in menuLists">
       <el-submenu
         :index="val.path"
@@ -22,10 +22,7 @@
 
       <el-menu-item :index="val.path" :key="val.path" v-else>
         <i :class="val.meta.icon ? val.meta.icon : ''"></i>
-        <template
-          #title
-          v-if="!val.meta.isLink"
-        >
+        <template #title v-if="!val.meta.isLink">
           <span>{{ val.meta.title }}</span>
         </template>
         <template #title v-else>
@@ -39,16 +36,9 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
-  import type { Menu } from 'store/interface/index';
-  import {
-    ref,
-    toRefs,
-    reactive,
-    computed,
-    defineComponent,
-    watch
-  } from 'vue'
+  import type { PropType } from 'vue'
+  import type { Menu } from 'store/interface/index'
+  import { ref, toRefs, reactive, computed, defineComponent, watch } from 'vue'
   import { useRoute, onBeforeRouteUpdate } from 'vue-router'
   import { useStore } from 'store/index'
   import SubItem from './subItem.vue'
@@ -58,7 +48,7 @@ import type { PropType } from 'vue';
     props: {
       menuList: {
         type: Array as PropType<Menu[]>,
-        require:true
+        require: true
       }
     },
     setup(props) {
@@ -67,7 +57,7 @@ import type { PropType } from 'vue';
       const state = reactive({
         defaultActive: route.path
       })
-      
+
       // 获取父级菜单数据
       const menuLists = computed(() => props.menuList)
 
@@ -81,7 +71,6 @@ import type { PropType } from 'vue';
           : store.state.themeConfig.isCollapse
       )
 
-
       // 路由更新时
       onBeforeRouteUpdate((to) => {
         const clientWidth = document.body.clientWidth
@@ -93,11 +82,7 @@ import type { PropType } from 'vue';
         menuLists,
         setIsCollapse,
         ...toRefs(state)
-        
       }
     }
   })
-
-</script> 
-
-
+</script>

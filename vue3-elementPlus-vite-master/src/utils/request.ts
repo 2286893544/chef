@@ -13,7 +13,7 @@ function getSession(key: string) {
   return JSON.parse(json)
 }
 
-export const PATH_URL:string  =  import.meta.env.VITE_GLOB_API_URL as string
+export const PATH_URL: string = import.meta.env.VITE_GLOB_API_URL as string
 
 // 配置新建一个 axios 实例
 const service: AxiosInstance = axios.create({
@@ -38,21 +38,7 @@ service.interceptors.request.use(
 // 添加响应拦截器
 service.interceptors.response.use(
   (response: AxiosResponse) => {
-    const res = response.data
-    if (res.code && res.code !== 0) {
-      // `token` 过期或者账号已在别处登录
-      if (res.code === 401 || res.code === 4001) {
-        window.sessionStorage.clear() // 清除浏览器全部临时缓存
-        router.push('/login') // 去登录页面
-        resetRoute() // 删除/重置路由
-        ElMessageBox.alert('你已被登出，请重新登录', '提示', {})
-          .then(() => {})
-          .catch(() => {})
-      }
-      return Promise.reject(service.interceptors.response)
-    } else {
-      return response.data
-    }
+    return response.data
   },
   (error: AxiosError) => {
     if (error.message.indexOf('timeout') != -1) {

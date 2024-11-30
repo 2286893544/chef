@@ -44,7 +44,7 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue", 
-    "mock/**/*.ts",
+    "src/mock/**/*.ts",
     "types/**/*.d.ts",
     "types/**/*.ts",
    ]

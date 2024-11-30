@@ -21,10 +21,9 @@ const router = createRouter({
         { path: '/icon', name: 'icon', component: () => import('views/icon/index.vue'), },
         { path: '/elementIcon', name: 'elementIcon', component: () => import('views/elementIcon/index.vue'), },
         {
-          path: '/person', name: 'person', component: () => import('views/person/person.vue'),
+          path: '/carousel', name: 'carousel', component: () => import('views/carousel/index.vue'),
           children: [
-            { path: 'er', name: "er", component: () => import('views/person/index.vue') },
-            { path: 'Two', name: "tw", component: () => import('views/person/Two.vue') },
+            { path: 'index', name: "index", component: () => import('views/carousel/carousel.vue') },
           ]
         }
       ]

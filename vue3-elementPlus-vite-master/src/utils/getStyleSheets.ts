@@ -32,7 +32,6 @@ const elementPlusIconfont = () => {
 	return new Promise((resolve, reject) => {
 		nextTick(() => {
 			const styles: any = document.styleSheets;
-			console.log('styles------------',styles);
 			let sheetsIconList = [];
 			for (let i = 0; i < styles.length; i++) {
 				for (let j = 0; j < styles[i].cssRules.length; j++) {

@@ -66,11 +66,11 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
           isAffix: false,
           isHide: false,
           isKeepAlive: true,
-          title: 'person',
+          title: '轮播图管理',
           index: '5'
         },
-        name: 'person',
-        path: '/person',
+        name: 'carousel',
+        path: '/carousel',
         children: [
           {
             meta: {
@@ -79,24 +79,11 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
               isAffix: false,
               isHide: false,
               isKeepAlive: true,
-              title: 'personInfo',
+              title: '轮播图',
               index: '6'
             },
-            name: 'er',
-            path: '/person/er'
-          },
-          {
-            meta: {
-              auth: ['admin', 'test'],
-              icon: 'iconfont el-icon-s-grid',
-              isAffix: false,
-              isHide: false,
-              isKeepAlive: true,
-              title: 'personTwo',
-              index: '5-2'
-            },
-            name: 'tw',
-            path: '/person/Two'
+            name: 'index',
+            path: '/carousel/index'
           },
         ]
       }

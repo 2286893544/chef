@@ -2,7 +2,6 @@ import { defineConfig, ConfigEnv, UserConfigExport, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 
-import { configMockPlugin } from './src/plugins/configMockPlugin'
 import { configStyleImportPlugin } from './src/plugins/configStyleImportPlugin'
 import { configSvgIconsPlugin } from './src/plugins/configSvgIconsPlugin'
 import { configHtmlPlugin } from './src/plugins/configHtmlPlugin'
@@ -22,7 +21,6 @@ export default ({ command, mode }: ConfigEnv): UserConfigExport => {
 
   const {
     VITE_PORT,
-    VITE_USE_MOCK,
     VITE_BUILD_COMPRESS,
     VITE_BUILD_COMPRESS_DELETE_ORIGIN_FILE
   } = viteEnv
@@ -31,7 +29,6 @@ export default ({ command, mode }: ConfigEnv): UserConfigExport => {
     base: './',
     plugins: [
       vue(),
-      configMockPlugin(VITE_USE_MOCK, isBuild), // mock 模拟请求
       configSvgIconsPlugin(isBuild), // svg 处理
       configStyleImportPlugin(isBuild), // element-plus 按需引入
       configHtmlPlugin(viteEnv, isBuild), // EJS 标签处理

@@ -25,11 +25,26 @@ const routesListModule: Module<RoutesListState, RootStateTypes> = {
           isAffix: false,
           isHide: false,
           isKeepAlive: true,
-          title: 'demo',
+          title: '活动管理',
           index: '2'
         },
-        name: 'demo',
-        path: '/demo'
+        name: 'active',
+        path: '/active',
+        children: [
+          {
+            meta: {
+              auth: ['admin', 'test'],
+              icon: 'iconfont el-icon-s-grid',
+              isAffix: false,
+              isHide: false,
+              isKeepAlive: true,
+              title: '活动信息',
+              index: '2-1'
+            },
+            name: 'info',
+            path: '/active/info'
+          },
+        ]
       },
       {
         meta: {

@@ -28,7 +28,18 @@ const carouselSchema = new mongoose.Schema({
   }
 })
 const carouselModel = mongoose.model('carousel', carouselSchema, 'carousel')
-
+//活动信息
+const activityMsgSchema = new mongoose.Schema({
+  title: String,
+  joinNum: Number,
+  accumulatedNum: Number,
+  visitNum: Number,
+  startTime: Date,
+  endTime: Date,
+  rule: String
+})
+const activityMsgModel = mongoose.model("activityMsg", activityMsgSchema, "activityMsg")
 module.exports = {
-  carouselModel
+  carouselModel,
+  activityMsgModel
 }

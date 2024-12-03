@@ -17,7 +17,13 @@ const router = createRouter({
       redirect: '/home',
       children: [
         { path: '/home', name: 'home', component: () => import('views/home/index.vue'), },
-        { path: '/demo', name: 'demo', component: () => import('views/demo/index.vue'), },
+        // { path: '/demo', name: 'demo', component: () => import('views/demo/index.vue'), },
+        {
+          path: "/active", name: "active", component: () => import("views/active/index.vue"),
+          children: [
+            {path: "info", name: "info", component: () => import("views/active/active.vue")}
+          ]
+        },
         { path: '/icon', name: 'icon', component: () => import('views/icon/index.vue'), },
         { path: '/elementIcon', name: 'elementIcon', component: () => import('views/elementIcon/index.vue'), },
         {

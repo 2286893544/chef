@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { carouselModel } = require("../model/model")
+var { carouselModel, activityMsgModel } = require("../model/model")
 var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
@@ -17,11 +17,13 @@ router.post("/upload", (req, res) => {
       res.status(500).json({ code: 500, msg: err })
     } else {
       let imgSrc = data.file[0].path
-      console.log(imgSrc)
+      let patharr = imgSrc.split("\\")
+      let imgpath = patharr.join("/")
+      console.log(imgpath);
       res.status(200).send({
         code: 200,
         msg: "图片上传成功",
-        path: data.file[0].path
+        path: imgpath
       });
     }
   })
@@ -78,4 +80,39 @@ router.put("/updateCarousel/:_id", async (req, res) => {
   }
 })
 
+
+
+//添加活动信息
+router.post("/addactivityMsg", (req, res) => {
+  console.log(req.body);
+  
+  activityMsgModel.create(req.body)
+  res.send({
+    code: 200
+  })
+})
+//获取所有活动信息
+router.get("/getactives", async(req, res) => {
+  let activityMsgs = await activityMsgModel.find()
+  res.send({
+    code: 200,
+    activityMsgs
+  })
+})
+//修改活动信息
+router.post("/updactive", async(req, res) => {
+  console.log(req.query);
+  console.log(req.body);
+  await activityMsgModel.updateOne({_id: req.query.updid}, req.body)
+  res.send({
+    code: 200
+  })
+})
+//删除活动信息
+router.delete("/delactive", async(req, res) => {
+  await activityMsgModel.deleteOne({_id: req.query.delid})
+  res.send({
+    code: 200
+  })
+})
 module.exports = router;

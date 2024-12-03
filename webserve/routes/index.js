@@ -38,7 +38,7 @@ router.post("/addCarousel", (req, res) => {
 
 // 请求轮播图数据
 router.get("/getCarousel", async (req, res) => {
-  let { page, pageSize } = req.query
+  let { page = 1, pageSize = 5 } = req.query
   let data = await carouselModel.find().skip((page - 1) * pageSize).limit(pageSize);
   let total = await carouselModel.find().countDocuments()
   res.status(200).send({
@@ -76,6 +76,10 @@ router.put("/updateCarousel/:_id", async (req, res) => {
   } catch (err) {
     res.status(500).send({ code: 500, msg: "修改失败", err })
   }
+})
+
+router.get('test', (req, res) => {
+  res.status(200).send({ code: 200, msg: "请求成功" })
 })
 
 module.exports = router;

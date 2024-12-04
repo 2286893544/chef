@@ -62,6 +62,21 @@ const positionSchema = new mongoose.Schema({
 })
 const positionModel = mongoose.model("position", positionSchema, "position")
 
+// 留言板
+const commentSchema   = new mongoose.Schema({
+  uid:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  },
+  avtor: String,
+  startTime:String,
+  audit:Boolean,
+  content:String,
+  cid:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  },
+})
 
 module.exports = {
   carouselModel,  //  轮播图

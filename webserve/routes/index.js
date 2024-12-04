@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { carouselModel, activityMsgModel, positionModel, userInfoModel } = require("../model/model")
+var { carouselModel, activityMsgModel, positionModel, userInfoModel, commentModel } = require("../model/model")
 var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
@@ -183,6 +183,9 @@ router.delete("/delPosition", async (req, res) => {
     })
   }
 })
+
+
+
 //添加用户
 router.post("/adduser", (req, res) => {
   userInfoModel.create(req.body)
@@ -191,11 +194,103 @@ router.post("/adduser", (req, res) => {
   })
 })
 //获取所有用户
-router.get("/getuser", async(req, res) => {
+router.get("/getuser", async (req, res) => {
   let users = await userInfoModel.find()
   res.send({
     code: 200,
     users: users
   })
 })
+
+
+// 添加留言信息
+router.post("/addComment", async (req, res) => {
+  try {
+    let userInfo = await userInfoModel.findOne({ _id: req.body.uid })
+    req.body.avtor = userInfo.avtor
+    req.body.name = userInfo.name
+    await commentModel.create(req.body)
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "添加失败",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      msg: "添加成功"
+    })
+  }
+})
+
+
+// 获取留言信息
+router.get("/getComment", async (req, res) => {
+  const { cid,page,pageSize } = req.query
+  let data;
+  let total;
+  try {
+    data = await commentModel.find({ cid }).skip((page - 1) * pageSize).limit(pageSize);
+    total = await commentModel.find({ cid }).countDocuments()
+  }
+  catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "获取失败",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      data,
+      total
+    })
+  }
+})
+
+// 更改审核状态
+router.put("/updateComment", async (req, res) => {
+
+  const { _id } = req.body
+  try {
+    let data = await commentModel.findOne({ _id })
+    if (data.audit) {
+      await commentModel.updateOne({ _id }, { audit: false })
+    } else {
+      await commentModel.updateOne({ _id }, { audit: true })
+    }
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "更新失败",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      msg: "更新成功"
+    })
+  }
+})
+
+// 删除留言
+router.delete("/delComment", async (req, res) => {
+  try {
+    await commentModel.deleteOne({ _id: req.query.id })
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "删除失败",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      msg: "删除成功"
+    })
+  }
+})
+
+
 module.exports = router;

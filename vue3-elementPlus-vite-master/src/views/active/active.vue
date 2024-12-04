@@ -10,18 +10,17 @@
       <el-table :data="activels" style="width: 100%; margin-top: 20px">
         <el-table-column prop="title" label="活动标题" align="center" />
         <el-table-column prop="joinNum" label="参赛人数" align="center" />
-        <el-table-column
-          prop="accumulatedNum"
-          label="累计票数"
-          align="center"
-        />
+        <el-table-column prop="accumulatedNum" label="累计票数" align="center" />
         <el-table-column prop="visitNum" label="访问总量" align="center" />
         <el-table-column prop="rule" label="活动规则" align="center" />
         <el-table-column label="活动状态" align="center">
           <template v-slot="scope">
-            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '未开始'" class="mx-1">未开始</el-text>
-            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '已结束'" class="mx-1" type="danger">已结束</el-text>
-            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '进行中'" class="mx-1" type="success">进行中</el-text>
+            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '未开始'"
+              class="mx-1">未开始</el-text>
+            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '已结束'" class="mx-1"
+              type="danger">已结束</el-text>
+            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '进行中'" class="mx-1"
+              type="success">进行中</el-text>
           </template>
         </el-table-column>
         <el-table-column label="开始时间" align="center">
@@ -43,69 +42,30 @@
       </el-table>
     </div>
     <!--添加修改活动-->
-    <el-dialog
-      v-model="centerDialogVisible"
-      :title="formstatus == 'add' ? '添加活动' : '修改活动'"
-      width="500"
-      align-center
-    >
-      <el-form
-        ref="ruleFormRef"
-        style="max-width: 600px"
-        :model="ruleForm"
-        :rules="rules"
-        label-width="auto"
-        class="demo-ruleForm"
-        :size="formSize"
-        status-icon
-        show-close="false"
-      >
+    <el-dialog v-model="centerDialogVisible" :title="formstatus == 'add' ? '添加活动' : '修改活动'" width="500" align-center>
+      <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" :rules="rules" label-width="auto"
+        class="demo-ruleForm" :size="formSize" status-icon show-close="false">
         <el-form-item label="活动名称" prop="title">
-          <el-input
-            v-model="ruleForm.title"
-            placeholder="请输入活动名称"
-          ></el-input>
+          <el-input v-model="ruleForm.title" placeholder="请输入活动名称"></el-input>
         </el-form-item>
         <el-form-item label="参赛人数" prop="joinNum">
-          <el-input
-            v-model.number="ruleForm.joinNum"
-            placeholder="请输入参赛人数"
-          ></el-input>
+          <el-input v-model.number="ruleForm.joinNum" placeholder="请输入参赛人数"></el-input>
         </el-form-item>
         <el-form-item label="累计票数" prop="accumulatedNum">
-          <el-input
-            v-model.number="ruleForm.accumulatedNum"
-            placeholder="请输入累计票数"
-          ></el-input>
+          <el-input v-model.number="ruleForm.accumulatedNum" placeholder="请输入累计票数"></el-input>
         </el-form-item>
         <el-form-item label="累计访问量" prop="visitNum">
-          <el-input
-            v-model.number="ruleForm.visitNum"
-            placeholder="请输入累计访问量"
-          ></el-input>
+          <el-input v-model.number="ruleForm.visitNum" placeholder="请输入累计访问量"></el-input>
         </el-form-item>
         <el-form-item label="开始时间" prop="startTime">
-          <el-date-picker
-            v-model="ruleForm.startTime"
-            type="datetime"
-            placeholder="请选择开始时间"
-          />
+          <el-date-picker v-model="ruleForm.startTime" type="datetime" placeholder="请选择开始时间" />
         </el-form-item>
         <el-form-item label="结束时间" prop="endTime">
-          <el-date-picker
-            v-model="ruleForm.endTime"
-            type="datetime"
-            placeholder="请选择结束时间"
-          />
+          <el-date-picker v-model="ruleForm.endTime" type="datetime" placeholder="请选择结束时间" />
         </el-form-item>
         <el-form-item label="活动规则" prop="rule">
-          <el-input
-            v-model="ruleForm.rule"
-            style="width: 480px"
-            :autosize="{ minRows: 4, maxRows: 6 }"
-            type="textarea"
-            placeholder="请输入活动规则"
-          />
+          <el-input v-model="ruleForm.rule" style="width: 480px" :autosize="{ minRows: 4, maxRows: 6 }" type="textarea"
+            placeholder="请输入活动规则" />
         </el-form-item>
       </el-form>
 
@@ -187,27 +147,27 @@ let ruleForm = reactive<RuleForm>({
 })
 
 const rules = reactive<FormRules<RuleForm>>({
-    title: [
-        {required: true, message: "请输入活动名称", trigger: 'blur'}
-    ],
-    joinNum: [
-        {required: true, message: "请输入参赛人数", trigger: 'blur'}
-    ],
-    accumulatedNum: [
-        {required: true, message: "请输入累计票数", trigger: 'blur'}
-    ],
-    visitNum: [
-        {required: true, message: "请输入累计访问量", trigger: 'blur'}
-    ],
-    startTime: [
-        {required: true, message: "请选择开始时间", trigger: 'blur'}
-    ],
-    endTime: [
-        {required: true, message: "请选择结束时间", trigger: 'blur'}
-    ],
-    rule: [
-        {required: true, message: "请输入活动规则", trigger: 'blur'}
-    ],
+  title: [
+    { required: true, message: "请输入活动名称", trigger: 'blur' }
+  ],
+  joinNum: [
+    { required: true, message: "请输入参赛人数", trigger: 'blur' }
+  ],
+  accumulatedNum: [
+    { required: true, message: "请输入累计票数", trigger: 'blur' }
+  ],
+  visitNum: [
+    { required: true, message: "请输入累计访问量", trigger: 'blur' }
+  ],
+  startTime: [
+    { required: true, message: "请选择开始时间", trigger: 'blur' }
+  ],
+  endTime: [
+    { required: true, message: "请选择结束时间", trigger: 'blur' }
+  ],
+  rule: [
+    { required: true, message: "请输入活动规则", trigger: 'blur' }
+  ],
 })
 
 // const submitForm = async (formEl: FormInstance | undefined) => {
@@ -224,15 +184,15 @@ const rules = reactive<FormRules<RuleForm>>({
 const resetForm = () => {
   centerDialogVisible.value = false
   ruleForm.title = '',
-  ruleForm.joinNum = 0,
-  ruleForm.accumulatedNum = 0,
-  ruleForm.visitNum = 0,
-  ruleForm.startTime = '',
-  ruleForm.endTime = '',
-  ruleForm.rule = ''
+    ruleForm.joinNum = 0,
+    ruleForm.accumulatedNum = 0,
+    ruleForm.visitNum = 0,
+    ruleForm.startTime = '',
+    ruleForm.endTime = '',
+    ruleForm.rule = ''
 }
 //添加
-const addactive = async() => {
+const addactive = async () => {
   let res: any = await service.post("/addactivityMsg", ruleForm)
   if (res.code == 200) {
     centerDialogVisible.value = false
@@ -240,7 +200,7 @@ const addactive = async() => {
   }
 }
 //修改
-const updactive = async() => {
+const updactive = async () => {
   // console.log(updid.value);
   // console.log(ruleForm);
   let res: any = await service.post(`/updactive?updid=${updid.value}`, ruleForm)
@@ -249,29 +209,29 @@ const updactive = async() => {
     resetForm()
     getactives()
   }
-  
+
 }
 //删除
-const delact = async(id: any) => {
+const delact = async (id: any) => {
   let res: any = await service.delete(`/delactive?delid=${id}`)
   if (res.code == 200) {
     getactives()
   }
 }
 //活动状态
-const checkActivityStatus = (startt: any,endt: any) => {
-      const currentTime = new Date(); // 当前时间
-      const start = new Date(startt); // 活动开始时间
-      const end = new Date(endt); // 活动结束时间
+const checkActivityStatus = (startt: any, endt: any) => {
+  const currentTime = new Date(); // 当前时间
+  const start = new Date(startt); // 活动开始时间
+  const end = new Date(endt); // 活动结束时间
 
-      if (currentTime < start) {
-        return "未开始"; // 当前时间早于活动开始时间
-      } else if (currentTime > end) {
-        return "已结束"; // 当前时间晚于活动结束时间
-      } else {
-        return "进行中"; // 当前时间在活动的开始和结束之间
-      }
-    }
+  if (currentTime < start) {
+    return "未开始"; // 当前时间早于活动开始时间
+  } else if (currentTime > end) {
+    return "已结束"; // 当前时间晚于活动结束时间
+  } else {
+    return "进行中"; // 当前时间在活动的开始和结束之间
+  }
+}
 onMounted(() => {
   getactives()
 })

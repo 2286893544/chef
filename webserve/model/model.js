@@ -74,8 +74,8 @@ const userInfoSchema = new mongoose.Schema({
     default: 0
   },
   mark: {
-  type: Number,
-  unique: true,
+    type: Number,
+    unique: true,
   },
   avtor: String,
   age: Number,
@@ -84,8 +84,8 @@ const userInfoSchema = new mongoose.Schema({
   jurisdictiom: Boolean,
   voteNum: Number,
   position: {
-  type: mongoose.Types.ObjectId,
-  ref: "position"
+    type: mongoose.Types.ObjectId,
+    ref: "position"
   },
   resumeText: String,
   visitNum: {
@@ -100,23 +100,42 @@ const counterSchema = new mongoose.Schema({
 });
 
 // 留言板
-const commentSchema   = new mongoose.Schema({
-  uid:{
+const commentSchema = new mongoose.Schema({
+  uid: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   },
+  name: String,
   avtor: String,
-  startTime:String,
-  audit:Boolean,
-  content:String,
-  cid:{
+  startTime: {
+    type: Date,
+    default: Date.now,
+    get: function (value) {
+      const date = new Date(value);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+  },
+  audit: {
+    type: Boolean,
+    default: false
+  },
+  content: String,
+  cid: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   },
 })
-const Counter = mongoose.model('Counter', counterSchema);
+const commentModel = mongoose.model("comment", commentSchema, "comment")
 
-userInfoSchema.pre('save', async function(next) {
+
+const Counter = mongoose.model('Counter', counterSchema);
+userInfoSchema.pre('save', async function (next) {
   if (this.isNew) {
     // 获取并更新计数器
     const counter = await Counter.findByIdAndUpdate(
@@ -136,4 +155,5 @@ module.exports = {
   activityMsgModel, //  活动信息
   positionModel,  //  职位
   userInfoModel,//用户
+  commentModel,//留言板
 }

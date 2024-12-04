@@ -39,6 +39,10 @@ const router = createRouter({
           children: [
             { path: 'positionIdx', name: "positionIdx", component: () => import('views/position/position.vue') },
           ]
+        },
+        // 留言板
+        {
+          path: "/comment/:id", name: "comment", component: () => import("views/comment/comment.vue"),
         }
 
       ]

@@ -48,6 +48,7 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
           },
         ]
       },
+      // 职位管理
       {
         meta: {
           auth: ['admin', 'test'],
@@ -55,12 +56,28 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
           isAffix: false,
           isHide: false,
           isKeepAlive: true,
-          title: 'icon',
+          title: '职位管理',
           index: '3'
         },
-        name: 'icon',
-        path: '/icon'
+        name: 'position',
+        path: '/position',
+        children: [
+          {
+            meta: {
+              auth: ['admin', 'test'],
+              icon: 'iconfont el-icon-s-grid',
+              isAffix: false,
+              isHide: false,
+              isKeepAlive: true,
+              title: '职位',
+              index: '3-1'
+            },
+            name: 'index',
+            path: '/position/positionIdx'
+          },
+        ]
       },
+
       {
         meta: {
           auth: ['admin', 'test'],
@@ -74,6 +91,7 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
         name: 'elementIcon',
         path: '/elementIcon'
       },
+      // 轮播图管理
       {
         meta: {
           auth: ['admin', 'test'],
@@ -95,10 +113,10 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
               isHide: false,
               isKeepAlive: true,
               title: '轮播图',
-              index: '6'
+              index: '5-1'
             },
             name: 'index',
-            path: '/carousel/index'
+            path: '/carousel/carouseldx'
           },
         ]
       }

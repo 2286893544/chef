@@ -17,21 +17,30 @@ const router = createRouter({
       redirect: '/home',
       children: [
         { path: '/home', name: 'home', component: () => import('views/home/index.vue'), },
-        // { path: '/demo', name: 'demo', component: () => import('views/demo/index.vue'), },
+        // 活动管理
         {
           path: "/active", name: "active", component: () => import("views/active/index.vue"),
           children: [
-            {path: "info", name: "info", component: () => import("views/active/active.vue")}
+            { path: "info", name: "info", component: () => import("views/active/active.vue") }
           ]
         },
         { path: '/icon', name: 'icon', component: () => import('views/icon/index.vue'), },
         { path: '/elementIcon', name: 'elementIcon', component: () => import('views/elementIcon/index.vue'), },
+        // 轮播图管理
         {
           path: '/carousel', name: 'carousel', component: () => import('views/carousel/index.vue'),
           children: [
-            { path: 'index', name: "index", component: () => import('views/carousel/carousel.vue') },
+            { path: 'carouseldx', name: "carouseldx", component: () => import('views/carousel/carousel.vue') },
+          ]
+        },
+        // 职位管理
+        {
+          path: '/position', name: 'position', component: () => import('views/position/index.vue'),
+          children: [
+            { path: 'positionIdx', name: "positionIdx", component: () => import('views/position/position.vue') },
           ]
         }
+
       ]
     }
   ]

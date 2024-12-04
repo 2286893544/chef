@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { carouselModel, activityMsgModel } = require("../model/model")
+var { carouselModel, activityMsgModel, positionModel } = require("../model/model")
 var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
@@ -80,27 +80,19 @@ router.put("/updateCarousel/:_id", async (req, res) => {
   }
 })
 
-router.get('test', (req, res) => {
-  res.status(200).send({ code: 200, msg: "请求成功" })
-})
-
-router.get('test', (req, res) => {
-  res.status(200).send({ code: 200, msg: "请求成功" })
-})
-
-
 
 //添加活动信息
 router.post("/addactivityMsg", (req, res) => {
   console.log(req.body);
-  
+
   activityMsgModel.create(req.body)
   res.send({
     code: 200
   })
 })
+
 //获取所有活动信息
-router.get("/getactives", async(req, res) => {
+router.get("/getactives", async (req, res) => {
   let activityMsgs = await activityMsgModel.find()
   res.send({
     code: 200,
@@ -108,19 +100,88 @@ router.get("/getactives", async(req, res) => {
   })
 })
 //修改活动信息
-router.post("/updactive", async(req, res) => {
+router.post("/updactive", async (req, res) => {
   console.log(req.query);
   console.log(req.body);
-  await activityMsgModel.updateOne({_id: req.query.updid}, req.body)
+  await activityMsgModel.updateOne({ _id: req.query.updid }, req.body)
   res.send({
     code: 200
   })
 })
 //删除活动信息
-router.delete("/delactive", async(req, res) => {
-  await activityMsgModel.deleteOne({_id: req.query.delid})
+router.delete("/delactive", async (req, res) => {
+  await activityMsgModel.deleteOne({ _id: req.query.delid })
   res.send({
     code: 200
   })
 })
+
+// 添加职位
+router.post("/addPosition", async (req, res) => {
+  try {
+    await positionModel.create(req.body)
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "添加失败",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      msg: "添加成功"
+    })
+  }
+})
+
+// 获取所有职位信息
+router.get("/getPosition", async (req, res) => {
+  let page = req.query.page || 1
+  let pageSize = req.query.pageSize || 10
+  let data = await positionModel.find().skip((page - 1) * pageSize).limit(pageSize);
+  let total = await positionModel.find().countDocuments()
+  res.status(200).send({
+    code: 200,
+    data,
+    total
+  })
+})
+
+// 更新职位信息
+router.put("/updatePosition", async (req, res) => {
+  try {
+    await positionModel.updateOne({ _id: req.body._id }, req.body)
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "更新失败",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      msg: "更新成功"
+    })
+  }
+
+})
+
+// 删除职位信息
+router.delete("/delPosition", async (req, res) => {
+  try {
+    await positionModel.deleteOne({ _id: req.query.id })
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "删除失败",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      msg: "删除成功"
+    })
+  }
+})
+
 module.exports = router;

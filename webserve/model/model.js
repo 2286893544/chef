@@ -61,6 +61,43 @@ const positionSchema = new mongoose.Schema({
   }
 })
 const positionModel = mongoose.model("position", positionSchema, "position")
+//用户
+const userInfoSchema = new mongoose.Schema({
+  name: String,
+  cover: String,
+  isApply: {
+    type: Boolean,
+    default: false
+  },
+  vote: {
+    type: Number,
+    default: 0
+  },
+  mark: {
+  type: Number,
+  unique: true,
+  },
+  avtor: String,
+  age: Number,
+  gender: Boolean,
+  label: String,
+  jurisdictiom: Boolean,
+  voteNum: Number,
+  position: {
+  type: mongoose.Types.ObjectId,
+  ref: "position"
+  },
+  resumeText: String,
+  visitNum: {
+    type: Number,
+    default: 0
+  },
+  richText: String
+})
+const counterSchema = new mongoose.Schema({
+  _id: { type: String, required: true }, // 计数器名称
+  seq: { type: Number, default: 0 },     // 当前计数器的值
+});
 
 // 留言板
 const commentSchema   = new mongoose.Schema({
@@ -77,9 +114,26 @@ const commentSchema   = new mongoose.Schema({
     ref: 'user'
   },
 })
+const Counter = mongoose.model('Counter', counterSchema);
 
+userInfoSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    // 获取并更新计数器
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: 'mark' },          // 计数器名称
+      { $inc: { seq: 1 } },     // 自增计数器
+      { new: true, upsert: true } // 如果不存在则创建计数器
+    );
+
+    // 设置 mark 为新的计数器值
+    this.mark = counter.seq;
+  }
+  next();
+});
+const userInfoModel = mongoose.model("userInfo", userInfoSchema, "userInfo")
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
   positionModel,  //  职位
+  userInfoModel,//用户
 }

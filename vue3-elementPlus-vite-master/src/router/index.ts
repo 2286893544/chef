@@ -25,7 +25,7 @@ const router = createRouter({
           ]
         },
         { path: '/icon', name: 'icon', component: () => import('views/icon/index.vue'), },
-        { path: '/elementIcon', name: 'elementIcon', component: () => import('views/elementIcon/index.vue'), },
+        { path: '/athlete', name: 'athlete', component: () => import('views/elementIcon/index.vue'), },
         // 轮播图管理
         {
           path: '/carousel', name: 'carousel', component: () => import('views/carousel/index.vue'),

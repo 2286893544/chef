@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { carouselModel, activityMsgModel, positionModel } = require("../model/model")
+var { carouselModel, activityMsgModel, positionModel, userInfoModel } = require("../model/model")
 var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
@@ -183,5 +183,19 @@ router.delete("/delPosition", async (req, res) => {
     })
   }
 })
-
+//添加用户
+router.post("/adduser", (req, res) => {
+  userInfoModel.create(req.body)
+  res.send({
+    code: 200
+  })
+})
+//获取所有用户
+router.get("/getuser", async(req, res) => {
+  let users = await userInfoModel.find()
+  res.send({
+    code: 200,
+    users: users
+  })
+})
 module.exports = router;

@@ -83,11 +83,11 @@ const routesListModule: Module<RoutesListState, RootStateTypes> = {
           isAffix: false,
           isHide: false,
           isKeepAlive: true,
-          title: 'elementIcon',
+          title: '用户管理',
           index: '4'
         },
-        name: 'elementIcon',
-        path: '/elementIcon'
+        name: 'athlete',
+        path: '/athlete'
       },
       {
         meta: {

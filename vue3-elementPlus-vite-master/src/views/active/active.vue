@@ -17,6 +17,13 @@
         />
         <el-table-column prop="visitNum" label="访问总量" align="center" />
         <el-table-column prop="rule" label="活动规则" align="center" />
+        <el-table-column label="活动状态" align="center">
+          <template v-slot="scope">
+            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '未开始'" class="mx-1">未开始</el-text>
+            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '已结束'" class="mx-1" type="danger">已结束</el-text>
+            <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '进行中'" class="mx-1" type="success">进行中</el-text>
+          </template>
+        </el-table-column>
         <el-table-column label="开始时间" align="center">
           <template v-slot="scope">
             {{ getfullTime(scope.row.startTime) }}
@@ -122,6 +129,7 @@ import { ref, onMounted, reactive } from 'vue'
 import service from '@/utils/request'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 import dayjs from 'dayjs'
+
 //时间戳转化为事件
 const getfullTime = (date: Date) => {
   return dayjs(date).format('YYYY年MM月DD日 HH:mm:ss')
@@ -225,19 +233,17 @@ const resetForm = () => {
 }
 //添加
 const addactive = async() => {
-  let res = await service.post("/addactivityMsg", ruleForm)
+  let res: any = await service.post("/addactivityMsg", ruleForm)
   if (res.code == 200) {
     centerDialogVisible.value = false
     getactives()
   }
-  
-  
 }
 //修改
 const updactive = async() => {
   // console.log(updid.value);
   // console.log(ruleForm);
-  let res = await service.post(`/updactive?updid=${updid.value}`, ruleForm)
+  let res: any = await service.post(`/updactive?updid=${updid.value}`, ruleForm)
   if (res.code == 200) {
     updid.value = ''
     resetForm()
@@ -247,11 +253,25 @@ const updactive = async() => {
 }
 //删除
 const delact = async(id: any) => {
-  let res = await service.delete(`/delactive?delid=${id}`)
+  let res: any = await service.delete(`/delactive?delid=${id}`)
   if (res.code == 200) {
     getactives()
   }
 }
+//活动状态
+const checkActivityStatus = (startt: any,endt: any) => {
+      const currentTime = new Date(); // 当前时间
+      const start = new Date(startt); // 活动开始时间
+      const end = new Date(endt); // 活动结束时间
+
+      if (currentTime < start) {
+        return "未开始"; // 当前时间早于活动开始时间
+      } else if (currentTime > end) {
+        return "已结束"; // 当前时间晚于活动结束时间
+      } else {
+        return "进行中"; // 当前时间在活动的开始和结束之间
+      }
+    }
 onMounted(() => {
   getactives()
 })

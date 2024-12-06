@@ -47,6 +47,15 @@
       </div>
     </template>
   </el-dialog>
+
+  <!-- 分页 -->
+  <div class="demo-pagination-block">
+    <div>
+      <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+        :background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -144,6 +153,18 @@ function getData() {
   })
 }
 
+// 更改每页数量
+const handleSizeChange = (val: number) => {
+  pageSize.value = val
+  getData()
+}
+
+// 选择页数
+const handleCurrentChange = (val: number) => {
+  page.value = val
+  getData()
+}
+
 onMounted(() => {
   getData()
 })
@@ -174,5 +195,13 @@ function addClose() {
   width: 97%;
   margin: 0 auto;
   margin-top: 20px;
+}
+
+.demo-pagination-block {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 20px 0;
 }
 </style>

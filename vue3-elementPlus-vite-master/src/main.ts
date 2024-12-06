@@ -10,6 +10,8 @@ import mitt from 'mitt'
 
 import App from './App.vue'
 
+
+
 const app = createApp(App)
 
 setupRouter(app) // 引入路由

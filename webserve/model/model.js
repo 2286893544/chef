@@ -84,7 +84,7 @@ const userInfoSchema = new mongoose.Schema({
   jurisdictiom: Boolean,
   voteNum: Number,
   position: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "position"
   },
   resumeText: String,

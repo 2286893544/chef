@@ -1,38 +1,38 @@
 <template>
 	<div class="userInfoabo">
-	  <el-table :data="userls" style="width: 100%; margin-top: 20px">
-        <el-table-column prop="name" label="姓名" align="center" />
-		<el-table-column label="编号" align="center" >
-			<template v-slot="scope">
-				{{ scope.row.mark }}号
-			</template>
-		</el-table-column>
-		<el-table-column label="头像" align="center" >
-			<template v-slot="scope">
-				<img :src="scope.row.avtor" alt="图片路径错误" style="height: 50px" />
-			</template>
-		</el-table-column>
+		<el-table :data="userls" style="width: 100%; margin-top: 20px">
+			<el-table-column prop="name" label="姓名" align="center" />
+			<el-table-column label="编号" align="center">
+				<template v-slot="scope">
+					{{ scope.row.mark }}号
+				</template>
+			</el-table-column>
+			<el-table-column label="头像" align="center">
+				<template v-slot="scope">
+					<img :src="scope.row.avtor" alt="图片路径错误" style="height: 50px" />
+				</template>
+			</el-table-column>
 		<el-table-column label="职位" align="center" >
 			<template v-slot="scope">
 				{{ scope.row.position[0].jobTitle }}
 			</template>
 		</el-table-column>
-		<el-table-column prop="age" label="年龄" align="center" />
-		<el-table-column label="性别" align="center" >
-			<template v-slot="scope">
-				{{ scope.row.gender? '男' : '女' }}
-			</template>
-		</el-table-column>
-		<el-table-column prop="vote" label="票数" align="center" />
-		<el-table-column label="操作" width="240" align="center" >
-			<template v-slot="scope">
-				<el-button type="primary" @click="gorich(scope.row._id)">简介</el-button>
-				<el-button type="primary">留言板</el-button>
+			<el-table-column prop="age" label="年龄" align="center" />
+			<el-table-column label="性别" align="center">
+				<template v-slot="scope">
+					{{ scope.row.gender ? '男' : '女' }}
+				</template>
+			</el-table-column>
+			<el-table-column prop="vote" label="票数" align="center" />
+			<el-table-column label="操作" width="240" align="center">
+				<template v-slot="scope">
+					<el-button type="primary" @click="gorich(scope.row._id)">简介</el-button>
+					<el-button type="primary" @click="goComment(scope.row._id)">留言板</el-button>
 				<el-button type="danger">删除</el-button>
 				
-			</template>
-		</el-table-column>
-      </el-table>
+				</template>
+			</el-table-column>
+		</el-table>
 	  <div>
           <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
             :background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
@@ -66,6 +66,14 @@ const handleCurrentChange = (val: number) => {
   page.value = val
   getdusers()
 }
+
+
+
+
+function goComment(id: string) {
+	router.push(`/comment/${id}`)
+}
+
 //获取所有用户
 let userls = ref([])
 let getdusers = async() => {
@@ -80,7 +88,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.userInfoabo{
+.userInfoabo {
 	padding: 10px 20px;
 }
 </style>

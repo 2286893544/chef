@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "dayjs": "^1.11.13",
+    "echarts": "^5.5.1",
     "element-plus": "^1.0.2-beta.41",
     "mockjs": "^1.1.0",
     "vite-plugin-mock": "^2.5.0",

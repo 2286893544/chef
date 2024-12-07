@@ -42,6 +42,10 @@ const router = createRouter({
         },
         {
           path: "/riched/:id", name: "riched", component: () => import("views/riched/riched.vue")
+        },
+        // 留言板
+        {
+          path: "/comment/:id", name: "comment", component: () => import("views/comment/comment.vue"),
         }
 
       ]

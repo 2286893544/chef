@@ -12,6 +12,11 @@
 				<img :src="scope.row.avtor" alt="图片路径错误" style="height: 50px" />
 			</template>
 		</el-table-column>
+		<el-table-column label="职位" align="center" >
+			<template v-slot="scope">
+				{{ scope.row.position[0].jobTitle }}
+			</template>
+		</el-table-column>
 		<el-table-column prop="age" label="年龄" align="center" />
 		<el-table-column label="性别" align="center" >
 			<template v-slot="scope">
@@ -19,24 +24,54 @@
 			</template>
 		</el-table-column>
 		<el-table-column prop="vote" label="票数" align="center" />
-		<el-table-column label="操作" align="center" >
+		<el-table-column label="操作" width="240" align="center" >
 			<template v-slot="scope">
-				<el-button type="danger">删除</el-button>
+				<el-button type="primary" @click="gorich(scope.row._id)">简介</el-button>
 				<el-button type="primary">留言板</el-button>
+				<el-button type="danger">删除</el-button>
+				
 			</template>
 		</el-table-column>
       </el-table>
+	  <div>
+          <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+            :background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
+            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        </div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import service from '@/utils/request';
+import { useRouter } from 'vue-router';
+const router = useRouter()
+//
+let gorich = (id: any) => {
+	router.push(`/riched/${id}`,)
+}
+//分页
+let page = ref(1)
+let pageSize = ref(5)
+let total = ref(20)
+// 更改每页数量
+const handleSizeChange = (val: number) => {
+  pageSize.value = val
+  page.value = 1
+  getdusers()
+}
+
+// 选择页数
+const handleCurrentChange = (val: number) => {
+  page.value = val
+  getdusers()
+}
 //获取所有用户
 let userls = ref([])
 let getdusers = async() => {
-	let res: any = await service.get("/getuser")
+	let res: any = await service.get("/getuser", { params: { nowPage: page.value, pageSize: pageSize.value } })
 	userls.value = res.users
+	total.value = res.userstotal
 }
 //onMounted
 onMounted(() => {

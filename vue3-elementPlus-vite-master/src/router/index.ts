@@ -39,6 +39,9 @@ const router = createRouter({
           children: [
             { path: 'positionIdx', name: "positionIdx", component: () => import('views/position/position.vue') },
           ]
+        },
+        {
+          path: "/riched/:id", name: "riched", component: () => import("views/riched/riched.vue")
         }
 
       ]

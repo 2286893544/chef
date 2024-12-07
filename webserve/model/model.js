@@ -114,10 +114,21 @@ userInfoSchema.pre('save', async function(next) {
   }
   next();
 });
+//投票信息
+const voteSchema = new mongoose.Schema({
+  dovoter: String,//投票的用户
+  actvoter: String,//被投的选手
+  votetime: {
+    type: Date,
+    default: Date.now()
+  }
+})
+const voteModel = mongoose.model("vote", voteSchema, 'vote')
 const userInfoModel = mongoose.model("userInfo", userInfoSchema, "userInfo")
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
   positionModel,  //  职位
   userInfoModel,//用户
+  voteModel,//投票信息
 }

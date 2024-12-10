@@ -97,6 +97,7 @@
         </div>
       </template>
     </el-dialog>
+		<loading :loadState="loadState" />
 	</div>
 </template>
 
@@ -105,11 +106,12 @@ import { ref, onMounted, reactive } from 'vue'
 import service from '@/utils/request';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
+import loading from '@/components/loading.vue';
 
-
-const router = useRouter()
 const fileList = ref([])
 const ActionUrl = ref<String>('')
+const router = useRouter()
+const loadState = ref<boolean>(false)
 //
 let gorich = (id: any) => {
 	router.push(`/riched/${id._id}`,)
@@ -142,9 +144,11 @@ function goComment(id: string) {
 //获取所有用户
 let userls = ref([])
 let getdusers = async () => {
+	loadState.value = true
 	let res: any = await service.get("/getuser", { params: { nowPage: page.value, pageSize: pageSize.value } })
 	userls.value = res.users
 	total.value = res.userstotal
+	loadState.value = false
 }
 //控制对话框
 const centerDialogVisible = ref(false)

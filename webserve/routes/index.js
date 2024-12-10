@@ -269,8 +269,7 @@ router.get("/getuser", async (req, res) => {
 })
 //获取所有选手
 router.get("/getuserapply", async (req, res) => {
-  // let { nowPage, pageSize } = req.query
-  // let users = await userInfoModel.find().skip( ( nowPage - 1 ) * pageSize ).limit( pageSize )
+  let { nowPage, pageSize } = req.query
   let usersa = await userInfoModel.aggregate([
     {
       $match: { isApply: true }
@@ -283,12 +282,12 @@ router.get("/getuserapply", async (req, res) => {
         as: "position"
       }
     },
-    // {
-    //   $skip: ( nowPage - 1 ) * pageSize
-    // },
-    // {
-    //   $limit: Number(pageSize)
-    // }
+    {
+      $skip: ( nowPage - 1 ) * pageSize
+    },
+    {
+      $limit: Number(pageSize)
+    }
   ])
   let usersatotal = await userInfoModel.countDocuments()
   res.send({

@@ -65,6 +65,10 @@ const positionModel = mongoose.model("position", positionSchema, "position")
 //用户
 const userInfoSchema = new mongoose.Schema({
   name: String,
+  isCheck: {
+    type: Boolean,
+    default: false
+  },
   cover: String,
   isApply: {
     type: Boolean,

@@ -24,12 +24,12 @@
 				</template>
 			</el-table-column>
 			<el-table-column prop="vote" label="票数" align="center" />
-			<el-table-column label="操作" width="240" align="center">
+			<el-table-column label="操作" width="330" align="center">
 				<template v-slot="scope">
 					<el-button type="primary" @click="gorich(scope.row)">简介</el-button>
 					<el-button type="primary" @click="goComment(scope.row._id)">留言板</el-button>
 					<el-button type="danger">删除</el-button>
-
+					<el-button type="primary" size="small">编辑</el-button>
 				</template>
 			</el-table-column>
 		</el-table>

@@ -45,6 +45,19 @@ const routesListModule: Module<RoutesListState, RootStateTypes> = {
             name: 'info',
             path: '/active/info'
           },
+          {
+            meta: {
+              auth: ['admin', 'test'],
+              icon: 'iconfont el-icon-menu',
+              isAffix: true,
+              isHide: false,
+              isKeepAlive: true,
+              title: '活动说明',
+              index: '2-2'
+            },
+            name: 'acspk',
+            path: '/active/acspk'
+          },
         ]
       },
       // 职位管理
@@ -116,7 +129,8 @@ const routesListModule: Module<RoutesListState, RootStateTypes> = {
             path: '/carousel/carouseldx'
           },
         ]
-      }
+      },
+      
     ],
   },
   mutations: {

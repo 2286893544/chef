@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel } = require("../model/model")
+var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel } = require("../model/model")
 var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
@@ -553,5 +553,27 @@ router.put('/changeRichText', async (req, res) => {
     })
   }
 })
-
+//添加活动说明
+router.post("/addacspackimg", (req, res) => {
+  acspeakModel.create(req.body)
+  res.send({
+    code: 200
+  })
+})
+//获取所有活动说明图片
+router.get("/getacspimgs", async(req, res) => {
+  let asimgs = await acspeakModel.find()
+  res.send({
+    code: 200,
+    asimgs
+  })
+})
+//删除说明活动图片
+router.delete("/delacspk", async(req, res) => {
+  let { did } = req.query
+  await acspeakModel.deleteOne({_id: did})
+  res.send({
+    code: 200
+  })
+})
 module.exports = router;

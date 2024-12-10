@@ -180,7 +180,11 @@ const voteSchema = new mongoose.Schema({
 })
 const voteModel = mongoose.model("vote", voteSchema, 'vote')
 const userInfoModel = mongoose.model("userInfo", userInfoSchema, "userInfo")
-
+//活动说明页
+const acspeakSchema = new mongoose.Schema({
+  imgsrc: String
+})
+const acspeakModel = mongoose.model("acspeak", acspeakSchema, 'acspeak')
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
@@ -188,4 +192,5 @@ module.exports = {
   userInfoModel,//用户
   voteModel,//投票信息
   commentModel,//留言板
+  acspeakModel,//活动说明页
 }

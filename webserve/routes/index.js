@@ -602,8 +602,8 @@ router.delete("/delacspk", async (req, res) => {
 })
 //改变选手的选中和非选中状态
 router.post("/cgeuchk", async(req, res) => {
-  let { auid } = req.body
-  await userInfoModel.updateOne({_id: auid}, { isCheck: !isCheck })
+  let { auid, chkstatus } = req.body
+  await userInfoModel.updateOne({_id: auid}, { isCheck: chkstatus })
   res.send({
     code: 200
   })
@@ -616,4 +616,9 @@ router.post("/cgeuchks", async(req, res) => {
     code: 200
   })
 })
+//获取全部的票数
+//获取某个选手的总票数
+//修改选手的个人票数
+
+
 module.exports = router;

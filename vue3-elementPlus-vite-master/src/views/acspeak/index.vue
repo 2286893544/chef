@@ -39,7 +39,7 @@ const ActionUrl = ref<String>('')
 
 // 删除
 const handleClose = (id: string) => {
-  ElMessageBox.confirm('您确定要删除该轮播图吗？', '提示', {
+  ElMessageBox.confirm('您确定要删除该图片吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',

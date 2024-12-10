@@ -9,6 +9,7 @@
       <!-- 表格 -->
       <el-table :data="activels" style="width: 100%; margin-top: 20px">
         <el-table-column prop="title" label="活动标题" align="center" />
+        <el-table-column prop="announcement" label="活动公告" align="center" />
         <el-table-column prop="joinNum" label="参赛人数" align="center" />
         <el-table-column prop="accumulatedNum" label="累计票数" align="center" />
         <el-table-column prop="visitNum" label="访问总量" align="center" />
@@ -56,6 +57,9 @@
         </el-form-item>
         <el-form-item label="累计访问量" prop="visitNum">
           <el-input v-model.number="ruleForm.visitNum" placeholder="请输入累计访问量"></el-input>
+        </el-form-item>
+        <el-form-item label="活动公告" prop="visitNum">
+          <el-input v-model.number="ruleForm.announcement" placeholder="请输入活动公告"></el-input>
         </el-form-item>
         <el-form-item label="开始时间" prop="startTime">
           <el-date-picker v-model="ruleForm.startTime" type="datetime" placeholder="请选择开始时间" />
@@ -117,6 +121,7 @@ const setdialogvisiblew = (status: String, data: any) => {
     ruleForm.joinNum = data.joinNum
     ruleForm.accumulatedNum = data.accumulatedNum
     ruleForm.visitNum = data.visitNum
+    ruleForm.announcement = data.announcement
     ruleForm.startTime = data.startTime
     ruleForm.endTime = data.endTime
     ruleForm.rule = data.rule
@@ -131,6 +136,7 @@ interface RuleForm {
   startTime: String
   endTime: String
   rule: String
+  announcement: String
 }
 
 const formSize = ref('default')
@@ -142,7 +148,8 @@ let ruleForm = reactive<RuleForm>({
   visitNum: 0,
   startTime: '',
   endTime: '',
-  rule: ''
+  rule: '',
+  announcement: ''
 })
 
 const rules = reactive({
@@ -157,6 +164,9 @@ const rules = reactive({
   ],
   visitNum: [
     { required: true, message: "请输入累计访问量", trigger: 'blur' }
+  ],
+  announcement: [
+  { required: true, message: "请输入活动公告", trigger: 'blur' }
   ],
   startTime: [
     { required: true, message: "请选择开始时间", trigger: 'blur' }

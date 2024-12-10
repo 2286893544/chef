@@ -12,7 +12,7 @@
         <el-table-column prop="_id" label="id" align="center" />
         <el-table-column label="图片" align="center">
           <template v-slot="scope">
-            <img :src="scope.row.imgPath" alt="图片路径错误" style="height: 50px" />
+            <img :src="scope.row.imgsrc" alt="图片路径错误" style="height: 50px" />
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">

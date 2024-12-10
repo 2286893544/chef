@@ -38,7 +38,8 @@ const activityMsgSchema = new mongoose.Schema({
   visitNum: Number,
   startTime: Date,
   endTime: Date,
-  rule: String
+  rule: String,
+  announcement: String
 })
 const activityMsgModel = mongoose.model("activityMsg", activityMsgSchema, "activityMsg")
 

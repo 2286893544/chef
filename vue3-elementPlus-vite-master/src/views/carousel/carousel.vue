@@ -162,6 +162,9 @@ const delCarousel = (id: string) => {
     if (res.code === 200) {
       ElMessage.success('删除成功')
       getCarousel()
+    } else {
+      ElMessage.error('删除失败')
+      console.log(res.err)
     }
   })
 }

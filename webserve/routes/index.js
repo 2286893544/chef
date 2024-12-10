@@ -46,7 +46,7 @@ router.post("/uploadr", (req, res) => {
         code: 200,
         errno: 0,
         data: {
-          url: `http://localhost:6624/${imgpath}`
+          url: `http://1.92.114.25:6624/${imgpath}`
         }
       })
     }
@@ -76,17 +76,41 @@ router.get("/getCarousel", async (req, res) => {
 
 // 删除轮播图
 router.delete("/delCarousel/:_id", async (req, res) => {
-  let data = await carouselModel.findOne({ _id: req.params._id })
-  const filePath = path.join(__dirname, '../upload', path.basename(data.imgPath.split("\\")[1]));
-  await fs.unlink(filePath, async (err) => {
-    if (err) {
-      console.log(err)
-      return res.status(500).send({ message: 'File deletion failed', error: err.message });
+  try {
+    // 查询数据
+    const data = await carouselModel.findOne({ _id: req.params._id });
+
+    // 检查数据是否存在
+    if (!data) {
+      return res.status(404).send({ code: 404, msg: "数据未找到" });
     }
-    await carouselModel.deleteOne({ _id: req.params._id })
-    res.status(200).send({ code: 200, msg: "删除成功", data })
-  });
-})
+
+    // 检查 imgPath 是否存在
+    if (!data.imgPath) {
+      return res.status(400).send({ code: 400, msg: "图片路径不存在" });
+    }
+
+    // 解析文件路径
+    const imgFileName = path.basename(data.imgPath); // 获取文件名
+    const filePath = path.join(__dirname, '../upload', imgFileName);
+
+    // 删除文件
+    fs.unlink(filePath, async (err) => {
+      if (err) {
+        console.error("文件删除失败:", err);
+        return res.status(500).send({ message: '文件删除失败', error: err.message });
+      }
+
+      // 删除数据库记录
+      await carouselModel.deleteOne({ _id: req.params._id });
+      res.status(200).send({ code: 200, msg: "删除成功", data });
+    });
+  } catch (error) {
+    console.error("删除轮播图时发生错误:", error);
+    res.status(500).send({ code: 500, msg: "服务器错误", error: error.message });
+  }
+});
+
 
 // 更改轮播图状态
 router.put("/updateCarousel/:_id", async (req, res) => {
@@ -561,7 +585,7 @@ router.post("/addacspackimg", (req, res) => {
   })
 })
 //获取所有活动说明图片
-router.get("/getacspimgs", async(req, res) => {
+router.get("/getacspimgs", async (req, res) => {
   let asimgs = await acspeakModel.find()
   res.send({
     code: 200,
@@ -569,9 +593,9 @@ router.get("/getacspimgs", async(req, res) => {
   })
 })
 //删除说明活动图片
-router.delete("/delacspk", async(req, res) => {
+router.delete("/delacspk", async (req, res) => {
   let { did } = req.query
-  await acspeakModel.deleteOne({_id: did})
+  await acspeakModel.deleteOne({ _id: did })
   res.send({
     code: 200
   })

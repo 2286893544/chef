@@ -551,7 +551,7 @@ router.post('/udvote', async (req, res) => {
     console.log(votesToInsert);
 
     await voteModel.insertMany(votesToInsert);
-
+    await userInfoModel.updateMany({_id: { $in: candidate_ids }}, { isCheck: false })
     return res.status(200).json({ message: '投票成功' });
   } catch (err) {
     console.error(err);
@@ -596,6 +596,22 @@ router.get("/getacspimgs", async (req, res) => {
 router.delete("/delacspk", async (req, res) => {
   let { did } = req.query
   await acspeakModel.deleteOne({ _id: did })
+  res.send({
+    code: 200
+  })
+})
+//改变选手的选中和非选中状态
+router.post("/cgeuchk", async(req, res) => {
+  let { auid } = req.body
+  await userInfoModel.updateOne({_id: auid}, { isCheck: !isCheck })
+  res.send({
+    code: 200
+  })
+})
+//取消所有选中选手
+router.post("/cgeuchks", async(req, res) => {
+  let { auids } = req.body
+  await userInfoModel.updateMany({_id: { $in: auids }}, { isCheck: false })
   res.send({
     code: 200
   })

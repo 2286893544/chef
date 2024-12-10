@@ -2,6 +2,7 @@
   "name": "Vue3-ElementPlus-Vite2",
   "version": "0.0.0",
   "scripts": {
+    "start": "vite --mode production",
     "dev": "vite --mode development",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview"
@@ -12,6 +13,7 @@
     "echarts": "^5.5.1",
     "element-plus": "^1.0.2-beta.41",
     "mockjs": "^1.1.0",
+    "quill": "^2.0.3",
     "vite-plugin-mock": "^2.5.0",
     "vue": "^3.0.5",
     "vue-router": "^4.0.6",

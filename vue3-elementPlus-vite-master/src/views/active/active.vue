@@ -87,7 +87,6 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import service from '@/utils/request'
-import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 import dayjs from 'dayjs'
 
 //时间戳转化为事件
@@ -134,8 +133,8 @@ interface RuleForm {
   rule: String
 }
 
-const formSize = ref<ComponentSize>('default')
-const ruleFormRef = ref<FormInstance>()
+const formSize = ref('default')
+const ruleFormRef = ref()
 let ruleForm = reactive<RuleForm>({
   title: '',
   joinNum: 0,
@@ -146,7 +145,7 @@ let ruleForm = reactive<RuleForm>({
   rule: ''
 })
 
-const rules = reactive<FormRules<RuleForm>>({
+const rules = reactive({
   title: [
     { required: true, message: "请输入活动名称", trigger: 'blur' }
   ],

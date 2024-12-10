@@ -230,7 +230,7 @@ router.get("/getuser", async (req, res) => {
       }
     },
     {
-      $skip: ( nowPage - 1 ) * pageSize
+      $skip: (nowPage - 1) * pageSize
     },
     {
       $limit: Number(pageSize)
@@ -244,7 +244,7 @@ router.get("/getuser", async (req, res) => {
   })
 })
 //获取所有选手
-router.get("/getuserapply", async(req, res) => {
+router.get("/getuserapply", async (req, res) => {
   // let { nowPage, pageSize } = req.query
   // let users = await userInfoModel.find().skip( ( nowPage - 1 ) * pageSize ).limit( pageSize )
   let usersa = await userInfoModel.aggregate([
@@ -295,8 +295,6 @@ router.post("/addComment", async (req, res) => {
     })
   }
 })
-
-
 // 获取留言信息
 router.get("/getComment", async (req, res) => {
   const { cid, page, pageSize } = req.query
@@ -320,7 +318,6 @@ router.get("/getComment", async (req, res) => {
     })
   }
 })
-
 // 更改审核状态
 router.put("/updateComment", async (req, res) => {
 
@@ -345,7 +342,6 @@ router.put("/updateComment", async (req, res) => {
     })
   }
 })
-
 // 删除留言
 router.delete("/delComment", async (req, res) => {
   try {
@@ -453,10 +449,10 @@ router.get("/getDetail", async (req, res) => {
     // 将一级数据添加到 data_things
     data_things.push(data_list);
 
-    // 生成职位类型数据（只取每个职位的前20条数据）
+    // 生成职位类型数据（只取每个职位的前10条数据）
     Object.values(jobTypeData).forEach(({ children }) => {
       // 只取前20条数据
-      const limitedChildren = children.slice(0, 20);
+      const limitedChildren = children.slice(0, 10);
       if (limitedChildren.length > 0) {
         data_things.push(limitedChildren);
       }
@@ -480,9 +476,9 @@ router.get("/getDetail", async (req, res) => {
 
 //投票接口
 router.post('/udvote', async (req, res) => {
-  const { voter_id, candidate_ids ,vtime } = req.body;
+  const { voter_id, candidate_ids, vtime } = req.body;
   console.log(voter_id, candidate_ids, candidate_ids.length);
-  
+
   // 步骤 1: 验证 candidate_ids 数组的长度，确保最多包含两个候选人 ID
   if (!Array.isArray(candidate_ids) || candidate_ids.length === 0 || candidate_ids.length > 2) {
     return res.status(400).json({ message: '至少投一个' });
@@ -529,7 +525,7 @@ router.post('/udvote', async (req, res) => {
     ]);
     console.log(voteCounts);
     console.log(votesToInsert);
-    
+
     await voteModel.insertMany(votesToInsert);
 
     return res.status(200).json({ message: '投票成功' });
@@ -538,5 +534,24 @@ router.post('/udvote', async (req, res) => {
     return res.status(500).json({ message: '错误' });
   }
 });
+
+router.put('/changeRichText', async (req, res) => {
+  let { id, content } = req.body;
+  console.log(content)
+  try {
+    await userInfoModel.updateOne({ _id: id }, { richText: content });
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "修改失败",
+      err
+    })
+  } finally {
+    res.send({
+      code: 200,
+      msg: "修改成功"
+    })
+  }
+})
 
 module.exports = router;

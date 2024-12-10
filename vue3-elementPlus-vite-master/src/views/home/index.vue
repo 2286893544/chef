@@ -15,12 +15,9 @@
       </div>
     </div>
 
-    <div
-      style="width: 98%; height: 100%; margin: 0 auto;margin-top: 50px;  display: flex;justify-content: space-around;align-items: center;">
-      <div ref="ageChart"
-        style="width: 50%; height: 350px;display: flex;justify-content: space-around;align-items: center;"></div>
-      <div ref="jobChart"
-        style="width: 50%; height: 350px;display: flex;justify-content: space-around;align-items: center;"></div>
+    <div class="chart-container">
+      <div ref="ageChart" class="chart"></div>
+      <div ref="jobChart" class="chart"></div>
     </div>
   </div>
 </template>
@@ -237,42 +234,111 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="less">
+
+<style lang="less" scoped>
 .actives-data {
   width: 80%;
-  height: 100px;
+  height: auto;
   margin: 0 auto;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin: 20px 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
 
   .actives-data-div {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    text-align: center;
 
     p {
       width: 100%;
-      text-align: center;
     }
 
     p:nth-child(1) {
-      font-size: 20px;
-      margin-bottom: 10px;
+      font-size: 18px;
+      margin-bottom: 8px;
     }
 
     p:nth-child(2) {
-      font-size: 30px;
+      font-size: 28px;
       color: red;
       font-family: electronicFont;
       font-weight: bold;
     }
+  }
+}
 
-    p:nth-child(2):hover {
-      color: rgb(39, 167, 218);
-      cursor: pointer;
+.chart-container {
+  width: 98%;
+  margin: 0 auto;
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  /* 允许在小屏幕下换行 */
+  justify-content: space-around;
+  align-items: center;
+
+  .chart {
+    width: 45%;
+    height: 350px;
+    margin-bottom: 20px;
+  }
+}
+
+/* 平板及以下设备 */
+@media (max-width: 768px) {
+  .actives-data {
+    width: 95%;
+  }
+
+  .actives-data-div p:nth-child(1) {
+    font-size: 16px;
+  }
+
+  .actives-data-div p:nth-child(2) {
+    font-size: 22px;
+  }
+
+  .chart-container {
+    width: 100%;
+    flex-direction: column;
+
+    .chart {
+      width: 80%;
+      /* 占满父容器 */
+      height: 300px;
+    }
+  }
+}
+
+/* 小屏设备（如手机，max-width: 480px） */
+@media (max-width: 480px) {
+  .actives-data {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .actives-data-div p:nth-child(1) {
+    font-size: 12px;
+    /* 标题字体再缩小，适配小屏 */
+  }
+
+  .actives-data-div p:nth-child(2) {
+    font-size: 16px;
+    /* 数据字体再调整 */
+  }
+
+  .chart-container {
+    margin-top: 15px;
+    flex-direction: column;
+
+    .chart {
+      width: 90%;
+      margin: 0 auto;
+      height: 250px;
     }
   }
 }

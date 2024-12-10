@@ -2,7 +2,7 @@
   <div class="carousel">
     <div class="carousel-top">
       <!-- 上传图片 -->
-      <el-upload class="upload-demo" action="http://127.0.0.1:6624/upload" :multiple="true" :on-success="handlePreview"
+      <el-upload class="upload-demo" :action="ActionUrl + '/upload'" :multiple="true" :on-success="handlePreview"
         :on-error="handleError" :limit="7" :on-exceed="handleExceed" :show-file-list="false" accept=".jpg,.png,.jpeg"
         :before-upload="beforeUpload">
         <el-button type="primary">上传图片</el-button>
@@ -56,6 +56,7 @@ import { ref, onMounted } from 'vue'
 import service from '@/utils/request';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
+
 // 定义轮播图的类型
 interface CarouselItem {
   id: number;
@@ -67,6 +68,7 @@ const page = ref(1)
 const pageSize = ref(5)
 const carouselList = ref<CarouselItem[]>()
 const total = ref<number>(0)
+const ActionUrl = ref<String>('')
 
 
 // 删除
@@ -94,6 +96,7 @@ const getCarousel = () => {
 
 onMounted(() => {
   getCarousel()
+  ActionUrl.value = import.meta.env.VITE_GLOB_API_URL
 })
 
 // 上传成功时

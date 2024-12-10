@@ -181,4 +181,59 @@ router.get("/getComment", async (req, res) => {
 })
 
 
+// 用户详情信息
+router.get('/getUserDetail', async (req, res) => {
+  let data;
+  let UserData; // 用户信息
+  let UserRank; // 用户排名
+  let UserVote; // 距离前一名用户票数
+  let { id } = req.query
+  try {
+    data = await userInfoModel.find().sort({ vote: -1 })
+    UserIdx = data.findIndex(item => item._id == id)
+    UserData = data[UserIdx]
+    UserRank = UserIdx + 1
+    UserVote = data[UserIdx - 1] ? data[UserIdx - 1].vote - data[UserIdx].vote : 0
+  } catch (err) {
+    res.json({
+      code: 500,
+      msg: "服务器错误",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      msg: "成功",
+      UserData,
+      UserRank,
+      UserVote
+    })
+  }
+})
+
+// 用户留言版信息
+router.get('/getComments', async (req, res) => {
+  let data;
+  let total;
+  let { cid = '', page = 1, pagesize = 6 } = req.query
+  try {
+    data = await commentModel.find({ cid }).skip((page - 1) * pagesize).limit(pagesize)
+    total = await commentModel.find({ cid }).countDocuments()
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "服务器错误",
+      err
+    })
+  } finally {
+    res.status(200).send({
+      code: 200,
+      msg: "成功",
+      data,
+      total
+    })
+  }
+})
+
+
 module.exports = router;

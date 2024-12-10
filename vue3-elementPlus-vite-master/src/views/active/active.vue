@@ -85,6 +85,8 @@
         </div>
       </template>
     </el-dialog>
+
+    <loading :loadState="loadState" />
   </div>
 </template>
 
@@ -92,18 +94,22 @@
 import { ref, onMounted, reactive } from 'vue'
 import service from '@/utils/request'
 import dayjs from 'dayjs'
+import loading from '@/components/loading.vue'
 
 //时间戳转化为事件
 const getfullTime = (date: Date) => {
   return dayjs(date).format('YYYY年MM月DD日 HH:mm:ss')
 }
 
+const loadState = ref<boolean>(false)
+
 //获取所有活动
 let activels = ref([])
 const getactives = async () => {
+  loadState.value = true
   let res: any = await service.get('/getactives')
-  console.log(res)
   activels.value = res.activityMsgs
+  loadState.value = false
 }
 //控制对话框
 const centerDialogVisible = ref(false)

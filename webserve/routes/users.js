@@ -189,9 +189,13 @@ router.get('/getUserDetail', async (req, res) => {
   let UserVote; // 距离前一名用户票数
   let { id } = req.query
   try {
-    data = await userInfoModel.find().sort({ vote: -1 })
+    data = await userInfoModel.find().sort({ vote: -1 }).lean()
     UserIdx = data.findIndex(item => item._id == id)
     UserData = data[UserIdx]
+    let jobTitle = await positionModel.findOne({ _id: UserData.position })
+    console.log(jobTitle)
+    UserData.position = jobTitle.jobTitle
+    console.log(UserData.position)
     UserRank = UserIdx + 1
     UserVote = data[UserIdx - 1] ? data[UserIdx - 1].vote - data[UserIdx].vote : 0
   } catch (err) {

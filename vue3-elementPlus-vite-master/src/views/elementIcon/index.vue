@@ -38,6 +38,8 @@
 				:background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
 				@size-change="handleSizeChange" @current-change="handleCurrentChange" />
 		</div>
+
+		<loading :loadState="loadState" />
 	</div>
 </template>
 
@@ -45,7 +47,9 @@
 import { ref, onMounted } from 'vue'
 import service from '@/utils/request';
 import { useRouter } from 'vue-router';
+import loading from '@/components/loading.vue';
 const router = useRouter()
+const loadState = ref<boolean>(false)
 //
 let gorich = (id: any) => {
 	router.push(`/riched/${id._id}`,)
@@ -78,9 +82,11 @@ function goComment(id: string) {
 //获取所有用户
 let userls = ref([])
 let getdusers = async () => {
+	loadState.value = true
 	let res: any = await service.get("/getuser", { params: { nowPage: page.value, pageSize: pageSize.value } })
 	userls.value = res.users
 	total.value = res.userstotal
+	loadState.value = false
 }
 //onMounted
 onMounted(() => {

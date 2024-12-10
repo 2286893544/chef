@@ -1,6 +1,8 @@
 <template>
   <div class="carousel">
     <div class="carousel-top">
+      <div style="background-color: black; color: white;">
+      </div>
       <!-- 上传图片 -->
       <el-upload class="upload-demo" :action="ActionUrl + '/upload'" :multiple="true" :on-success="handlePreview"
         :on-error="handleError" :limit="7" :on-exceed="handleExceed" :show-file-list="false" accept=".jpg,.png,.jpeg"
@@ -48,6 +50,9 @@
       </div>
 
     </div>
+
+    <loading :loadState="loadState"  />
+
   </div>
 </template>
 
@@ -55,6 +60,7 @@
 import { ref, onMounted } from 'vue'
 import service from '@/utils/request';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import loading from '@/components/loading.vue';
 
 
 // 定义轮播图的类型
@@ -68,7 +74,8 @@ const page = ref(1)
 const pageSize = ref(5)
 const carouselList = ref<CarouselItem[]>()
 const total = ref<number>(0)
-const ActionUrl = ref<String>('')
+const ActionUrl = ref<string>('')
+const loadState = ref<boolean>(false)
 
 
 // 删除
@@ -88,9 +95,11 @@ const handleClose = (id: string) => {
 
 // 获取轮播图数据
 const getCarousel = () => {
+  loadState.value = true
   service.get(`/getCarousel`, { params: { page: page.value, pageSize: pageSize.value } }).then((res: any) => {
     carouselList.value = res.data
     total.value = res.total
+    loadState.value = false
   })
 }
 

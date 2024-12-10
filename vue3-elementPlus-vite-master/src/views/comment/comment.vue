@@ -42,6 +42,8 @@
       </div>
     </div>
 
+    <loading :loadState="loadState" />
+
   </div>
 </template>
 
@@ -50,6 +52,7 @@ import service from '@/utils/request';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
+import loading from '@/components/loading.vue';
 
 type commentType = {
   _id: String,
@@ -68,19 +71,23 @@ const page = ref<number>(1)
 const pageSize = ref<number>(3)
 const total = ref<number>(0)
 const router = useRouter()
+const loadState = ref<boolean>(false)
 
 function goBack() {
   router.back()
 }
 
 function getComment() {
+  loadState.value = true
   service.get(`/getComment`, { params: { cid, page: page.value, pageSize: pageSize.value } }).then((res: any) => {
     if (res.code === 200) {
       comment.value = res.data
       total.value = res.total
+      loadState.value = false
     } else {
       ElMessage.error(res.msg)
       console.log(res.err)
+      loadState.value = false
     }
   })
 }

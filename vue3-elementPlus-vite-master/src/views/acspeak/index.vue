@@ -22,6 +22,8 @@
         </el-table-column>
       </el-table>
     </div>
+
+    <loading :loadState="loadState" />
   </div>
 </template>
 
@@ -29,11 +31,13 @@
 import { ref, onMounted } from 'vue'
 import service from '@/utils/request';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import loading from '@/components/loading.vue';
 
 
 
 const acspklList = ref([])
-const ActionUrl = ref<String>('')
+const ActionUrl = ref<string>('')
+const loadState = ref<boolean>(false)
 
 
 
@@ -54,8 +58,10 @@ const handleClose = (id: string) => {
 
 // 获取轮播图数据
 const getacspk = () => {
+  loadState.value = true
   service.get(`/getacspimgs`).then((res: any) => {
     acspklList.value = res.asimgs
+    loadState.value = false
   })
 }
 

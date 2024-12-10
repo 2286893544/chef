@@ -19,6 +19,8 @@
       <div ref="ageChart" class="chart"></div>
       <div ref="jobChart" class="chart"></div>
     </div>
+
+    <loading :loadState="loadState" />
   </div>
 </template>
 
@@ -27,6 +29,7 @@
 import service from '@/utils/request';
 import * as echarts from 'echarts'
 import { ref, onMounted, reactive } from 'vue'
+import loading from '@/components/loading.vue';
 
 
 type activityMsgType = {
@@ -51,8 +54,8 @@ const activesData = ref<activityMsgType>({
 })
 const jobDistributionNum = ref([])
 let jobList = reactive([])
-const lookState = ref<String>("")
-const loadState = ref<Boolean>(false)
+const lookState = ref<string>("")
+const loadState = ref<boolean>(false)
 
 // 使用ref来引用DOM元素
 const ageChart = ref<HTMLDivElement | null>(null)
@@ -60,6 +63,7 @@ const jobChart = ref<HTMLDivElement | null>(null)
 
 
 function getactives() {
+
   service.get("/getactives").then((res: any) => {
     activesData.value = res.activityMsgs[0]
   })
@@ -228,9 +232,12 @@ function jobChartinit() {
 }
 
 onMounted(() => {
-  getactives()
-  getuser()
-  getDetail()
+  loadState.value = true
+  Promise.all([getactives(), getuser(), getDetail()]).then(() => {
+    loadState.value = false
+  }).catch(() => {
+    loadState.value = true
+  })
 })
 </script>
 

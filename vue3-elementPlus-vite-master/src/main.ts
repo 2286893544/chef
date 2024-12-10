@@ -6,6 +6,7 @@ import 'virtual:svg-icons-register' // Register icon sprite
 
 import './styles/index.scss'
 
+
 import mitt from 'mitt'
 
 import App from './App.vue'

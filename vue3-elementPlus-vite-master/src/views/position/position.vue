@@ -16,6 +16,9 @@
         </template>
       </el-table-column>
     </el-table>
+
+
+    <loading :loadState="loadState" />
   </div>
 
   <!-- 弹出框-添加 -->
@@ -62,6 +65,7 @@
 import service from '@/utils/request';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { onMounted, ref } from 'vue';
+import loading from '@/components/loading.vue';
 
 // 数据类型
 type posData = {
@@ -78,6 +82,7 @@ const page = ref<number>(1)
 const pageSize = ref<number>(5)
 const total = ref<number>(0)
 const editData = ref({ _id: "", jobTitle: "" })
+const loadState = ref<boolean>(false)
 
 // 删除消息确认框
 const open = (id: string) => {
@@ -143,12 +148,15 @@ function editDataAdd() {
 
 // 获取数据
 function getData() {
+  loadState.value = true
   service.get("/getPosition", { params: { page: page.value, pageSize: pageSize.value } }).then((res: any) => {
     if (res.code == 200) {
       tableData.value = res.data
       total.value = res.total
+      loadState.value = false
     } else {
       ElMessage.error("获取数据失败")
+      loadState.value = false
     }
   })
 }

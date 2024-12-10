@@ -21,7 +21,9 @@ const router = createRouter({
         {
           path: "/active", name: "active", component: () => import("views/active/index.vue"),
           children: [
-            { path: "info", name: "info", component: () => import("views/active/active.vue") }
+            { path: "info", name: "info", component: () => import("views/active/active.vue") },
+            //活动说明图片
+            { path: 'acspk', name: 'acspk', component: () => import('views/acspeak/index.vue'), },
           ]
         },
         { path: '/icon', name: 'icon', component: () => import('views/icon/index.vue'), },

@@ -34,10 +34,10 @@
             {{ getfullTime(scope.row.endTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" width="150px">
           <template v-slot="scope">
-            <el-button type="danger" size="small" @click="delact(scope.row._id)">删除</el-button>
             <el-button type="primary" size="small" @click="setdialogvisiblew('upd', scope.row)">编辑</el-button>
+            <el-button type="danger" size="small" @click="delact(scope.row._id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -166,7 +166,7 @@ const rules = reactive({
     { required: true, message: "请输入累计访问量", trigger: 'blur' }
   ],
   announcement: [
-  { required: true, message: "请输入活动公告", trigger: 'blur' }
+    { required: true, message: "请输入活动公告", trigger: 'blur' }
   ],
   startTime: [
     { required: true, message: "请选择开始时间", trigger: 'blur' }

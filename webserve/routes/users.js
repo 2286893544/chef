@@ -14,14 +14,34 @@ router.get('/getRank', async (req, res) => {
   let { position = '', page = 1, pagesize = 5 } = req.query
   try {
     if (position !== '') {
-      data = await userInfoModel.find({ position: position }).sort({ score: -1 }).skip((page - 1) * pagesize).limit(pagesize)
+      data = await userInfoModel.find({ position: position }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize)
     } else {
-      data = await userInfoModel.find().sort({ score: -1 }).skip((page - 1) * pagesize).limit(pagesize)
+      data = await userInfoModel.find().sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize)
     }
   } catch (err) {
     res.json({
       code: 500,
       msg: "服务器错误"
+    })
+  } finally {
+    res.json({
+      code: 200,
+      msg: "成功",
+      data
+    })
+  }
+})
+
+// 获取前三名
+router.get('/getThree', async (req, res) => {
+  let data;
+  try {
+    data = await userInfoModel.find().sort({ vote: -1 }).limit(3)
+  } catch (err) {
+    res.json({
+      code: 500,
+      msg: "服务器错误",
+      err
     })
   } finally {
     res.json({
@@ -239,5 +259,24 @@ router.get('/getComments', async (req, res) => {
   }
 })
 
+// 更新 - 界面访问量
+router.put('/addVisit', async (req, res) => {
+  let data;
+  try {
+    data = await visitModel.findOneAndUpdate({}, { $inc: { visit: 1 } }, { new: true })
+  } catch (err) {
+    res.json({
+      code: 500,
+      msg: "服务器错误",
+      err
+    })
+  } finally {
+    res.json({
+      code: 200,
+      msg: "成功",
+      data
+    })
+  }
+})
 
 module.exports = router;

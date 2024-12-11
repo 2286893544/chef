@@ -172,12 +172,12 @@ const setdialogvisiblew = (status: String, data: any) => {
 }
 //表单
 interface RuleForm {
-  name: String,
-  cover: String,
-  age: Number,
-  gender: Boolean,
-  label: String,
-  position: String,
+  name: string,
+  cover: string,
+  age: number,
+  gender: boolean,
+  label: string,
+  position: string,
 
 }
 
@@ -263,7 +263,7 @@ const handleError = (err: any) => {
 }
 
 //获取所有职位
-let positionls = ref([])
+let positionls = ref<any>([])
 const getpositions = async() => {
 	let res = await service.get("/getPosition")
 	positionls.value = res.data

@@ -242,8 +242,9 @@ router.post("/adduser", (req, res) => {
 })
 //获取所有用户
 router.get("/getuser", async (req, res) => {
-  let { nowPage, pageSize } = req.query
-  // let users = await userInfoModel.find().skip( ( nowPage - 1 ) * pageSize ).limit( pageSize )
+  let { nowPage = 1, pageSize = 6 } = req.query
+  let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
+  let ids = idArr.filter(item => item.isCheck).map(i => i._id)
   let users = await userInfoModel.aggregate([
     {
       $lookup: {
@@ -264,7 +265,8 @@ router.get("/getuser", async (req, res) => {
   res.send({
     code: 200,
     users: users,
-    userstotal: userstotal
+    userstotal: userstotal,
+    ids: ids
   })
 })
 //获取所有选手
@@ -283,7 +285,7 @@ router.get("/getuserapply", async (req, res) => {
       }
     },
     {
-      $skip: ( nowPage - 1 ) * pageSize
+      $skip: (nowPage - 1) * pageSize
     },
     {
       $limit: Number(pageSize)
@@ -551,7 +553,7 @@ router.post('/udvote', async (req, res) => {
     console.log(votesToInsert);
 
     await voteModel.insertMany(votesToInsert);
-    await userInfoModel.updateMany({_id: { $in: candidate_ids }}, { isCheck: false })
+    await userInfoModel.updateMany({ _id: { $in: candidate_ids } }, { isCheck: false })
     return res.status(200).json({ message: '投票成功' });
   } catch (err) {
     console.error(err);
@@ -601,17 +603,17 @@ router.delete("/delacspk", async (req, res) => {
   })
 })
 //改变选手的选中和非选中状态
-router.post("/cgeuchk", async(req, res) => {
+router.post("/cgeuchk", async (req, res) => {
   let { auid, chkstatus } = req.body
-  await userInfoModel.updateOne({_id: auid}, { isCheck: chkstatus })
+  await userInfoModel.updateOne({ _id: auid }, { isCheck: chkstatus })
   res.send({
     code: 200
   })
 })
 //取消所有选中选手
-router.post("/cgeuchks", async(req, res) => {
+router.post("/cgeuchks", async (req, res) => {
   let { auids } = req.body
-  await userInfoModel.updateMany({_id: { $in: auids }}, { isCheck: false })
+  await userInfoModel.updateMany({ _id: { $in: auids } }, { isCheck: false })
   res.send({
     code: 200
   })

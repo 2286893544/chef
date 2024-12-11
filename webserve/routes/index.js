@@ -4,7 +4,7 @@ var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, 
 var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
-
+const { ObjectId } = require('mongodb');
 // 上传图片
 router.post("/upload", (req, res) => {
   //创建一个表单对象
@@ -242,10 +242,11 @@ router.post("/adduser", (req, res) => {
 })
 //获取所有用户
 router.get("/getuser", async (req, res) => {
-  let { nowPage = 1, pageSize = 6 } = req.query
+  let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query
+  
   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
   let ids = idArr.filter(item => item.isCheck).map(i => i._id)
-  let users = await userInfoModel.aggregate([
+  let pieline = [
     {
       $lookup: {
         localField: "position",
@@ -254,13 +255,34 @@ router.get("/getuser", async (req, res) => {
         as: "position"
       }
     },
-    {
-      $skip: (nowPage - 1) * pageSize
-    },
+    
+  ];
+  if (searchcontent) {
+    pieline.push({
+      $match: {
+        $or: [
+          { name: { $regex: searchcontent} }, // 模糊匹配名称
+          { mark: Number(searchcontent) }, // 精确匹配编号
+        ],
+      },
+    });
+  }
+  if (positionid) {
+    pieline.push({
+      $match: {
+        "position._id": new ObjectId(positionid), // 转换为 ObjectId
+      },
+    });
+  }
+  pieline.push({
+    $skip: (nowPage - 1) * pageSize
+  })
+  pieline.push(
     {
       $limit: Number(pageSize)
     }
-  ])
+  )
+  let users = await userInfoModel.aggregate(pieline)
   let userstotal = await userInfoModel.countDocuments()
   res.send({
     code: 200,

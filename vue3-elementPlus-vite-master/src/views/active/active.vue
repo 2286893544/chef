@@ -185,16 +185,7 @@ const rules = reactive({
   ],
 })
 
-// const submitForm = async (formEl: FormInstance | undefined) => {
-//   if (!formEl) return
-//   await formEl.validate((valid, fields) => {
-//     if (valid) {
-//       addactive()
-//     } else {
-//       console.log('error submit!', fields)
-//     }
-//   })
-// }
+
 
 const resetForm = () => {
   centerDialogVisible.value = false

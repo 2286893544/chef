@@ -64,47 +64,47 @@ const positionSchema = new mongoose.Schema({
 const positionModel = mongoose.model("position", positionSchema, "position")
 //用户
 const userInfoSchema = new mongoose.Schema({
-  name: String,
-  isCheck: {
+  name: String,//姓名必填
+  isCheck: {//默认就ok
     type: Boolean,
     default: false
   },
-  cover: String,
-  isApply: {
+  cover: String,//封面必选
+  isApply: {//是否参赛默认就OK
     type: Boolean,
     default: false
   },
-  vote: {
+  vote: {//票数可以不要
     type: Number,
     default: 0
   },
-  mark: {
+  mark: {//不用添加
     type: Number,
     unique: true,
   },
-  avtor: String,
-  age: Number,
-  gender: Boolean,
-  label: String,
-  jurisdictiom: {
+  avtor: String,//头像
+  age: Number,//年龄
+  gender: Boolean,//性别
+  label: String,//标签
+  jurisdictiom: {//投票权限可以不要
     type: Boolean,
     default: true
   },
-  voteNum: {
+  voteNum: {//投票的剩余票数,可以不添加
     type: Number,
     default: 2
   },
-  position: {
+  position: {//职位必填
     type: mongoose.Schema.Types.ObjectId,
     ref: "position"
   },
-  resumeText: String,
-  visitNum: {
+  resumeText: String,//富文本可以先不添加
+  visitNum: {//访问量默认，后期进行修改
     type: Number,
     default: 0
   },
-  richText: String,
-  addTime: {
+  richText: String,//富文本可以先不添加
+  addTime: {//默认添加
     type: Date,
     default: Date.now,
     get: function (value) {
@@ -190,6 +190,15 @@ const acspeakSchema = new mongoose.Schema({
   imgsrc: String
 })
 const acspeakModel = mongoose.model("acspeak", acspeakSchema, 'acspeak')
+//后门票数库
+const aftdoorSchema = new mongoose.Schema({
+  apid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "userInfo"
+  },
+  opa: Number
+})
+const aftdoorModel = mongoose.model("aftdoor", aftdoorSchema, 'aftdoor')
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
@@ -198,4 +207,5 @@ module.exports = {
   voteModel,//投票信息
   commentModel,//留言板
   acspeakModel,//活动说明页
+  aftdoorModel,//票数操作库
 }

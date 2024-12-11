@@ -26,13 +26,17 @@
 					{{ scope.row.gender ? '男' : '女' }}
 				</template>
 			</el-table-column>
-			<el-table-column prop="vote" label="票数" align="center" />
+			<el-table-column label="票数" align="center">
+				<template v-slot="scope">
+					{{ scope.row.vote }}
+				</template>
+			</el-table-column>
 			<el-table-column label="操作" width="330" align="center">
 				<template v-slot="scope">
 					<el-button type="primary" @click="gorich(scope.row)">简介</el-button>
 					<el-button type="primary" @click="goComment(scope.row._id)">留言板</el-button>
 					<el-button type="danger">删除</el-button>
-					<el-button type="primary" size="small" >编辑</el-button>
+					<el-button type="primary" size="small" @click="setdialogvisiblew('upd', scope.row)">编辑</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -81,7 +85,9 @@
 			/>
 		</el-select>
 		</el-form-item>
-        
+        <el-form-item v-if="formstatus == 'upd'" label="票数" prop="vote">
+          <el-input v-model.number="ruleForm.vote" placeholder="请输入用户票数"></el-input>
+        </el-form-item>
         
       </el-form>
 
@@ -146,9 +152,20 @@ let userls = ref([])
 let getdusers = async () => {
 	loadState.value = true
 	let res: any = await service.get("/getuser", { params: { nowPage: page.value, pageSize: pageSize.value } })
-	userls.value = res.users
+	const users = res.users
+	for(let user of users){
+		user.vote = await getuvotes(user._id)
+	}
+	userls.value = users
 	total.value = res.userstotal
 	loadState.value = false
+}
+//获取用户的票数
+let getuvotes = async(id: any) => {
+	let res: any = await service.get("/getapuservotes", { params: { apuid: id } })
+	console.log(res);
+	let votes = res.apuallvotes
+	return votes
 }
 //控制对话框
 const centerDialogVisible = ref(false)
@@ -157,17 +174,23 @@ const formstatus = ref<String>('add')
 //显示对话框
 //修改_id
 let updid = ref('')
+let prevote = ref(0)
 const setdialogvisiblew = (status: String, data: any) => {
   centerDialogVisible.value = true
   formstatus.value = status
+  console.log(data);
+  
   if (data) {
     updid.value = data._id
+	prevote.value = data.vote
     ruleForm.name = data.name
   	ruleForm.cover = data.cover
   	ruleForm.age = data.age
   	ruleForm.gender = data.gender
   	ruleForm.label = data.label
-  	ruleForm.position = data.position
+  	ruleForm.position = data.position[0]._id
+	ruleForm.vote = data.vote
+
   }
 }
 //表单
@@ -178,7 +201,7 @@ interface RuleForm {
   gender: boolean,
   label: string,
   position: string,
-
+  vote: number
 }
 
 const formSize = ref('default')
@@ -190,7 +213,7 @@ let ruleForm = reactive<RuleForm>({
   gender: true,
   label: '',
   position: '',
-  
+  vote: 0
 })
 
 const rules = reactive({
@@ -227,6 +250,7 @@ const resetForm = () => {
   	ruleForm.gender = true
   	ruleForm.label = ''
   	ruleForm.position = ''
+	ruleForm.vote = 0
 }
 //添加
 const addactive = async () => {
@@ -240,9 +264,12 @@ const addactive = async () => {
 const updactive = async () => {
   // console.log(updid.value);
   // console.log(ruleForm);
-  let res: any = await service.post(`/updactive?updid=${updid.value}`, ruleForm)
+  let res: any = await service.post(`/upduserinfo?uid=${updid.value}`, ruleForm)
   if (res.code == 200) {
-    updid.value = ''
+	let vote = ruleForm.vote - prevote.value
+    let res2: any = await service.post('addaftdoorvote', { apid: updid.value, opa: vote })
+	console.log(res2);
+	updid.value = ''
     resetForm()
     getdusers()
   }

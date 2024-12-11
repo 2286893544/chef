@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel } = require("../model/model")
+var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel, aftdoorModel } = require("../model/model")
 var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
@@ -616,8 +616,47 @@ router.post("/cgeuchks", async(req, res) => {
   })
 })
 //获取全部的票数
+router.get("/allvotes", async(req, res) => {
+  let allactvotes = await voteModel.find().countDocuments()
+  let aftdoorvotels = await aftdoorModel.find()
+  let allvotes = 0;
+  aftdoorvotels.forEach((item) => {
+    allactvotes += item.opa
+  })
+  allvotes = allactvotes
+  res.send({
+    code: 200,
+    allvotes
+  })
+})
 //获取某个选手的总票数
+router.get("/getapuservotes", async(req, res) => {
+  let { apuid } = req.query
+  let actvotes = await voteModel.find({actvoter: apuid}).countDocuments()
+  let aftdoorvotels = await aftdoorModel.find({apid: apuid})
+  let apuallvotes = 0;
+  aftdoorvotels.forEach((item) => {
+    actvotes += item.opa
+  })
+  apuallvotes = actvotes
+  res.send({
+    code: 200,
+    apuallvotes
+  })
+})
 //修改选手的个人票数
-
-
+router.post("/addaftdoorvote", async(req, res) => {
+  aftdoorModel.create(req.body)
+  res.send({
+    code: 200
+  })
+})
+//修改用户信息
+router.post("/upduserinfo", async(req, res) => {
+  let { uid } = req.query
+  await userInfoModel.updateOne({_id: uid}, req.body)
+  res.send({
+    code: 200
+  })
+})
 module.exports = router;

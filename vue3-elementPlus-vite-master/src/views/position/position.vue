@@ -9,7 +9,7 @@
           {{ scope.row.addTime.replace('T', ' ').split('.')[0] }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" width="200px" align="center">
         <template v-slot="scope">
           <el-button type="warning" @click="editDataMsg(scope.row)">编辑</el-button>
           <el-button type="danger" @click="open(scope.row._id)">删除</el-button>

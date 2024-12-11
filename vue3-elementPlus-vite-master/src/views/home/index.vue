@@ -279,7 +279,7 @@ onMounted(() => {
 }
 
 .chart-container {
-  width: 98%;
+  width: 80%;
   margin: 0 auto;
   margin-top: 40px;
   display: flex;
@@ -287,9 +287,10 @@ onMounted(() => {
   /* 允许在小屏幕下换行 */
   justify-content: space-around;
   align-items: center;
+  margin-top: 10vh;
 
   .chart {
-    width: 45%;
+    width: 40%;
     height: 350px;
     margin-bottom: 20px;
   }
@@ -312,6 +313,7 @@ onMounted(() => {
   .chart-container {
     width: 100%;
     flex-direction: column;
+    margin-top: 20vh;
 
     .chart {
       width: 80%;
@@ -339,8 +341,9 @@ onMounted(() => {
   }
 
   .chart-container {
-    margin-top: 15px;
+    margin-top: 10vh;
     flex-direction: column;
+    height: 70vh;
 
     .chart {
       width: 90%;

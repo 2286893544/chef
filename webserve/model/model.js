@@ -117,6 +117,11 @@ const userInfoSchema = new mongoose.Schema({
       const seconds = String(date.getSeconds()).padStart(2, '0');
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
+  },
+  openid: String,
+  gitflower: {
+    type: Number,
+    default: 0
   }
 })
 const counterSchema = new mongoose.Schema({
@@ -192,6 +197,7 @@ const acspeakSchema = new mongoose.Schema({
 const acspeakModel = mongoose.model("acspeak", acspeakSchema, 'acspeak')
 //后门票数库
 const aftdoorSchema = new mongoose.Schema({
+  openid: String,
   apid: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "userInfo"

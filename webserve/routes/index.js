@@ -5,6 +5,75 @@ var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
 const { ObjectId } = require('mongodb');
+//登录
+// 微信小程序的 AppID 和 AppSecret
+const APP_ID = 'your_app_id'; // 你的 AppID
+const APP_SECRET = 'your_app_secret'; // 你的 AppSecret
+// 处理小程序登录请求
+router.post('/login', async (req, res) => {
+  const { code } = req.body;
+
+  if (!code) {
+    return res.status(400).json({ error: 'Code is required' });
+  }
+
+  try {
+    // 使用微信接口获取 session_key 和 openid
+    const response = await axios.get('https://api.weixin.qq.com/sns/jscode2session', {
+      params: {
+        appid: APP_ID,
+        secret: APP_SECRET,
+        js_code: code,
+        grant_type: 'authorization_code'
+      }
+    });
+
+    const { openid, session_key, errcode, errmsg } = response.data;
+
+    if (errcode) {
+      return res.status(500).json({ error: errmsg });
+    }
+
+    // 存储 session_key 和 openid，生成用户 session 或 token
+    // 这里可以根据需求存储到数据库中，或者使用内存存储（如 Redis）
+
+    // 示例：将 openid 和 session_key 存储到内存
+    // 在实际项目中，你应该将 session_key 存储到数据库或缓存系统（如 Redis）中
+    // const sessionData = {
+    //   openid,
+    //   session_key,
+    // };
+    let user = await userInfoModel.findOne({openid: openid})
+    if (!user) {
+      userInfoModel.create({openid: openid})
+    }
+    // 返回给前端的登录凭证（如 session_key 或 token）
+    res.json({
+      openid,
+      message: 'Login successful',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+//用户授权保存微信用户的昵称，头像性别，等信息
+router.post("/saveUserInfo", async(req, res) => {
+  let { openid } = req.query
+  let { nickName,
+    avatarUrl,
+    gender } = req.body
+  let ugender;
+  if (gender === '1') {
+    ugender = true
+  }else{
+    ugender = false
+  }
+  await userInfoModel.updateOne({openid: openid}, { name: nickName, avtor: avatarUrl, gender: ugender })
+  res.send({
+    code: 200
+  })
+})
 // 上传图片
 router.post("/upload", (req, res) => {
   //创建一个表单对象
@@ -683,5 +752,37 @@ router.post("/upduserinfo", async(req, res) => {
   res.send({
     code: 200
   })
+})
+//用户充值
+router.post("/buygitflower", async(req, res) => {
+  let { openid } = req.query
+  let { flowernums } = req.body
+  let user = await userInfoModel.findOne({openid: openid})
+  let updatenums = user.gitflower += flowernums
+  await userInfoModel.updateOne({openid: openid}, { gitflower: updatenums })
+  res.send({
+    code: 200,
+    msg: "充值成功"
+  })
+})
+//用户赠送鲜花
+router.post("/dgitglower", async(req, res) => {
+  let { openid, apid, opa} = req.body
+  let user = await userInfoModel.findOne({openid: openid})
+  if (opa > user.gitflower) {
+    res.send({
+      code: 201,
+      msg: "余额不足"
+    })
+  }else{
+    await aftdoorModel.create(req.body)
+    let nowflowers = user.gitflower - opa
+    await userInfoModel.updateOne({openid: openid}, { gitflower: nowflowers })
+    res.send({
+      code: 200,
+      msg: "赠送成功"
+    })
+  }
+
 })
 module.exports = router;

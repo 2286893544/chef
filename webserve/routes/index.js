@@ -243,7 +243,7 @@ router.post("/adduser", (req, res) => {
 //获取所有用户
 router.get("/getuser", async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query
-  
+
   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
   let ids = idArr.filter(item => item.isCheck).map(i => i._id)
   let pieline = [
@@ -255,13 +255,13 @@ router.get("/getuser", async (req, res) => {
         as: "position"
       }
     },
-    
+
   ];
   if (searchcontent) {
     pieline.push({
       $match: {
         $or: [
-          { name: { $regex: searchcontent} }, // 模糊匹配名称
+          { name: { $regex: searchcontent } }, // 模糊匹配名称
           { mark: Number(searchcontent) }, // 精确匹配编号
         ],
       },
@@ -641,7 +641,7 @@ router.post("/cgeuchks", async (req, res) => {
   })
 })
 //获取全部的票数
-router.get("/allvotes", async(req, res) => {
+router.get("/allvotes", async (req, res) => {
   let allactvotes = await voteModel.find().countDocuments()
   let aftdoorvotels = await aftdoorModel.find()
   let allvotes = 0;
@@ -655,10 +655,10 @@ router.get("/allvotes", async(req, res) => {
   })
 })
 //获取某个选手的总票数
-router.get("/getapuservotes", async(req, res) => {
+router.get("/getapuservotes", async (req, res) => {
   let { apuid } = req.query
-  let actvotes = await voteModel.find({actvoter: apuid}).countDocuments()
-  let aftdoorvotels = await aftdoorModel.find({apid: apuid})
+  let actvotes = await voteModel.find({ actvoter: apuid }).countDocuments()
+  let aftdoorvotels = await aftdoorModel.find({ apid: apuid })
   let apuallvotes = 0;
   aftdoorvotels.forEach((item) => {
     actvotes += item.opa
@@ -670,18 +670,75 @@ router.get("/getapuservotes", async(req, res) => {
   })
 })
 //修改选手的个人票数
-router.post("/addaftdoorvote", async(req, res) => {
+router.post("/addaftdoorvote", async (req, res) => {
   aftdoorModel.create(req.body)
   res.send({
     code: 200
   })
 })
 //修改用户信息
-router.post("/upduserinfo", async(req, res) => {
+router.post("/upduserinfo", async (req, res) => {
   let { uid } = req.query
-  await userInfoModel.updateOne({_id: uid}, req.body)
+  await userInfoModel.updateOne({ _id: uid }, req.body)
   res.send({
     code: 200
   })
 })
+
+
+// 添加用户简历
+const convertToQuillHTML = (data) => {
+  let htmlContent = `<div class="quill-editor-content">`;
+
+  // 添加封面图片
+  if (data.cover) {
+    htmlContent += `<img src="${data.cover}" alt="Cover Image" style="width: 100%; height: auto;" />`;
+  }
+
+  // 添加姓名和职位
+  htmlContent += `<h1>${data.name}</h1>`;
+  htmlContent += `<p><strong>职位:</strong> ${data.position}</p>`;
+
+  // 添加年龄
+  htmlContent += `<p><strong>年龄:</strong> ${data.age}</p>`;
+
+  // 如果有简历文本，加入到内容中
+  if (data.resumeText) {
+    htmlContent += `<p><strong>简历:</strong> ${data.resumeText}</p>`;
+  }
+
+  // 如果有标签
+  if (data.label) {
+    htmlContent += `<p><strong>标签:</strong> ${data.label}</p>`;
+  }
+
+  htmlContent += `</div>`;
+
+  return htmlContent;
+};
+
+// 后端 API 处理逻辑
+router.put('/changeRichTexts', async (req, res) => {
+  let { id, data } = req.body;  // 获取前端传来的数据
+  try {
+    // 转换数据为 Quill 可识别的 HTML 格式
+    const richTextHTML = convertToQuillHTML(data);
+
+    // 更新数据库中的 richText 字段
+    await userInfoModel.updateOne({ _id: id }, { richText: richTextHTML });
+
+    res.send({
+      code: 200,
+      msg: "修改成功",
+    });
+  } catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "修改失败",
+      err,
+    });
+  }
+});
+
+
 module.exports = router;

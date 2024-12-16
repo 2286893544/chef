@@ -5,10 +5,11 @@ var multiparty = require('multiparty')
 var path = require('path')
 var fs = require('fs')
 const { ObjectId } = require('mongodb');
+var axios = require('axios')
 //登录
 // 微信小程序的 AppID 和 AppSecret
-const APP_ID = 'your_app_id'; // 你的 AppID
-const APP_SECRET = 'your_app_secret'; // 你的 AppSecret
+const APP_ID = 'wxd6ad47771c27cf1c'; // 你的 AppID
+const APP_SECRET = '97b2a824242879d31b91e1b48c82ceaa'; // 你的 AppSecret
 // 处理小程序登录请求
 router.post('/login', async (req, res) => {
   const { code } = req.body;

@@ -8,8 +8,8 @@ const { ObjectId } = require('mongodb');
 var axios = require('axios')
 //登录
 // 微信小程序的 AppID 和 AppSecret
-const APP_ID = 'wxd6ad47771c27cf1c'; // 你的 AppID
-const APP_SECRET = '97b2a824242879d31b91e1b48c82ceaa'; // 你的 AppSecret
+const APP_ID = 'wx8b40cf41c01e6519'; // 你的 AppID
+const APP_SECRET = '3a5101b8ad5b4552c9be505215682006'; // 你的 AppSecret
 // 处理小程序登录请求
 router.post('/login', async (req, res) => {
   const { code } = req.body;
@@ -31,9 +31,9 @@ router.post('/login', async (req, res) => {
 
     const { openid, session_key, errcode, errmsg } = response.data;
 
-    if (errcode) {
-      return res.status(500).json({ error: errmsg });
-    }
+    // if (errcode) {
+    //   return res.status(500).json({ error: errmsg });
+    // }
 
     // 存储 session_key 和 openid，生成用户 session 或 token
     // 这里可以根据需求存储到数据库中，或者使用内存存储（如 Redis）

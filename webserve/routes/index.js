@@ -44,9 +44,9 @@ router.post('/login', async (req, res) => {
     //   openid,
     //   session_key,
     // };
-    let user = await userInfoModel.findOne({openid: openid})
+    let user = await userInfoModel.findOne({ openid: openid })
     if (!user) {
-      userInfoModel.create({openid: openid})
+      userInfoModel.create({ openid: openid })
     }
     // 返回给前端的登录凭证（如 session_key 或 token）
     res.json({
@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
   }
 });
 //用户授权保存微信用户的昵称，头像性别，等信息
-router.post("/saveUserInfo", async(req, res) => {
+router.post("/saveUserInfo", async (req, res) => {
   let { openid } = req.query
   let { nickName,
     avatarUrl,
@@ -67,10 +67,10 @@ router.post("/saveUserInfo", async(req, res) => {
   let ugender;
   if (gender === '1') {
     ugender = true
-  }else{
+  } else {
     ugender = false
   }
-  await userInfoModel.updateOne({openid: openid}, { name: nickName, avtor: avatarUrl, gender: ugender })
+  await userInfoModel.updateOne({ openid: openid }, { name: nickName, avtor: avatarUrl, gender: ugender })
   res.send({
     code: 200
   })
@@ -484,8 +484,8 @@ router.delete("/delComment", async (req, res) => {
 router.get("/getShow", async (req, res) => {
   try {
     let data = await userInfoModel.find().lean()
+    data = data.filter(item => item.isApply)
     let poData = await positionModel.find().lean()
-
     const poDataMap = poData.reduce((map, po) => {
       map[po._id.toString()] = po.jobTitle; // 将职位ID（po._id）映射到职位名称（po.jobTitle）
       return map;
@@ -812,30 +812,30 @@ router.put('/changeRichTexts', async (req, res) => {
 
 
 //用户充值
-router.post("/buygitflower", async(req, res) => {
+router.post("/buygitflower", async (req, res) => {
   let { openid } = req.query
   let { flowernums } = req.body
-  let user = await userInfoModel.findOne({openid: openid})
+  let user = await userInfoModel.findOne({ openid: openid })
   let updatenums = user.gitflower += flowernums
-  await userInfoModel.updateOne({openid: openid}, { gitflower: updatenums })
+  await userInfoModel.updateOne({ openid: openid }, { gitflower: updatenums })
   res.send({
     code: 200,
     msg: "充值成功"
   })
 })
 //用户赠送鲜花
-router.post("/dgitglower", async(req, res) => {
-  let { openid, apid, opa} = req.body
-  let user = await userInfoModel.findOne({openid: openid})
+router.post("/dgitglower", async (req, res) => {
+  let { openid, apid, opa } = req.body
+  let user = await userInfoModel.findOne({ openid: openid })
   if (opa > user.gitflower) {
     res.send({
       code: 201,
       msg: "余额不足"
     })
-  }else{
+  } else {
     await aftdoorModel.create(req.body)
     let nowflowers = user.gitflower - opa
-    await userInfoModel.updateOne({openid: openid}, { gitflower: nowflowers })
+    await userInfoModel.updateOne({ openid: openid }, { gitflower: nowflowers })
     res.send({
       code: 200,
       msg: "赠送成功"

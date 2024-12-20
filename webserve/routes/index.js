@@ -310,6 +310,7 @@ router.post("/adduser", (req, res) => {
     code: 200
   })
 })
+
 //获取所有用户
 router.get("/getuser", async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query
@@ -361,6 +362,7 @@ router.get("/getuser", async (req, res) => {
     ids: ids
   })
 })
+
 //获取所有选手
 router.get("/getuserapply", async (req, res) => {
   let { nowPage, pageSize } = req.query
@@ -436,6 +438,7 @@ router.get("/getComment", async (req, res) => {
     })
   }
 })
+
 // 更改审核状态
 router.put("/updateComment", async (req, res) => {
 

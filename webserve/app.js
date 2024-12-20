@@ -5,7 +5,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors')
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const homePageRouter = require('./routes/homePage');  // 首页
+const applyRouter = require('./routes/apply');        // 报名
+const explainRouter = require('./routes/explain');    // 说明
+const rankRouter = require('./routes/rank');          // 排名
 var app = express();
 
 // view engine setup
@@ -22,7 +25,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/homePage', homePageRouter);
+app.use('/apply', applyRouter);
+app.use('/explain', explainRouter);
+app.use('/rank', rankRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

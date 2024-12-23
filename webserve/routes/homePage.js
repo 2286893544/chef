@@ -10,9 +10,10 @@ var {
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
 } = require("../model/model");
+
 //获取所有首页选手
 router.get("/getaplyuser", async (req, res) => {
-  let { nowPage = 1, pageSize = 6, positionid, searchcontent, fsc } = req.query
+  let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query
 
   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
   let ids = idArr.filter(item => item.isCheck).map(i => i._id)
@@ -108,49 +109,7 @@ router.get('/getActivityMsg', async (req, res) => {
   }
 })
 
-// 获取选手信息
-router.get('/getUsers', async (req, res) => {
-  try {
-    let { page = 1, pagesize = 6, vote = '', position = '', search = '' } = req.query
-    let total;
-    let result = []
-    if (position) {
-      result.push({ position: position })
-    }
-    if (search) {
-      result.push({ name: { $regex: search } })
-      result.push({ mark: search })
-    }
-    if (result.length > 0) {
 
-      if (vote === '最热' || vote === '排行') {
-        data = await userInfoModel.find({ $and: result }).skip((page - 1) * pagesize).limit(pagesize).sort({ vote: -1 })
-        total = await userInfoModel.find({ $and: result }).countDocuments()
-      } else if (vote === '最新') {
-        data = await userInfoModel.find({ $and: result }).skip((page - 1) * pagesize).limit(pagesize).sort({ addTime: -1 })
-        total = await userInfoModel.find({ $and: result }).countDocuments()
-      } else {
-        data = await userInfoModel.find({ $and: result }).skip((page - 1) * pagesize).limit(pagesize)
-        total = await userInfoModel.find({ $and: result }).countDocuments()
-      }
-    } else {
-      if (vote === '最热' || vote === '排行') {
-        data = await userInfoModel.find().skip((page - 1) * pagesize).limit(pagesize).sort({ vote: -1 })
-        total = await userInfoModel.countDocuments()
-      } else if (vote === '最新') {
-        data = await userInfoModel.find().skip((page - 1) * pagesize).limit(pagesize).sort({ addTime: -1 })
-        total = await userInfoModel.countDocuments()
-      } else {
-        data = await userInfoModel.find().skip((page - 1) * pagesize).limit(pagesize)
-        total = await userInfoModel.countDocuments()
-      }
-    }
-    res.json({ code: 200, msg: '获取选手信息成功', data, total })
-
-  } catch (err) {
-    res.json({ code: 500, msg: '获取选手信息失败', err })
-  }
-})
 
 // 首页根据用户职位
 router.get('/getPosition', async (req, res) => {
@@ -253,5 +212,102 @@ router.post('/udvote', async (req, res) => {
     return res.status(500).json({ message: '错误' });
   }
 });
+
+// 获取选手信息 -- 测试接口 待定
+router.get('/getUsers', async (req, res) => {
+  try {
+    let { page = 1, pagesize = 6, vote = '', position = '', search = '' } = req.query
+    let total;
+    let result = []
+    if (position) {
+      result.push({ position: position })
+    }
+    if (search) {
+      result.push({ name: { $regex: search } })
+      result.push({ mark: search })
+    }
+    if (result.length > 0) {
+
+      if (vote === '最热' || vote === '排行') {
+        data = await userInfoModel.find({ $and: result }).skip((page - 1) * pagesize).limit(pagesize).sort({ vote: -1 })
+        total = await userInfoModel.find({ $and: result }).countDocuments()
+      } else if (vote === '最新') {
+        data = await userInfoModel.find({ $and: result }).skip((page - 1) * pagesize).limit(pagesize).sort({ addTime: -1 })
+        total = await userInfoModel.find({ $and: result }).countDocuments()
+      } else {
+        data = await userInfoModel.find({ $and: result }).skip((page - 1) * pagesize).limit(pagesize)
+        total = await userInfoModel.find({ $and: result }).countDocuments()
+      }
+    } else {
+      if (vote === '最热' || vote === '排行') {
+        data = await userInfoModel.find().skip((page - 1) * pagesize).limit(pagesize).sort({ vote: -1 })
+        total = await userInfoModel.countDocuments()
+      } else if (vote === '最新') {
+        data = await userInfoModel.find().skip((page - 1) * pagesize).limit(pagesize).sort({ addTime: -1 })
+        total = await userInfoModel.countDocuments()
+      } else {
+        data = await userInfoModel.find().skip((page - 1) * pagesize).limit(pagesize)
+        total = await userInfoModel.countDocuments()
+      }
+    }
+    res.json({ code: 200, msg: '获取选手信息成功', data, total })
+
+  } catch (err) {
+    res.json({ code: 500, msg: '获取选手信息失败', err })
+  }
+})
+
+
+//用户充值
+router.post("/buygitflower", async (req, res) => {
+  let { openid } = req.query
+  let { flowernums } = req.body
+  let user = await userInfoModel.findOne({ openid: openid })
+  let updatenums = user.gitflower += flowernums
+  await userInfoModel.updateOne({ openid: openid }, { gitflower: updatenums })
+  res.send({
+    code: 200,
+    msg: "充值成功"
+  })
+})
+
+//用户赠送鲜花
+router.post("/dgitglower", async (req, res) => {
+  let { openid, apid, opa } = req.body
+  let user = await userInfoModel.findOne({ openid: openid })
+  if (opa > user.gitflower) {
+    res.send({
+      code: 201,
+      msg: "余额不足"
+    })
+  } else {
+    await aftdoorModel.create(req.body)
+    let nowflowers = user.gitflower - opa
+    await userInfoModel.updateOne({ openid: openid }, { gitflower: nowflowers })
+    res.send({
+      code: 200,
+      msg: "赠送成功"
+    })
+  }
+
+})
+
+//获取某个选手的总票数
+router.get("/getapuservotes", async (req, res) => {
+  let { apuid } = req.query
+  let actvotes = await voteModel.find({ actvoter: apuid }).countDocuments()
+  let aftdoorvotels = await aftdoorModel.find({ apid: apuid })
+  let apuallvotes = 0;
+  aftdoorvotels.forEach((item) => {
+    actvotes += item.opa
+  })
+  apuallvotes = actvotes
+  await userInfoModel.updateOne({ _id: apuid }, { vote: apuallvotes })
+  res.send({
+    code: 200,
+    apuallvotes
+  })
+})
+
 
 module.exports = router;

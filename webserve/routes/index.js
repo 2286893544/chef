@@ -670,22 +670,6 @@ router.get("/allvotes", async (req, res) => {
     allvotes
   })
 })
-//获取某个选手的总票数
-router.get("/getapuservotes", async (req, res) => {
-  let { apuid } = req.query
-  let actvotes = await voteModel.find({ actvoter: apuid }).countDocuments()
-  let aftdoorvotels = await aftdoorModel.find({ apid: apuid })
-  let apuallvotes = 0;
-  aftdoorvotels.forEach((item) => {
-    actvotes += item.opa
-  })
-  apuallvotes = actvotes
-  await userInfoModel.updateOne({_id: apuid}, { vote: apuallvotes })
-  res.send({
-    code: 200,
-    apuallvotes
-  })
-})
 //修改选手的个人票数
 router.post("/addaftdoorvote", async (req, res) => {
   aftdoorModel.create(req.body)
@@ -703,7 +687,7 @@ router.post("/upduserinfo", async (req, res) => {
 })
 
 
-// 添加用户简历
+// ·
 const convertToQuillHTML = (data) => {
   let htmlContent = `<div class="quill-editor-content">`;
 
@@ -758,36 +742,5 @@ router.put('/changeRichTexts', async (req, res) => {
 });
 
 
-//用户充值
-router.post("/buygitflower", async (req, res) => {
-  let { openid } = req.query
-  let { flowernums } = req.body
-  let user = await userInfoModel.findOne({ openid: openid })
-  let updatenums = user.gitflower += flowernums
-  await userInfoModel.updateOne({ openid: openid }, { gitflower: updatenums })
-  res.send({
-    code: 200,
-    msg: "充值成功"
-  })
-})
-//用户赠送鲜花
-router.post("/dgitglower", async (req, res) => {
-  let { openid, apid, opa } = req.body
-  let user = await userInfoModel.findOne({ openid: openid })
-  if (opa > user.gitflower) {
-    res.send({
-      code: 201,
-      msg: "余额不足"
-    })
-  } else {
-    await aftdoorModel.create(req.body)
-    let nowflowers = user.gitflower - opa
-    await userInfoModel.updateOne({ openid: openid }, { gitflower: nowflowers })
-    res.send({
-      code: 200,
-      msg: "赠送成功"
-    })
-  }
 
-})
 module.exports = router;

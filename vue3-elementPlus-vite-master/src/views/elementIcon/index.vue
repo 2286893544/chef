@@ -162,7 +162,7 @@ let getdusers = async () => {
 }
 //获取用户的票数
 let getuvotes = async(id: any) => {
-	let res: any = await service.get("/getapuservotes", { params: { apuid: id } })
+	let res: any = await service.get("/homePage/getapuservotes", { params: { apuid: id } })
 	console.log(res);
 	let votes = res.apuallvotes
 	return votes

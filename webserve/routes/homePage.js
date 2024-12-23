@@ -16,7 +16,7 @@ router.get("/getaplyuser", async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query
 
   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
-  let ids = idArr.filter(item => item.isCheck).map(i => i._id)
+  let ids = idArr.filter(item => item.isApply).map(i => i._id)
   let pieline = [
     {
       $lookup: {
@@ -111,7 +111,7 @@ router.get('/getActivityMsg', async (req, res) => {
 
 
 
-// 首页根据用户职位
+// 首页获取用户职位
 router.get('/getPosition', async (req, res) => {
   let data;
   let { position = '', page = 1, pagesize = 6 } = req.query
@@ -155,7 +155,6 @@ router.put('/addVisit', async (req, res) => {
 //投票接口
 router.post('/udvote', async (req, res) => {
   const { voter_id, candidate_ids, vtime } = req.body;
-  console.log(voter_id, candidate_ids, candidate_ids.length);
 
   // 步骤 1: 验证 candidate_ids 数组的长度，确保最多包含两个候选人 ID
   if (!Array.isArray(candidate_ids) || candidate_ids.length === 0 || candidate_ids.length > 2) {
@@ -201,11 +200,8 @@ router.post('/udvote', async (req, res) => {
     const voteCounts = await voteModel.aggregate([
       { $group: { _id: "$candidate_id", totalVotes: { $sum: 1 } } }
     ]);
-    console.log(voteCounts);
-    console.log(votesToInsert);
 
     await voteModel.insertMany(votesToInsert);
-    await userInfoModel.updateMany({ _id: { $in: candidate_ids } }, { isCheck: false })
     return res.status(200).json({ message: '投票成功' });
   } catch (err) {
     console.error(err);

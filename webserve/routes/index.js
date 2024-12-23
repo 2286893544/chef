@@ -97,7 +97,7 @@ router.post("/upload", (req, res) => {
     }
   })
 })
-//
+
 router.post("/uploadr", (req, res) => {
   //创建一个表单对象
   let form = new multiparty.Form()
@@ -111,7 +111,6 @@ router.post("/uploadr", (req, res) => {
       let imgSrc = data.file[0].path
       let patharr = imgSrc.split("\\")
       let imgpath = patharr.join("/")
-      console.log(imgpath);
       res.send({
         code: 200,
         errno: 0,
@@ -200,8 +199,6 @@ router.put("/updateCarousel/:_id", async (req, res) => {
 
 //添加活动信息
 router.post("/addactivityMsg", (req, res) => {
-  console.log(req.body);
-
   activityMsgModel.create(req.body)
   res.send({
     code: 200
@@ -218,8 +215,6 @@ router.get("/getactives", async (req, res) => {
 })
 //修改活动信息
 router.post("/updactive", async (req, res) => {
-  console.log(req.query);
-  console.log(req.body);
   await activityMsgModel.updateOne({ _id: req.query.updid }, req.body)
   res.send({
     code: 200
@@ -316,7 +311,7 @@ router.get("/getuser", async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query
 
   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
-  let ids = idArr.filter(item => item.isCheck).map(i => i._id)
+  let ids = idArr.filter(item => item.isApply).map(i => i._id)
   let pieline = [
     {
       $lookup: {
@@ -600,7 +595,6 @@ router.get("/getDetail", async (req, res) => {
 // 更新富文本
 router.put('/changeRichText', async (req, res) => {
   let { id, content } = req.body;
-  console.log(content)
   try {
     await userInfoModel.updateOne({ _id: id }, { richText: content });
   } catch (err) {
@@ -636,22 +630,6 @@ router.get("/getacspimgs", async (req, res) => {
 router.delete("/delacspk", async (req, res) => {
   let { did } = req.query
   await acspeakModel.deleteOne({ _id: did })
-  res.send({
-    code: 200
-  })
-})
-//改变选手的选中和非选中状态
-router.post("/cgeuchk", async (req, res) => {
-  let { auid, chkstatus } = req.body
-  await userInfoModel.updateOne({ _id: auid }, { isCheck: chkstatus })
-  res.send({
-    code: 200
-  })
-})
-//取消所有选中选手
-router.post("/cgeuchks", async (req, res) => {
-  let { auids } = req.body
-  await userInfoModel.updateMany({ _id: { $in: auids } }, { isCheck: false })
   res.send({
     code: 200
   })

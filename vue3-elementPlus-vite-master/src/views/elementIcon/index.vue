@@ -163,7 +163,6 @@ let getdusers = async () => {
 //获取用户的票数
 let getuvotes = async(id: any) => {
 	let res: any = await service.get("/homePage/getapuservotes", { params: { apuid: id } })
-	console.log(res);
 	let votes = res.apuallvotes
 	return votes
 }
@@ -178,7 +177,6 @@ let prevote = ref(0)
 const setdialogvisiblew = (status: String, data: any) => {
   centerDialogVisible.value = true
   formstatus.value = status
-  console.log(data);
   
   if (data) {
     updid.value = data._id
@@ -262,13 +260,10 @@ const addactive = async () => {
 }
 //修改
 const updactive = async () => {
-  // console.log(updid.value);
-  // console.log(ruleForm);
   let res: any = await service.post(`/upduserinfo?uid=${updid.value}`, ruleForm)
   if (res.code == 200) {
 	let vote = ruleForm.vote - prevote.value
     let res2: any = await service.post('addaftdoorvote', { apid: updid.value, opa: vote })
-	console.log(res2);
 	updid.value = ''
     resetForm()
     getdusers()

@@ -73,8 +73,6 @@ onMounted(() => {
 // 上传成功时
 const handlePreview = (uploadFile: any) => {
   const imgsrc = import.meta.env.VITE_GLOB_API_URL + '/' + uploadFile.path;
-  console.log(imgsrc);
-
   handleOnSubmit(imgsrc)
 }
 

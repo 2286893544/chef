@@ -207,8 +207,6 @@ const addactive = async () => {
 }
 //修改
 const updactive = async () => {
-  // console.log(updid.value);
-  // console.log(ruleForm);
   let res: any = await service.post(`/updactive?updid=${updid.value}`, ruleForm)
   if (res.code == 200) {
     updid.value = ''

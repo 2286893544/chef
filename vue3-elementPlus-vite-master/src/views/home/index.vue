@@ -30,6 +30,7 @@ import service from '@/utils/request';
 import * as echarts from 'echarts'
 import { ref, onMounted, reactive } from 'vue'
 import loading from '@/components/loading.vue';
+import { ElMessage } from 'element-plus';
 
 
 type activityMsgType = {
@@ -75,7 +76,7 @@ function getuser() {
       ageChartinit()
     })
   } catch (err) {
-    console.log(err)
+    ElMessage.error(`获取数据失败,${err}`)
   }
 }
 async function getDetail() {
@@ -85,7 +86,7 @@ async function getDetail() {
       jobChartinit()
     })
   } catch (err) {
-    console.log(err)
+    ElMessage.error(`获取数据失败,${err}`)
   }
 }
 function ageChartinit() {
@@ -201,11 +202,6 @@ function jobChartinit() {
       lookState.value = ""
       myEcharts.setOption(allOptions[optionStack.pop()]);
       updateLookStateText()
-      // if (optionStack.length === 0) {
-      //   console.log('Already in root level!');
-      // } else {
-      //   console.log('Go back to previous level.');
-      // }
     };
 
     // 用于更新图表的 "Back" 文本

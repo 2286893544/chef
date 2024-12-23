@@ -86,7 +86,6 @@ function getComment() {
       loadState.value = false
     } else {
       ElMessage.error(res.msg)
-      console.log(res.err)
       loadState.value = false
     }
   })
@@ -124,7 +123,6 @@ function deleteComment(id: String) {
           getComment()
         } else {
           ElMessage.error(res.msg)
-          console.log(res.err)
         }
       })
     })
@@ -146,7 +144,6 @@ function changeState(_id: string) {
     })
   } catch (err) {
     ElMessage.error('修改失败')
-    console.log(err)
   }
 }
 

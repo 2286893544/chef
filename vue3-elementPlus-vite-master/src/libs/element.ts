@@ -193,7 +193,6 @@ export function setupElementPlus(app: App<Element>): void {
   // plugins.forEach((plugin: any) => {
   //   app.use(plugin)
   // })
-  // console.log('elementPlus---',ElementPlus);
   app.use(ElementPlus);
   // 全局配置
   app.config.globalProperties.$ELEMENT = { size: 'small', zIndex: 3000 }

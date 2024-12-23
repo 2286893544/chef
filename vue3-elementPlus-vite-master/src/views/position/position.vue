@@ -104,7 +104,6 @@ const open = (id: string) => {
             message: '删除成功',
           })
         } else {
-          console.log(res.msg, res.err)
           ElMessage({
             type: 'error',
             message: '删除失败',

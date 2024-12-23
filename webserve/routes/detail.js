@@ -70,4 +70,19 @@ router.get("/getComment", async (req, res) => {
   }
 })
 
+// 添加留言信息
+router.post("/addComment", async (req, res) => {
+  try {
+    let userInfo = await userInfoModel.findOne({ _id: req.body.uid })
+    req.body.avtor = userInfo.avtor
+    req.body.name = userInfo.name
+    await commentModel.create(req.body)
+  } catch (err) {
+    res.status(500).send({ code: 500, msg: "添加失败", err })
+  } finally {
+    res.status(200).send({ code: 200, msg: "添加成功" })
+  }
+})
+
+
 module.exports = router;

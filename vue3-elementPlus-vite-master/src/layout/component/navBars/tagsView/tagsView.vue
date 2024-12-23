@@ -93,7 +93,6 @@ export default {
 
     // 1、添加 tagsView：未设置隐藏（isHide）也添加到在 tagsView 中
     const addTagsView = (path: string, to?: RouteLocationNormalized) => {
-      // console.log(path, to, '----------------------')
       if (state.tagsViewList.some((v) => v.path === path))
         return false
       

@@ -214,9 +214,7 @@ router.get('/getUserDetail', async (req, res) => {
     UserIdx = data.findIndex(item => item._id == id)
     UserData = data[UserIdx]
     let jobTitle = await positionModel.findOne({ _id: UserData.position })
-    console.log(jobTitle)
     UserData.position = jobTitle.jobTitle
-    console.log(UserData.position)
     UserRank = UserIdx + 1
     UserVote = data[UserIdx - 1] ? data[UserIdx - 1].vote - data[UserIdx].vote : 0
   } catch (err) {

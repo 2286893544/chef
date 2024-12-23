@@ -65,10 +65,6 @@ const positionModel = mongoose.model("position", positionSchema, "position")
 //用户
 const userInfoSchema = new mongoose.Schema({
   name: String,//姓名必填
-  isCheck: {//默认就ok
-    type: Boolean,
-    default: false
-  },
   cover: String,//封面必选
   isApply: {//是否参赛默认就OK
     type: Boolean,
@@ -97,6 +93,11 @@ const userInfoSchema = new mongoose.Schema({
   position: {//职位必填
     type: mongoose.Schema.Types.ObjectId,
     ref: "position"
+  },
+  phone: {
+    type: Number,
+    maxLength: 11,
+    default: 12345678901
   },
   resumeText: String,//富文本可以先不添加
   visitNum: {//访问量默认，后期进行修改

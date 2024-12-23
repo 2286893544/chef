@@ -142,10 +142,10 @@ const beforeUpload = (file: any) => {
   const isLt500KB = file.size / 1024 < 500;
 
   if (!isJpgOrPng) {
-    console.log('上传文件格式只能是 JPG/PNG/JPEG!');
+    alert('上传文件格式只能是 JPG/PNG/JPEG!');
   }
   if (!isLt500KB) {
-    console.log('上传文件大小不能超过 500KB!');
+    alert('上传文件大小不能超过 500KB!');
   }
 
   // 返回 true 允许上传，false 阻止上传
@@ -173,7 +173,6 @@ const delCarousel = (id: string) => {
       getCarousel()
     } else {
       ElMessage.error('删除失败')
-      console.log(res.err)
     }
   })
 }
@@ -186,7 +185,6 @@ const updateCarousel = (id: string) => {
       getCarousel()
     } else {
       ElMessage.error('更新失败')
-      console.log(res.err)
     }
   })
 }

@@ -737,6 +737,7 @@ router.get("/getapuservotes", async (req, res) => {
     actvotes += item.opa
   })
   apuallvotes = actvotes
+  await userInfoModel.updateOne({_id: apuid}, { vote: apuallvotes })
   res.send({
     code: 200,
     apuallvotes

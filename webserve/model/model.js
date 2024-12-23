@@ -205,6 +205,7 @@ const aftdoorSchema = new mongoose.Schema({
   opa: Number
 })
 const aftdoorModel = mongoose.model("aftdoor", aftdoorSchema, 'aftdoor')
+
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息

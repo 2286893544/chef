@@ -595,67 +595,9 @@ router.get("/getDetail", async (req, res) => {
 
 
 
-//投票接口
-router.post('/udvote', async (req, res) => {
-  const { voter_id, candidate_ids, vtime } = req.body;
-  console.log(voter_id, candidate_ids, candidate_ids.length);
 
-  // 步骤 1: 验证 candidate_ids 数组的长度，确保最多包含两个候选人 ID
-  if (!Array.isArray(candidate_ids) || candidate_ids.length === 0 || candidate_ids.length > 2) {
-    return res.status(400).json({ message: '至少投一个' });
-  }
 
-  // 获取当前日期（YYYY-MM-DD格式）
-  const today = new Date().toISOString().split('T')[0];
-
-  try {
-    // 步骤 2: 查找当前用户今天投票的记录
-    const voteRecords = await voteModel.find({
-      dovoter: voter_id,
-      votetime: { $gte: new Date(today) } // 查找今天的投票记录
-    });
-
-    // 步骤 3: 判断用户是否已投票超过两个候选人
-    if (voteRecords.length === 2) {
-      return res.status(400).json({ message: '每天只能投两次' });
-    }
-
-    // 步骤 4: 如果用户已投票一次，检查第二次是否传递了多个候选人
-    if (voteRecords.length === 1 && candidate_ids.length > 1) {
-      return res.status(400).json({ message: '今天还能投一次' });
-    }
-
-    // 步骤 5: 检查重复投票
-    const votedCandidates = voteRecords.map(record => record.candidate_id);
-    const newVotes = candidate_ids.filter(id => !votedCandidates.includes(id));
-
-    // 如果有已经投过票的候选人，提示不能重复投票
-    if (candidate_ids.length !== newVotes.length) {
-      return res.status(400).json({ message: '同一个选手一天只能投一次' });
-    }
-
-    // 步骤 6: 记录新的投票
-    const votesToInsert = newVotes.map(candidate_id => ({
-      dovoter: voter_id,
-      actvoter: candidate_id,
-      votetime: vtime,
-    }));
-    // 步骤 7: 获取所有被投票的候选人票数
-    const voteCounts = await voteModel.aggregate([
-      { $group: { _id: "$candidate_id", totalVotes: { $sum: 1 } } }
-    ]);
-    console.log(voteCounts);
-    console.log(votesToInsert);
-
-    await voteModel.insertMany(votesToInsert);
-    await userInfoModel.updateMany({ _id: { $in: candidate_ids } }, { isCheck: false })
-    return res.status(200).json({ message: '投票成功' });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: '错误' });
-  }
-});
-
+// 更新富文本
 router.put('/changeRichText', async (req, res) => {
   let { id, content } = req.body;
   console.log(content)
@@ -674,6 +616,7 @@ router.put('/changeRichText', async (req, res) => {
     })
   }
 })
+
 //添加活动说明
 router.post("/addacspackimg", (req, res) => {
   acspeakModel.create(req.body)

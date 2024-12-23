@@ -9,6 +9,8 @@ const homePageRouter = require('./routes/homePage');  // 首页
 const applyRouter = require('./routes/apply');        // 报名
 const explainRouter = require('./routes/explain');    // 说明
 const rankRouter = require('./routes/rank');          // 排名
+const detailRouter = require('./routes/detail');      // 详情
+const users = require('./routes/users');
 var app = express();
 
 // view engine setup
@@ -29,6 +31,8 @@ app.use('/homePage', homePageRouter);
 app.use('/apply', applyRouter);
 app.use('/explain', explainRouter);
 app.use('/rank', rankRouter);
+app.use('/detail', detailRouter);
+app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

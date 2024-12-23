@@ -133,7 +133,19 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
           },
         ]
       },
-      
+      {
+        meta: {
+          auth: ['admin', 'test'],
+          icon: 'iconfont el-icon-s-grid',
+          isAffix: false,
+          isHide: false,
+          isKeepAlive: true,
+          title: '投票记录',
+          index: '6'
+        },
+        name: 'votehistory',
+        path: '/votehistory'
+      },
 
     ],
   },

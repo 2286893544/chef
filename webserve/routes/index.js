@@ -2,10 +2,24 @@ var express = require('express');
 var router = express.Router();
 var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel, aftdoorModel } = require("../model/model")
 var multiparty = require('multiparty')
-var path = require('path')
 var fs = require('fs')
 const { ObjectId } = require('mongodb');
 var axios = require('axios')
+var fs = require('fs')
+var path = require('path')
+
+router.get('/tp.txt', async (req, res) => {
+  // 读取项目根目录下的tp.txt,并返回值
+  fs.readFile('/var/www/project/webserve/tp.txt', 'utf-8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    res.status(200).send(data);
+  })
+})
+
+
 //登录
 // 微信小程序的 AppID 和 AppSecret
 const APP_ID = 'wx8b40cf41c01e6519'; // 你的 AppID
@@ -718,6 +732,23 @@ router.put('/changeRichTexts', async (req, res) => {
     });
   }
 });
+
+//获取某个选手的总票数
+router.get("/getapuservotes", async (req, res) => {
+  let { apuid } = req.query
+  let actvotes = await voteModel.find({ actvoter: apuid }).countDocuments()
+  let aftdoorvotels = await aftdoorModel.find({ apid: apuid })
+  let apuallvotes = 0;
+  aftdoorvotels.forEach((item) => {
+    actvotes += item.opa
+  })
+  apuallvotes = actvotes
+  await userInfoModel.updateOne({ _id: apuid }, { vote: apuallvotes })
+  res.send({
+    code: 200,
+    apuallvotes
+  })
+})
 
 
 

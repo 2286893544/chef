@@ -116,7 +116,11 @@ router.get('/getPosition', async (req, res) => {
   let data;
   let { position = '', page = 1, pagesize = 6 } = req.query
   try {
-    data = await userInfoModel.find({ position: position }).skip((page - 1) * pagesize).limit(pagesize)
+    if (data) {
+      data = await userInfoModel.find({ position: position }).skip((page - 1) * pagesize).limit(pagesize)
+    } else {
+      data = await userInfoModel.find().skip((page - 1) * pagesize).limit(pagesize)
+    }
   } catch (err) {
     res.json({
       code: 500,

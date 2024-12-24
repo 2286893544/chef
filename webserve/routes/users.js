@@ -19,16 +19,9 @@ router.get('/getRank', async (req, res) => {
       data = await userInfoModel.find().sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize)
     }
   } catch (err) {
-    res.json({
-      code: 500,
-      msg: "服务器错误"
-    })
+    res.json({ code: 500, msg: "服务器错误" })
   } finally {
-    res.json({
-      code: 200,
-      msg: "成功",
-      data
-    })
+    res.json({ code: 200, msg: "成功", data })
   }
 })
 
@@ -38,17 +31,9 @@ router.get('/getThree', async (req, res) => {
   try {
     data = await userInfoModel.find().sort({ vote: -1 }).limit(3)
   } catch (err) {
-    res.json({
-      code: 500,
-      msg: "服务器错误",
-      err
-    })
+    res.json({ code: 500, msg: "服务器错误", err })
   } finally {
-    res.json({
-      code: 200,
-      msg: "成功",
-      data
-    })
+    res.json({ code: 200, msg: "成功", data })
   }
 })
 
@@ -59,17 +44,9 @@ router.get('/getSearch', async (req, res) => {
   try {
     data = await userInfoModel.find({ $or: [{ name: name }, { mark: name }] }).skip((page - 1) * pagesize).limit(pagesize)
   } catch (err) {
-    res.json({
-      code: 500,
-      msg: "服务器错误",
-      err
-    })
+    res.json({ code: 500, msg: "服务器错误", err })
   } finally {
-    res.json({
-      code: 200,
-      msg: "成功",
-      data
-    })
+    res.json({ code: 200, msg: "成功", data })
   }
 })
 
@@ -80,17 +57,9 @@ router.get('/getHot', async (req, res) => {
   try {
     data = await userInfoModel.find().sort({ score: -1 }).skip((page - 1) * pagesize).limit(pagesize)
   } catch (err) {
-    res.json({
-      code: 500,
-      msg: "服务器错误",
-      err
-    })
+    res.json({ code: 500, msg: "服务器错误", err })
   } finally {
-    res.json({
-      code: 200,
-      msg: "成功",
-      data
-    })
+    res.json({ code: 200, msg: "成功", data })
   }
 })
 
@@ -101,17 +70,9 @@ router.get('/getNew', async (req, res) => {
   try {
     data = await userInfoModel.find().sort({ addTime: -1 }).skip((page - 1) * pagesize).limit(pagesize)
   } catch (err) {
-    res.json({
-      code: 500,
-      msg: "服务器错误",
-      err
-    })
+    res.json({ code: 500, msg: "服务器错误", err })
   } finally {
-    res.json({
-      code: 200,
-      msg: "成功",
-      data
-    })
+    res.json({ code: 200, msg: "成功", data })
   }
 })
 

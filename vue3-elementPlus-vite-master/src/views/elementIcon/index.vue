@@ -31,8 +31,9 @@
 					{{ scope.row.vote }}
 				</template>
 			</el-table-column>
-			<el-table-column label="操作" width="330" align="center">
+			<el-table-column label="操作" width="360" align="center">
 				<template v-slot="scope">
+					<el-button type="primary" @click="gosinaply(scope.row)">投票</el-button>
 					<el-button type="primary" @click="gorich(scope.row)">简介</el-button>
 					<el-button type="primary" @click="goComment(scope.row._id)">留言板</el-button>
 					<el-button type="danger">删除</el-button>
@@ -122,6 +123,10 @@ const loadState = ref<boolean>(false)
 let gorich = (id: any) => {
 	router.push(`/riched/${id._id}`,)
 	sessionStorage.setItem("richText", JSON.stringify(id.richText))
+}
+//
+let gosinaply = (id: any) => {
+	router.push(`/sinaply/${id._id}`,)
 }
 //分页
 let page = ref(1)
@@ -275,6 +280,8 @@ const updactive = async () => {
 // 上传成功时
 const handlePreview = (uploadFile: any) => {
   const imgsrc = import.meta.env.VITE_GLOB_API_URL + '/' + uploadFile.path;
+  console.log(imgsrc);
+  
   ruleForm.cover = imgsrc
 }
 

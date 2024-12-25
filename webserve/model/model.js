@@ -207,6 +207,24 @@ const aftdoorSchema = new mongoose.Schema({
 })
 const aftdoorModel = mongoose.model("aftdoor", aftdoorSchema, 'aftdoor')
 
+// 订单系统
+const orderFormSchema = new mongoose.Schema({
+  orderId: String,  // 订单号
+  money: Number,    // 订单金额
+  title: String,    // 订单标题
+  buyerId: String,  // 买家
+  sellerId: String, // 被赠送者
+  created_at: { type: Date, default: Date.now },  // 订单创建时间
+  updated_at: { type: Date, default: Date.now },  // 最后更新时间
+  status: {   // 订单状态
+    type: String,
+    enum: ['pending', 'paid', 'failed'],
+    default: 'pending'
+  },
+  paymentInfo: Object,  // 支付信息（支付成功后保存）
+})
+const orderFormModel = mongoose.model("orderForm", orderFormSchema, "orderForm")
+
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
@@ -216,4 +234,5 @@ module.exports = {
   commentModel,//留言板
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
+  orderFormModel,//订单系统
 }

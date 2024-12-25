@@ -308,8 +308,9 @@ router.get("/getapuservotes", async (req, res) => {
     apuallvotes
   })
 })
+
 //获取所有投票记录
-router.get("/voteshistory", async(req, res) => {
+router.get("/voteshistory", async (req, res) => {
   // let sends = await voteModel.find()
   // let flowers = await aftdoorModel.find({openid: { $exists: true }})
   let { page, pageSize } = req.query
@@ -367,10 +368,10 @@ router.get("/voteshistory", async(req, res) => {
   flowers.forEach((item) => {
     result.push(
       {
-          send: item.dovoter,
-          acp: item.actvoter,
-          vote: item.opa,
-          desc: item.desc,
+        send: item.dovoter,
+        acp: item.actvoter,
+        vote: item.opa,
+        desc: item.desc,
         desc2: item.desc2
       }
     )

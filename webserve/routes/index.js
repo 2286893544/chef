@@ -8,18 +8,6 @@ var axios = require('axios')
 var fs = require('fs')
 var path = require('path')
 
-router.get('/tp.txt', async (req, res) => {
-  // 读取项目根目录下的tp.txt,并返回值
-  fs.readFile('/var/www/project/webserve/tp.txt', 'utf-8', (err, data) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    res.status(200).send(data);
-  })
-})
-
-
 //登录
 // 微信小程序的 AppID 和 AppSecret
 const APP_ID = 'wx8b40cf41c01e6519'; // 你的 AppID

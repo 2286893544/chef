@@ -18,28 +18,67 @@ router.get("/getShow", async (req, res) => {
 })
 
 // 获取用户数据
+// router.get("/getRank", async (req, res) => {
+//   let userRank; // 前三名
+//   let userRanks;
+//   let { page = 1, pagesize = 8, position = '' } = req.query;
+//   let total;
+//   try {
+//     let data;
+//     if (position) {
+//       data = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean()
+//       total = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).countDocuments()
+//     } else {
+//       data = await userInfoModel.find({ isApply: true }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean()
+//       total = await userInfoModel.find({ isApply: true }).countDocuments()
+//     }
+//     userRank = data.filter((item, index) => index < 3)
+//     userRanks = data.filter((item, index) => index >= 3)
+//   } catch (err) {
+//     res.status(500).send({ msg: "服务器错误", code: 500, ok: false })
+//   } finally {
+//     res.status(200).send({ msg: "获取成功", code: 200, ok: true, userRank, userRanks, total })
+//   }
+// })
+
+
 router.get("/getRank", async (req, res) => {
   let userRank; // 前三名
-  let userRanks;
+  let userRanks; // 其他名次
   let { page = 1, pagesize = 8, position = '' } = req.query;
   let total;
   try {
     let data;
     if (position) {
-      data = await userInfoModel.find({ position }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean()
-      total = await userInfoModel.find({ position }).countDocuments()
+      // 获取全局的前三名
+      const topUsers = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).sort({ vote: -1 }).limit(3).lean();
+
+      // 获取分页后的数据
+      data = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean();
+      total = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).countDocuments();
+
+      // 将前三名与分页数据合并
+      userRank = topUsers;
+      userRanks = data.filter((item) => !topUsers.includes(item)); // 排除前三名，剩下的为 userRanks
     } else {
-      data = await userInfoModel.find().sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean()
-      total = await userInfoModel.countDocuments()
+      // 获取全局的前三名
+      const topUsers = await userInfoModel.find({ isApply: true }).sort({ vote: -1 }).limit(3).lean();
+
+      // 获取分页后的数据
+      data = await userInfoModel.find({ isApply: true }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean();
+      total = await userInfoModel.find({ isApply: true }).countDocuments();
+
+      // 将前三名与分页数据合并
+      userRank = topUsers;
+      userRanks = data.filter((item) => !topUsers.includes(item)); // 排除前三名，剩下的为 userRanks
     }
-    userRank = data.filter((item, index) => index < 3)
-    userRanks = data.filter((item, index) => index >= 3)
   } catch (err) {
-    res.status(500).send({ msg: "服务器错误", code: 500, ok: false })
+    res.status(500).send({ msg: "服务器错误", code: 500, ok: false });
   } finally {
-    res.status(200).send({ msg: "获取成功", code: 200, ok: true, userRank, userRanks, total })
+    res.status(200).send({ msg: "获取成功", code: 200, ok: true, userRank, userRanks, total });
   }
-})
+});
+
 
 // 首页根据用户职位
 router.get('/getPosition', async (req, res) => {

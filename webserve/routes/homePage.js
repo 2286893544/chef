@@ -10,7 +10,7 @@ var {
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
 } = require("../model/model");
-
+const { ObjectId } = require('mongodb');
 //获取所有首页选手
 router.get("/getaplyuser", async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query

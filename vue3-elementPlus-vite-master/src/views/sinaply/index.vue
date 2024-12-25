@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import service from '@/utils/request';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import loading from '@/components/loading.vue';
 
 const fileList = ref([])
 const ActionUrl = ref<String>('')
 const router = useRouter()
+const route = useRoute()
 const loadState = ref<boolean>(false)
+const vid = route.params.id
+let voice = ref('active')
+function goBack() {
+  router.back()
+}
 //分页
 let page = ref(1)
 let pageSize = ref(5)
@@ -25,14 +31,17 @@ const handleCurrentChange = (val: number) => {
 	page.value = val
 	getvotedata()
 }
+let setvoice = (mtd: any) => {
+    
+    voice.value = mtd
+    getvotedata()
+}
 //获取数据
 let votehisdata = ref([])
 let getvotedata = async() => {
-    let res: any = await service.get("/homePage/voteshistory", { params: { page: page.value, pageSize: pageSize.value } })
-
+    let res: any = await service.get("/homePage/sinaplyvotes", { params: { vid: vid, voice: voice.value, page: page.value, pageSize: pageSize.value } })
     votehisdata.value = res.pageData
     total.value = res.totalItems
-    loadState.value = false
 }
 onMounted(() => {
     getvotedata()
@@ -41,17 +50,18 @@ onMounted(() => {
 </script>
 <template>
     <div>
+        <div>
+            <span class="back" @click="goBack">返回</span>
+        </div>
+        <div>
+            <el-button type="primary" @click="setvoice('active')" :class="voice == 'passive'? 'dis' : '' ">赠送</el-button>
+        <el-button type="primary" @click="setvoice('passive')" :class="voice == 'active'? 'dis' : '' ">得到</el-button>
+        </div>
         <el-table :data="votehisdata" style="width: 100%; margin-top: 20px">
-			<el-table-column label="用户" align="center">
-				<template v-slot="scope">
-					{{ scope.row.send }}
-					<!-- {{ scope.row.desc[0].name }} -->
-				</template>
-			</el-table-column>
+			<el-table-column prop="send" label="用户" align="center" />
 			<el-table-column label="选手" align="center">
 				<template v-slot="scope">
-					{{ scope.row.acp }}
-					<!-- {{ scope.row.desc2[0].name }} -->
+					{{ scope.row.acp }}号
 				</template>
 			</el-table-column>
 			<el-table-column label="记录" align="center">
@@ -65,9 +75,10 @@ onMounted(() => {
         <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
 				:background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
 				@size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        <loading :loadState="loadState" />
     </div>
 </template>
 <style scoped>
-
+.dis{
+    background-color: gray;
+}
 </style>

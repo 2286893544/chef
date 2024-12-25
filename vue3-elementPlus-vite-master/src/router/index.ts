@@ -51,7 +51,10 @@ const router = createRouter({
         },
         //投票记录
         { path: '/votehistory', name: 'votehistory', component: () => import('views/vote/index.vue'), },
-
+        //个人投票记录
+        {
+          path: "/sinaply/:id", name: "sinaply", component: () => import("views/sinaply/index.vue")
+        },
       ]
     }
   ]

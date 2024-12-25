@@ -10,7 +10,7 @@ var {
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
 } = require("../model/model");
-
+const { ObjectId } = require('mongodb');
 //获取所有首页选手
 router.get("/getaplyuser", async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query
@@ -28,7 +28,7 @@ router.get("/getaplyuser", async (req, res) => {
     },
 
   ];
-  if (fsc == 'hot') {
+  if (fsc == '最热' || fsc == '排行') {
     pieline.push(
       {
         $sort: {
@@ -37,7 +37,7 @@ router.get("/getaplyuser", async (req, res) => {
       }
     )
   }
-  if (fsc == 'new') {
+  if (fsc == '最新') {
     pieline.push(
       {
         $sort: {
@@ -391,5 +391,99 @@ router.get("/voteshistory", async (req, res) => {
     totallen: pageData.length
   })
 })
+//获取某个选手的投票送礼，或者被投的记录
+router.get("/sinaplyvotes", async(req, res) => {
+  let { vid, voice, page, pageSize } = req.query
+  //所有的记录
+  let sends = await voteModel.aggregate([
+    {
+      $lookup: {
+        from: "userInfo",
+        localField: "dovoter",
+        foreignField: "openid",
+        as: "desc"
+      }
+    },
+    {
+      $lookup: {
+        from: "userInfo",
+        localField: "actvoter",
+        foreignField: "openid",
+        as: "desc2"
+      }
+    }
+  ])
+  let flowers = await aftdoorModel.aggregate([
+    {
+      $match: { openid: { $exists: true } }
+    },
+    {
+      $lookup: {
+        from: "userInfo",
+        localField: "openid",
+        foreignField: "openid",
+        as: "desc"
+      }
+    },
+    {
+      $lookup: {
+        from: "userInfo",
+        localField: "apid",
+        foreignField: "openid",
+        as: "desc2"
+      }
+    }
+  ])
+  let result = []
+  sends.forEach((item) => {
+    result.push(
+      {
+        send: item.dovoter,
+        acp: item.actvoter,
+        vote: 1,
+        desc: item.desc,
+        desc2: item.desc2
+      }
+    )
+  })
+  flowers.forEach((item) => {
+    result.push(
+      {
+          send: item.dovoter,
+          acp: item.actvoter,
+          vote: item.opa,
+          desc: item.desc,
+        desc2: item.desc2
+      }
+    )
+  })
+  console.log(result);
+  
+  let filterdata;
+  if (voice == 'active') {
+    filterdata = result.filter((item) => {
+      item.desc[0]._id = vid
+    })
+  }
+  if (voice == 'passive') {
+    filterdata = result.filter((item) => {
+      item.desc2[0]._id = vid
+    })
+  }
+  const skip = (page - 1) * pageSize;
+  const limit = parseInt(pageSize);
+  console.log(filterdata);
+  
+  // 获取当前页的数据
+  const pageData = filterdata.slice(skip, skip + limit);
 
+  // 获取总数据条数
+  const totalItems = filterdata.length;
+  res.send({
+    code: 2000,
+    pageData,
+    totalItems,
+    totallen: pageData.length
+  })
+})
 module.exports = router;

@@ -109,7 +109,15 @@ router.get('/getActivityMsg', async (req, res) => {
   }
 })
 
-
+// 获取所有职位信息
+router.get('/getPositionMsg', async (req, res) => {
+  try {
+    let data = await positionModel.find()
+    res.json({ code: 200, msg: '获取职位信息成功', data })
+  } catch (err) {
+    res.json({ code: 500, msg: '获取职位信息失败', err })
+  }
+})
 
 // 首页获取用户职位
 router.get('/getPosition', async (req, res) => {

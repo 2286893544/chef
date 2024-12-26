@@ -738,6 +738,4 @@ router.get("/getapuservotes", async (req, res) => {
   })
 })
 
-
-
 module.exports = router;

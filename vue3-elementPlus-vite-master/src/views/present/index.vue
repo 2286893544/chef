@@ -26,6 +26,7 @@
         <el-button type="primary" @click="onSubmit">查询</el-button>
       </el-form-item>
     </el-form>
+
     <!-- 表格 -->
     <el-table :data="tableData" stripe style="width: 100%; margin-top: 20px;">
       <el-table-column prop="buyerName" label="赠送人" align="center" />
@@ -46,7 +47,7 @@
       </el-table-column>
       <el-table-column label="支付时间" align="center">
         <template v-slot="scope">
-          {{ changeTimeFormat(scope.row.updated_at) }}
+          {{ scope.row.updated_at!==scope.row.created_at ? changeTimeFormat(scope.row.updated_at) : '未支付' }}
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">

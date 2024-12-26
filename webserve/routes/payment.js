@@ -1,100 +1,147 @@
-var express = require('express');
-var router = express.Router();
-var {
-  carouselModel,  //  轮播图
-  activityMsgModel, //  活动信息
-  positionModel,  //  职位
-  userInfoModel,//用户
-  voteModel,//投票信息
-  commentModel,//留言板
-  acspeakModel,//活动说明页
-  aftdoorModel,
-  orderFormModel,//票数操作库
-} = require("../model/model");
-const { wxPay, getHash } = require('../utils/jsSDK');  // 引入jsSDK中的wxPay方法
+const express = require('express');
+const router = express.Router();
+const { userInfoModel, orderFormModel, TaskModel } = require('../model/model');
+const { wxPay, getHash } = require('../utils/jsSDK');
+const { scheduleTask } = require('../utils/task');
 
-const bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({ extended: true }));
-router.use(bodyParser.json());
-
-
-// 支付接口暂定
-router.post("/pay", async (req, res) => {
+/**
+ * 支付接口
+ */
+router.post('/pay', async (req, res) => {
   try {
     const { order_id, total_fee, title, backendUrl, buyerId, sellerId } = req.body;
 
-    // 发起支付请求
-    const paymentParams = {
-      order_id, //商户订单号
-      money: total_fee, //金额，最多两位小数
-      title,  // 支付商品的标题
-      backendUrl  // 支付通知回调地址
-    };
-
-    // 调用支付函数，返回支付平台的响应数据
-    let paymentResponse = await wxPay(paymentParams);
-
-    const buyer = await userInfoModel.findOne({ _id: buyerId }).lean();
-    const buyerName = buyer.name;
-    const seller = await userInfoModel.findOne({ _id: sellerId }).lean();
-    const sellerName = seller.name;
-
-    const orderFormInfo = await orderFormModel.findOne({ orderId: order_id });
-    
-    if (!orderFormInfo) {
-      // 添加订单信息
-      const orderForm = {
-        orderId: order_id, // 订单ID
-        money: total_fee, // 订单金额
-        title: title, // 订单标题
-        buyerId: buyerId, // 买家ID
-        sellerId: sellerId, // 卖家ID
-        buyerName: buyerName, // 买家姓名
-        sellerName: sellerName, // 卖家姓名
-      }
-      await orderFormModel.create(orderForm)
+    // 检查必要参数
+    if (!order_id || !total_fee || !title || !backendUrl || !buyerId || !sellerId) {
+      return res.status(400).json({ code: 400, msg: '缺少必要参数' });
     }
 
-    // 返回支付接口的响应数据给前端
-    res.json({ paymentResponse });
-  } catch (err) {
-    res.json({ code: 500, msg: "支付请求失败", error: err.message });
-  }
-})
+    // 调用支付接口
+    const paymentParams = {
+      order_id,
+      money: total_fee,
+      title,
+      backendUrl,
+    };
+    const paymentResponse = await wxPay(paymentParams);
 
-// 支付回调通知的接口
+    // 获取买家和卖家信息
+    const buyer = await userInfoModel.findOne({ _id: buyerId }).lean();
+    const seller = await userInfoModel.findOne({ _id: sellerId }).lean();
+    if (!buyer || !seller) {
+      return res.status(404).json({ code: 404, msg: '买家或卖家信息不存在' });
+    }
+
+    // 检查订单是否已存在
+    const existingOrder = await orderFormModel.findOne({ orderId: order_id });
+    if (!existingOrder) {
+      // 创建新订单
+      await orderFormModel.create({
+        orderId: order_id,
+        money: total_fee,
+        title,
+        buyerId,
+        sellerId,
+        buyerName: buyer.name,
+        sellerName: seller.name,
+        status: 'pending',
+      });
+    }
+
+    res.json({ code: 200, msg: '支付请求已发起，请完成支付', data: paymentResponse });
+  } catch (err) {
+    console.error('支付接口处理失败:', err);
+    res.status(500).json({ code: 500, msg: '支付接口处理失败', error: err.message });
+  }
+});
+
+/**
+ * 支付回调接口
+ */
 router.post('/wxnotify', async (req, res) => {
   try {
     const data = req.body || {};
-    const appSecret = '1ed05cdb3a0ba072cc4d52c4fa3b32f3';
+    const appSecret = '1ed05cdb3a0ba072cc4d52c4fa3b32f3'; // 支付平台签名密钥
 
-    // 检验订单是否存在
+    console.log('支付回调数据:', JSON.stringify(data, null, 2));
+
+    // 验证订单是否存在
     const order = await orderFormModel.findOne({ orderId: data.trade_order_id });
     if (!order) {
-      console.error("订单不存在:", data.trade_order_id);
-      return res.status(404).json({ code: 404, msg: "订单不存在" });
+      console.error('订单不存在:', data.trade_order_id);
+      return res.status(404).json({ code: 404, msg: '订单不存在' });
     }
 
-    // 检验订单是否已支付
+    // 检查订单是否已处理
     if (order.status === 'paid') {
-      console.log("订单已支付，忽略重复回调:", data.trade_order_id);
-      return res.json({ code: 200, msg: "订单已处理" });
+      console.log('订单已支付，忽略重复回调:', data.trade_order_id);
+      return res.json({ code: 200, msg: '订单已处理' });
     }
 
-    // 验签逻辑，确保数据未被篡改
-    if (data.hash !== getHash(data, appSecret)) {
-      await orderFormModel.updateOne({ orderId: data.trade_order_id }, { $set: { status: 'failed', paymentInfo: data, updated_at: new Date() } });
-      res.json({ code: 500, msg: '验签失败', data });
-      return;
+    // 验签逻辑
+    const generatedHash = getHash(data, appSecret);
+    console.log('生成的 Hash:', generatedHash);
+    console.log('回调中的 Hash:', data.hash);
+    if (data.hash !== generatedHash) {
+      console.error('验签失败:', data);
+      await orderFormModel.updateOne(
+        { orderId: data.trade_order_id },
+        { $set: { status: 'failed', paymentInfo: data, updatedAt: new Date() } }
+      );
+      return res.status(400).json({ code: 400, msg: '验签失败', data });
     }
 
-    // 更新订单状态
-    const newStatus = data.status === 'OD' ? 'paid' : 'failed';
-    await orderFormModel.updateOne({ orderId: data.trade_order_id }, { $set: { status: newStatus, paymentInfo: data, updated_at: new Date() } });
+    // 如果支付成功
+    if (data.status === 'OD') {
+      console.log('支付成功:', data.trade_order_id);
 
-  } catch (e) {
-    console.error("支付回调处理失败:", e);
-    res.json({ code: 500, msg: "支付回调处理失败", error: e });
+      // 更新订单状态
+      await orderFormModel.updateOne(
+        { orderId: data.trade_order_id },
+        { $set: { status: 'paid', paymentInfo: data, updatedAt: new Date() } }
+      );
+
+      // 添加任务到任务系统
+      const voteIncrement = Math.floor(data.total_fee); // 1 元等于 1 票
+      const executeAt = new Date(Date.now() + 60 * 60 * 1000); // 一小时后
+
+      const task = await TaskModel.create({
+        userId: order.sellerId,
+        voteIncrement,
+        executeAt,
+        status: 'pending',
+      });
+
+      console.log('任务已创建:', task);
+
+      // 调度任务
+      scheduleTask(task._id.toString(), executeAt, async () => {
+        console.log(`任务开始执行：任务 ID ${task._id}`);
+        await userInfoModel.updateOne(
+          { _id: task.userId },
+          { $inc: { vote: voteIncrement } } // 使用 $inc 累加票数
+        );
+        console.log(`任务完成：用户 ${task.userId} 的票数增加了 ${voteIncrement}`);
+
+        // 更新任务状态为已完成
+        await TaskModel.updateOne(
+          { _id: task._id },
+          { $set: { status: 'completed', updatedAt: new Date() } }
+        );
+      });
+
+      res.json({ code: 200, msg: '支付成功，任务已调度', data });
+    } else {
+      console.log('支付失败:', data.trade_order_id);
+      await orderFormModel.updateOne(
+        { orderId: data.trade_order_id },
+        { $set: { status: 'failed', paymentInfo: data, updatedAt: new Date() } }
+      );
+      res.status(400).json({ code: 400, msg: '支付失败', data });
+    }
+  } catch (err) {
+    console.error('支付回调处理失败:', err);
+    res.status(500).json({ code: 500, msg: '支付回调处理失败', error: err.message });
   }
 });
 

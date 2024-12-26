@@ -21,7 +21,8 @@
       </el-table-column>
       <el-table-column label="支付时间" align="center">
         <template v-slot="scope">
-          {{ changeTimeFormat(scope.row.updated_at) }}
+          <!-- {{ changeTimeFormat(scope.row.updated_at) }} -->
+          {{ scope.row.updated_at !== scope.row.created_at ? changeTimeFormat(scope.row.updated_at) : '未支付' }}
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
@@ -47,7 +48,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute()
 const router = useRouter()
-const _id = route.params.id
+const uid = route.params.id
 const tableData = ref([])
 const page = ref(1)
 const pageSize = ref(5)
@@ -65,7 +66,7 @@ function goBack() {
 
 // 获取订单数据
 function getAllOrder() {
-  service.get('/orderForm/getAllOrder', { params: { page: page.value, pageSize: pageSize.value, sellerId: _id } }).then((res: any) => {
+  service.get('/orderForm/getAllOrder', { params: { page: page.value, pageSize: pageSize.value, sellerId: uid } }).then((res: any) => {
     tableData.value = res.data
     total.value = res.total
   })

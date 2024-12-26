@@ -1,10 +1,12 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var cors = require('cors')
-var indexRouter = require('./routes/index');
+var createError = require('http-errors'); // HTTP 错误处理中间件
+var express = require('express'); // 引入 Express 框架
+var path = require('path'); // 用于处理文件路径
+var cookieParser = require('cookie-parser'); // 用于解析 Cookie
+var logger = require('morgan'); // 用于日志记录
+var cors = require('cors'); // 解决跨域问题
+
+// 引入路由文件
+const indexRouter = require('./routes/index'); // 默认首页路由
 const homePageRouter = require('./routes/homePage');    // 首页
 const applyRouter = require('./routes/apply');          // 报名
 const explainRouter = require('./routes/explain');      // 说明
@@ -12,46 +14,62 @@ const rankRouter = require('./routes/rank');            // 排名
 const detailRouter = require('./routes/detail');        // 详情
 const paymentRouter = require('./routes/payment');      // 支付
 const orderFormRouter = require('./routes/orderForm');  // 订单系统
-const users = require('./routes/users');
+const users = require('./routes/users');               // 用户系统
+
+// 初始化 Express 应用
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-app.use(cors())
+// 引入任务系统的重新加载功能
+const { reloadTasks } = require('./utils/task');
 
+// ** 任务重启时重新加载未完成任务 **
+reloadTasks()
+  .then(() => {
+    console.log("未完成任务加载完成"); // 加载成功
+  })
+  .catch(err => {
+    console.error("任务加载失败:", err); // 加载失败
+  });
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/upload', express.static(path.join(__dirname, 'upload')));
+// ** 配置视图引擎 ** 
+app.set('views', path.join(__dirname, 'views')); // 设置视图文件路径
+app.set('view engine', 'jade'); // 设置模板引擎为 Jade（可根据需要改为其他模板引擎）
 
-app.use('/', indexRouter);
-app.use('/homePage', homePageRouter);
-app.use('/apply', applyRouter);
-app.use('/explain', explainRouter);
-app.use('/rank', rankRouter);
-app.use('/detail', detailRouter);
-app.use('/payment', paymentRouter);
-app.use('/orderForm', orderFormRouter);
-app.use('/users', users);
+// ** 使用中间件 **
+app.use(cors()); // 解决跨域问题
+app.use(logger('dev')); // 请求日志记录
+app.use(express.json()); // 解析 JSON 数据
+app.use(express.urlencoded({ extended: false })); // 解析 URL 编码的数据
+app.use(cookieParser()); // 解析 Cookie
+app.use(express.static(path.join(__dirname, 'public'))); // 设置静态文件路径
+app.use('/upload', express.static(path.join(__dirname, 'upload'))); // 文件上传路径
 
-// catch 404 and forward to error handler
+// ** 注册路由 **
+app.use('/', indexRouter); // 默认首页
+app.use('/homePage', homePageRouter); // 首页模块
+app.use('/apply', applyRouter); // 报名模块
+app.use('/explain', explainRouter); // 说明模块
+app.use('/rank', rankRouter); // 排名模块
+app.use('/detail', detailRouter); // 详情模块
+app.use('/payment', paymentRouter); // 支付模块
+app.use('/orderForm', orderFormRouter); // 订单模块
+app.use('/users', users); // 用户模块
+
+// ** 捕获 404 错误，并交由错误处理中间件处理 **
 app.use(function (req, res, next) {
-  next(createError(404));
+  next(createError(404)); // 创建 404 错误
 });
 
-// error handler
+// ** 错误处理中间件 **
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
+  // 设置本地变量，仅在开发环境中提供错误信息
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
+  // 渲染错误页面
+  res.status(err.status || 500); // 默认错误码为 500
   res.render('error');
 });
 
+// 导出 app 实例，供其他文件使用
 module.exports = app;

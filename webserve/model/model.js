@@ -214,6 +214,8 @@ const orderFormSchema = new mongoose.Schema({
   title: String,    // 订单标题
   buyerId: String,  // 买家
   sellerId: String, // 被赠送者
+  buyerName: String, // 买家姓名
+  sellerName: String, // 被赠送者姓名
   created_at: { type: Date, default: Date.now },  // 订单创建时间
   updated_at: { type: Date, default: Date.now },  // 最后更新时间
   status: {   // 订单状态

@@ -34,15 +34,26 @@ router.post("/pay", async (req, res) => {
     // 调用支付函数，返回支付平台的响应数据
     let paymentResponse = await wxPay(paymentParams);
 
-    // 添加订单信息
-    const orderForm = {
-      orderId: order_id, // 订单ID
-      money: total_fee, // 订单金额
-      title: title, // 订单标题
-      buyerId: buyerId, // 买家ID
-      sellerId: sellerId, // 卖家ID
+    const buyer = await userInfoModel.findOne({ _id: buyerId }).lean();
+    const buyerName = buyer.name;
+    const seller = await userInfoModel.findOne({ _id: sellerId }).lean();
+    const sellerName = seller.name;
+
+    const orderFormInfo = await orderFormModel.findOne({ orderId: order_id });
+    
+    if (!orderFormInfo) {
+      // 添加订单信息
+      const orderForm = {
+        orderId: order_id, // 订单ID
+        money: total_fee, // 订单金额
+        title: title, // 订单标题
+        buyerId: buyerId, // 买家ID
+        sellerId: sellerId, // 卖家ID
+        buyerName: buyerName, // 买家姓名
+        sellerName: sellerName, // 卖家姓名
+      }
+      await orderFormModel.create(orderForm)
     }
-    await orderFormModel.create(orderForm)
 
     // 返回支付接口的响应数据给前端
     res.json({ paymentResponse });

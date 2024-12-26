@@ -55,6 +55,10 @@ const router = createRouter({
         {
           path: "/sinaply/:id", name: "sinaply", component: () => import("views/sinaply/index.vue")
         },
+        // 礼物记录
+        { path: "/present", name: "present", component: () => import("views/present/index.vue") },
+        // 个人礼物记录
+        { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") }
       ]
     }
   ]

@@ -51,7 +51,7 @@
 
     </div>
 
-    <loading :loadState="loadState"  />
+    <loading :loadState="loadState" />
 
   </div>
 </template>

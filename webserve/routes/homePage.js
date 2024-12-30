@@ -145,7 +145,15 @@ router.get('/getActivityMsg', async (req, res) => {
   }
 })
 
-
+// 获取所有职位信息
+router.get('/getPositionMsg', async (req, res) => {
+  try {
+    let data = await positionModel.find()
+    res.json({ code: 200, msg: '获取职位信息成功', data })
+  } catch (err) {
+    res.json({ code: 500, msg: '获取职位信息失败', err })
+  }
+})
 
 // 首页获取用户职位
 router.get('/getPosition', async (req, res) => {
@@ -428,7 +436,7 @@ router.get("/voteshistory", async (req, res) => {
   })
 })
 //获取某个选手的投票送礼，或者被投的记录
-router.get("/sinaplyvotes", async(req, res) => {
+router.get("/sinaplyvotes", async (req, res) => {
   let { vid, voice, page, pageSize } = req.query
   //所有的记录
   let sends = await voteModel.aggregate([
@@ -485,16 +493,16 @@ router.get("/sinaplyvotes", async(req, res) => {
   flowers.forEach((item) => {
     result.push(
       {
-          send: item.dovoter,
-          acp: item.actvoter,
-          vote: item.opa,
-          desc: item.desc,
+        send: item.dovoter,
+        acp: item.actvoter,
+        vote: item.opa,
+        desc: item.desc,
         desc2: item.desc2
       }
     )
   })
   console.log(result);
-  
+
   let filterdata;
   if (voice == 'active') {
     filterdata = result.filter((item) => {
@@ -509,7 +517,7 @@ router.get("/sinaplyvotes", async(req, res) => {
   const skip = (page - 1) * pageSize;
   const limit = parseInt(pageSize);
   console.log(filterdata);
-  
+
   // 获取当前页的数据
   const pageData = filterdata.slice(skip, skip + limit);
 

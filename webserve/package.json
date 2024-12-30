@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "3": "pm2 stop webserve",
     "start": "cross-env NODE_ENV=production pm2 start ./bin/www --name webserve",
     "dev": "cross-env NODE_ENV=development nodemon --watch ./ --ext js,ts,json --ignore ./node_modules ./bin/www",
     "prod-restart": "pm2 restart webserve",
-    "3": "pm2 stop webserve",
     "prod-delete": "pm2 delete webserve",
     "logs": "pm2 logs webserve"
   },

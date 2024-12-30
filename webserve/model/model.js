@@ -214,6 +214,8 @@ const orderFormSchema = new mongoose.Schema({
   title: String,    // 订单标题
   buyerId: String,  // 买家
   sellerId: String, // 被赠送者
+  buyerName: String, // 买家姓名
+  sellerName: String, // 被赠送者姓名
   created_at: { type: Date, default: Date.now },  // 订单创建时间
   updated_at: { type: Date, default: Date.now },  // 最后更新时间
   status: {   // 订单状态
@@ -225,6 +227,17 @@ const orderFormSchema = new mongoose.Schema({
 })
 const orderFormModel = mongoose.model("orderForm", orderFormSchema, "orderForm")
 
+// 定义任务模型
+const taskSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'userInfo', required: true }, // 用户 ID
+  voteIncrement: { type: Number, required: true }, // 增加的票数
+  executeAt: { type: Date, required: true }, // 执行时间
+  status: { type: String, enum: ['pending', 'completed'], default: 'pending' }, // 任务状态
+  createdAt: { type: Date, default: Date.now }, // 创建时间
+});
+
+const TaskModel = mongoose.model('Task', taskSchema, 'Task');
+
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
@@ -235,4 +248,5 @@ module.exports = {
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
   orderFormModel,//订单系统
+  TaskModel,//任务系统
 }

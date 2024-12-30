@@ -143,6 +143,19 @@ const routesListModule: Module<RoutesListState, RootStateTypes> = {
         name: 'votehistory',
         path: '/votehistory'
       },
+      {
+        meta: {
+          auth: ['admin', 'test'],
+          icon: 'iconfont el-icon-s-grid',
+          isAffix: false,
+          isHide: false,
+          isKeepAlive: true,
+          title: '礼物记录',
+          index: '7'
+        },
+        name: 'present',
+        path: '/present'
+      },
     ],
   },
   mutations: {

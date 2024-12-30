@@ -8,6 +8,42 @@ var axios = require('axios')
 var fs = require('fs')
 var path = require('path')
 
+// 异步中间件：获取投票数据并更新用户的投票数
+const updateVotesMiddleware = async (req, res, next) => {
+  // 使用 setImmediate 将异步任务放入下一轮事件循环，确保不阻塞响应
+  setImmediate(async () => {
+    try {
+      // 获取所有申请的用户
+      let aplyusers = await userInfoModel.find({ isApply: true }).lean();
+
+      // 并行执行所有用户的投票更新任务
+      const updatePromises = aplyusers.map(async (item) => {
+        // 获取 actvotes
+        let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments();
+
+        // 获取 aftdoorvotels
+        let aftdoorvotels = await aftdoorModel.find({ apid: item._id }).lean();
+
+        // 计算 apuallvotes
+        let apuallvotes = actvotes;
+        for (let aftdoor of aftdoorvotels) {
+          apuallvotes += aftdoor.opa;
+        }
+
+        // 更新用户的投票数
+        await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes });
+      });
+
+      // 等待所有投票更新任务完成
+      await Promise.all(updatePromises);
+    } catch (error) {
+      console.error('Error updating votes:', error);
+    }
+
+    // 不影响接口响应速度，继续传递控制权
+    next();
+  });
+};
 //登录
 // 微信小程序的 AppID 和 AppSecret
 const APP_ID = 'wx8b40cf41c01e6519'; // 你的 AppID
@@ -309,9 +345,10 @@ router.post("/adduser", (req, res) => {
 })
 
 //获取所有用户
-router.get("/getuser", async (req, res) => {
+router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query
-
+  //调用函数修改选手票数
+  // await pudaplyuVote()
   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
   let ids = idArr.filter(item => item.isApply).map(i => i._id)
   let pieline = [
@@ -737,7 +774,22 @@ router.get("/getapuservotes", async (req, res) => {
     apuallvotes
   })
 })
-
+//函数获取所有选手并修改票数
+// let pudaplyuVote  = async() => {
+//   console.log(1)
+  
+//   let aplyusers = await userInfoModel.find({isApply: true})
+//   aplyusers.forEach( async(item) => {
+//     let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments()
+//     let aftdoorvotels = await aftdoorModel.find({ apid: item._id })
+//     let apuallvotes = 0;
+//     aftdoorvotels.forEach((item) => {
+//       actvotes += item.opa
+//     })
+//     apuallvotes = actvotes
+//     await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes })
+//   })
+// }
 
 
 module.exports = router;

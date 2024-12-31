@@ -15,12 +15,13 @@ const detailRouter = require('./routes/detail');        // 详情
 const paymentRouter = require('./routes/payment');      // 支付
 const orderFormRouter = require('./routes/orderForm');  // 订单系统
 const users = require('./routes/users');               // 用户系统
+const loginRouter = require('./routes/login');         // 登录
 
 // 初始化 Express 应用
 var app = express();
 
 // 引入任务系统的重新加载功能
-const { reloadTasks } = require('./utils/task');
+const { reloadTasks, scheduleDailyVoteReset } = require('./utils/task');
 
 // ** 任务重启时重新加载未完成任务 **
 reloadTasks()
@@ -30,6 +31,8 @@ reloadTasks()
   .catch(err => {
     console.error("任务加载失败:", err); // 加载失败
   });
+// ** 调度每日投票数量重置任务 **
+scheduleDailyVoteReset();
 
 // ** 配置视图引擎 ** 
 app.set('views', path.join(__dirname, 'views')); // 设置视图文件路径
@@ -53,6 +56,7 @@ app.use('/rank', rankRouter); // 排名模块
 app.use('/detail', detailRouter); // 详情模块
 app.use('/payment', paymentRouter); // 支付模块
 app.use('/orderForm', orderFormRouter); // 订单模块
+app.use('/login', loginRouter); // 登录模块
 app.use('/users', users); // 用户模块
 
 // ** 捕获 404 错误，并交由错误处理中间件处理 **

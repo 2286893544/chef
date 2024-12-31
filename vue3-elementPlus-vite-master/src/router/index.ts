@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { App } from 'vue'
+import { ElMessage } from 'element-plus'
 
 const routerHistory = createWebHistory()
 // createWebHashHistory hash 路由
@@ -74,6 +75,7 @@ router.beforeEach((to, from, next) => {
       next();
     } else {
       // 如果没有 token，重定向到登录页面
+      ElMessage.warning('请先登录');
       next({ path: '/login', query: { redirect: to.fullPath } }); // 保存目标路径
     }
   } else {

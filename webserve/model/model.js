@@ -29,6 +29,13 @@ const carouselSchema = new mongoose.Schema({
 })
 const carouselModel = mongoose.model('carousel', carouselSchema, 'carousel')
 
+// 登陆
+const registerSchema = new mongoose.Schema({
+  name: String,
+  password: String,
+  phone: String
+})
+const registerModel = mongoose.model("register", registerSchema, "register")
 
 //活动信息
 const activityMsgSchema = new mongoose.Schema({
@@ -249,4 +256,5 @@ module.exports = {
   aftdoorModel,//票数操作库
   orderFormModel,//订单系统
   TaskModel,//任务系统
+  registerModel,// 登录
 }

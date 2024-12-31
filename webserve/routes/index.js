@@ -10,8 +10,7 @@ var path = require('path')
 
 //登录
 // 微信小程序的 AppID 和 AppSecret
-const APP_ID = 'wx8b40cf41c01e6519'; // 你的 AppID
-const APP_SECRET = '3a5101b8ad5b4552c9be505215682006'; // 你的 AppSecret
+const APP_ID = 'wx8b40cf41c01e6519'; // 你的 AppIDconst APP_SECRET = '3a5101b8ad5b4552c9be505215682006'; // 你的 AppSecret
 // 处理小程序登录请求
 router.post('/login', async (req, res) => {
   const { code } = req.body;

@@ -201,7 +201,7 @@ const acspeakSchema = new mongoose.Schema({
 const acspeakModel = mongoose.model("acspeak", acspeakSchema, 'acspeak')
 //后门票数库
 const aftdoorSchema = new mongoose.Schema({
-  openid: String,
+  nid: String,
   apid: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "userInfo"
@@ -240,7 +240,11 @@ const taskSchema = new mongoose.Schema({
 });
 
 const TaskModel = mongoose.model('Task', taskSchema, 'Task');
-
+const ctrlSchema = new mongoose.Schema({
+  act: String,
+  pwd: String
+})
+const ctrlModel = mongoose.model('ctrl', ctrlSchema, 'ctrl')
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
@@ -252,4 +256,5 @@ module.exports = {
   aftdoorModel,//票数操作库
   orderFormModel,//订单系统
   TaskModel,//任务系统
+  ctrlModel,//后台管理账号
 }

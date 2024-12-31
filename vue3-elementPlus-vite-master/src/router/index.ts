@@ -60,10 +60,27 @@ const router = createRouter({
         // 个人礼物记录
         { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") }
       ]
-    }
+    },
+    { path: "/login", name: "login", component: ()=>import("views/login/log.vue") }
   ]
 })
-
+// 全局前置守卫
+router.beforeEach((to, from, next) => {
+  // 判断是否需要登录权限
+  if (to.path != '/login') {
+    const token = localStorage.getItem('token'); // 获取本地存储的 token
+    if (token) {
+      // 如果有 token，放行
+      next();
+    } else {
+      // 如果没有 token，重定向到登录页面
+      next({ path: '/login', query: { redirect: to.fullPath } }); // 保存目标路径
+    }
+  } else {
+    // 不需要登录权限，直接放行
+    next();
+  }
+});
 // 删除/重置路由
 export function resetRoute(): void {
   router.getRoutes().forEach((route) => {

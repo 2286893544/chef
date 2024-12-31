@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel, aftdoorModel } = require("../model/model")
+var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel, aftdoorModel, ctrlModel } = require("../model/model")
 var multiparty = require('multiparty')
 var fs = require('fs')
 const { ObjectId } = require('mongodb');
@@ -87,7 +87,48 @@ router.post("/login", async(req, res) => {
   // 生成 JWT Token
   const token = jwt.sign({ phoneNumber }, '123', { expiresIn: '1h' });
 
-  return res.json({ message: '登录成功', token, user });
+  return res.json({ message: '登录成功', token, user, code: 200 });
+})
+//后台注册账号
+router.post('/adregister', async(req, res) => {
+  let { act, pwd } = req.body
+   // 验证请求体
+   if (!act || !pwd) {
+    return res.status(400).json({ error: '账号和密码不能为空' });
+  }
+
+  // 检查用户是否已注册
+  const existingUser = await ctrlModel.findOne({ act: act })
+  if (existingUser) {
+    return res.status(400).json({ error: '账号已注册' });
+  }
+  await ctrlModel.create({ act: act, pwd: pwd })
+  res.send({
+    code: 200,
+    msg: "reg ok!"
+  })
+})
+//后台登录
+router.post("/adlogin", async(req, res) => {
+  const { act, pwd } = req.body;
+  if (!act || !pwd) {
+    return res.status(400).json({ error: '账号和密码不能为空' });
+  }
+
+  // 检查用户是否存在
+  const user = await ctrlModel.findOne({act: act})
+  if (!user) {
+    return res.status(401).json({ error: '账号或密码错误' });
+  }
+
+  // 验证密码
+  if (user.pwd !== pwd) {
+    return res.status(401).json({ error: '账号或密码错误' });
+  }
+
+  // 生成 JWT Token
+  const token = jwt.sign({ act }, '123', { expiresIn: '1h' });
+  return res.json({ message: '登录成功', token, user, code: 200 });
 })
 //用户授权保存微信用户的昵称，头像性别，等信息
 router.post("/saveUserInfo", async (req, res) => {

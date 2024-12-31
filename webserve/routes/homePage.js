@@ -450,10 +450,16 @@ router.get("/sinaplyvotes", async (req, res) => {
   //所有的记录
   let sends = await voteModel.aggregate([
     {
+      $addFields: {
+        dovoter: { $toObjectId: "$dovoter" }, // 将字符串转换为 ObjectId
+        actvoter: { $toObjectId: "$actvoter" } // 同理转换另一个字段
+      }
+    },
+    {
       $lookup: {
         from: "userInfo",
         localField: "dovoter",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc"
       }
     },
@@ -461,20 +467,25 @@ router.get("/sinaplyvotes", async (req, res) => {
       $lookup: {
         from: "userInfo",
         localField: "actvoter",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc2"
       }
     }
   ])
   let flowers = await aftdoorModel.aggregate([
     {
-      $match: { openid: { $exists: true } }
+      $match: { nid: { $exists: true } }
+    },
+    {
+      $addFields: {
+        nid: { $toObjectId: "$nid" }, // 将字符串转换为 ObjectId
+      }
     },
     {
       $lookup: {
         from: "userInfo",
-        localField: "openid",
-        foreignField: "openid",
+        localField: "nid",
+        foreignField: "_id",
         as: "desc"
       }
     },
@@ -482,7 +493,7 @@ router.get("/sinaplyvotes", async (req, res) => {
       $lookup: {
         from: "userInfo",
         localField: "apid",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc2"
       }
     }
@@ -513,14 +524,14 @@ router.get("/sinaplyvotes", async (req, res) => {
   console.log(result);
 
   let filterdata;
-  if (voice == 'active') {
+  if (voice === 'active') {
     filterdata = result.filter((item) => {
-      item.desc[0]._id = vid
+      item.desc[0]._id = new ObjectId(vid)
     })
   }
-  if (voice == 'passive') {
+  if (voice === 'passive') {
     filterdata = result.filter((item) => {
-      item.desc2[0]._id = vid
+      item.desc2[0]._id = new ObjectId(vid)
     })
   }
   const skip = (page - 1) * pageSize;

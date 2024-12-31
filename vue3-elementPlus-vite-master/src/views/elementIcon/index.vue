@@ -152,11 +152,7 @@ let userls = ref([])
 let getdusers = async () => {
 	loadState.value = true
 	let res: any = await service.get("/getuser", { params: { nowPage: page.value, pageSize: pageSize.value } })
-	const users = res.users
-	for (let user of users) {
-		user.vote = await getuvotes(user._id)
-	}
-	userls.value = users
+	userls.value = res.users
 	total.value = res.userstotal
 	loadState.value = false
 }

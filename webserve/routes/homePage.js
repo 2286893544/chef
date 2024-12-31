@@ -304,11 +304,11 @@ router.get('/getUsers', async (req, res) => {
 
 //用户充值
 router.post("/buygitflower", async (req, res) => {
-  let { openid } = req.query
+  let { uid } = req.query
   let { flowernums } = req.body
-  let user = await userInfoModel.findOne({ openid: openid })
+  let user = await userInfoModel.findOne({ _id: uid })
   let updatenums = user.gitflower += flowernums
-  await userInfoModel.updateOne({ openid: openid }, { gitflower: updatenums })
+  await userInfoModel.updateOne({ _id: uid }, { gitflower: updatenums })
   res.send({
     code: 200,
     msg: "充值成功"
@@ -317,8 +317,8 @@ router.post("/buygitflower", async (req, res) => {
 
 //用户赠送鲜花
 router.post("/dgitglower", async (req, res) => {
-  let { openid, apid, opa } = req.body
-  let user = await userInfoModel.findOne({ openid: openid })
+  let { nid, apid, opa } = req.body
+  let user = await userInfoModel.findOne({ _id: nid })
   if (opa > user.gitflower) {
     res.send({
       code: 201,
@@ -327,7 +327,7 @@ router.post("/dgitglower", async (req, res) => {
   } else {
     await aftdoorModel.create(req.body)
     let nowflowers = user.gitflower - opa
-    await userInfoModel.updateOne({ openid: openid }, { gitflower: nowflowers })
+    await userInfoModel.updateOne({ _id: nid }, { gitflower: nowflowers })
     res.send({
       code: 200,
       msg: "赠送成功"
@@ -355,15 +355,19 @@ router.get("/getapuservotes", async (req, res) => {
 
 //获取所有投票记录
 router.get("/voteshistory", async (req, res) => {
-  // let sends = await voteModel.find()
-  // let flowers = await aftdoorModel.find({openid: { $exists: true }})
   let { page, pageSize } = req.query
   let sends = await voteModel.aggregate([
+    {
+      $addFields: {
+        dovoter: { $toObjectId: "$dovoter" }, // 将字符串转换为 ObjectId
+        actvoter: { $toObjectId: "$actvoter" } // 同理转换另一个字段
+      }
+    },
     {
       $lookup: {
         from: "userInfo",
         localField: "dovoter",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc"
       }
     },
@@ -371,20 +375,25 @@ router.get("/voteshistory", async (req, res) => {
       $lookup: {
         from: "userInfo",
         localField: "actvoter",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc2"
       }
     }
   ])
   let flowers = await aftdoorModel.aggregate([
     {
-      $match: { openid: { $exists: true } }
+      $match: { nid: { $exists: true } }
+    },
+    {
+      $addFields: {
+        nid: { $toObjectId: "$nid" }, // 将字符串转换为 ObjectId
+      }
     },
     {
       $lookup: {
         from: "userInfo",
-        localField: "openid",
-        foreignField: "openid",
+        localField: "nid",
+        foreignField: "_id",
         as: "desc"
       }
     },
@@ -392,7 +401,7 @@ router.get("/voteshistory", async (req, res) => {
       $lookup: {
         from: "userInfo",
         localField: "apid",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc2"
       }
     }

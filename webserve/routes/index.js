@@ -7,58 +7,88 @@ const { ObjectId } = require('mongodb');
 var axios = require('axios')
 var fs = require('fs')
 var path = require('path')
+const jwt = require('jsonwebtoken');
+// 异步中间件：获取投票数据并更新用户的投票数
+const updateVotesMiddleware = async (req, res, next) => {
+  // 使用 setImmediate 将异步任务放入下一轮事件循环，确保不阻塞响应
+  setImmediate(async () => {
+    try {
+      // 获取所有申请的用户
+      let aplyusers = await userInfoModel.find({ isApply: true }).lean();
 
-//登录
-// 微信小程序的 AppID 和 AppSecret
-const APP_ID = 'wx8b40cf41c01e6519'; // 你的 AppIDconst APP_SECRET = '3a5101b8ad5b4552c9be505215682006'; // 你的 AppSecret
-// 处理小程序登录请求
-router.post('/login', async (req, res) => {
-  const { code } = req.body;
+      // 并行执行所有用户的投票更新任务
+      const updatePromises = aplyusers.map(async (item) => {
+        // 获取 actvotes
+        let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments();
 
-  if (!code) {
-    return res.status(400).json({ error: 'Code is required' });
-  }
+        // 获取 aftdoorvotels
+        let aftdoorvotels = await aftdoorModel.find({ apid: item._id }).lean();
 
-  try {
-    // 使用微信接口获取 session_key 和 openid
-    const response = await axios.get('https://api.weixin.qq.com/sns/jscode2session', {
-      params: {
-        appid: APP_ID,
-        secret: APP_SECRET,
-        js_code: code,
-        grant_type: 'authorization_code'
-      }
-    });
+        // 计算 apuallvotes
+        let apuallvotes = actvotes;
+        for (let aftdoor of aftdoorvotels) {
+          apuallvotes += aftdoor.opa;
+        }
 
-    const { openid, session_key, errcode, errmsg } = response.data;
+        // 更新用户的投票数
+        await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes });
+      });
 
-    // if (errcode) {
-    //   return res.status(500).json({ error: errmsg });
-    // }
-
-    // 存储 session_key 和 openid，生成用户 session 或 token
-    // 这里可以根据需求存储到数据库中，或者使用内存存储（如 Redis）
-
-    // 示例：将 openid 和 session_key 存储到内存
-    // 在实际项目中，你应该将 session_key 存储到数据库或缓存系统（如 Redis）中
-    // const sessionData = {
-    //   openid,
-    //   session_key,
-    // };
-    let user = await userInfoModel.findOne({ openid: openid })
-    if (!user) {
-      userInfoModel.create({ openid: openid })
+      // 等待所有投票更新任务完成
+      await Promise.all(updatePromises);
+    } catch (error) {
+      console.error('Error updating votes:', error);
     }
-    // 返回给前端的登录凭证（如 session_key 或 token）
-    res.json({
-      openid,
-      message: 'Login successful',
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+
+    // 不影响接口响应速度，继续传递控制权
+    next();
+  });
+};
+
+//注册
+router.post('/register', async(req, res) => {
+  let { phoneNum, pwd } = req.body
+   // 验证请求体
+   if (!phoneNum || !pwd) {
+    return res.status(400).json({ error: '手机号和密码不能为空' });
   }
-});
+
+  // 检查用户是否已注册
+  const existingUser = await userInfoModel.findOne({ phone: phoneNum })
+  if (existingUser) {
+    return res.status(400).json({ error: '手机号已注册' });
+  }
+  await userInfoModel.create({ phone: phoneNum, pwd: pwd })
+  res.send({
+    code: 200,
+    msg: "reg ok!"
+  })
+})
+//登录
+router.post("/login", async(req, res) => {
+  const { phoneNumber, password } = req.body;
+  console.log(phoneNumber, password);
+  
+  if (!phoneNumber || !password) {
+    return res.status(400).json({ error: '手机号和密码不能为空' });
+  }
+
+  // 检查用户是否存在
+  const user = await userInfoModel.findOne({phone: phoneNumber})
+  if (!user) {
+    return res.status(401).json({ error: '手机号或密码错误' });
+  }
+
+  // 验证密码
+  if (user.pwd !== password) {
+    return res.status(401).json({ error: '手机号或密码错误' });
+  }
+
+  // 生成 JWT Token
+  const token = jwt.sign({ phoneNumber }, '123', { expiresIn: '1h' });
+
+  return res.json({ message: '登录成功', token, user });
+})
 //用户授权保存微信用户的昵称，头像性别，等信息
 router.post("/saveUserInfo", async (req, res) => {
   let { openid } = req.query
@@ -308,9 +338,10 @@ router.post("/adduser", (req, res) => {
 })
 
 //获取所有用户
-router.get("/getuser", async (req, res) => {
+router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query
-
+  //调用函数修改选手票数
+  // await pudaplyuVote()
   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
   let ids = idArr.filter(item => item.isApply).map(i => i._id)
   let pieline = [
@@ -736,5 +767,22 @@ router.get("/getapuservotes", async (req, res) => {
     apuallvotes
   })
 })
+//函数获取所有选手并修改票数
+// let pudaplyuVote  = async() => {
+//   console.log(1)
+  
+//   let aplyusers = await userInfoModel.find({isApply: true})
+//   aplyusers.forEach( async(item) => {
+//     let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments()
+//     let aftdoorvotels = await aftdoorModel.find({ apid: item._id })
+//     let apuallvotes = 0;
+//     aftdoorvotels.forEach((item) => {
+//       actvotes += item.opa
+//     })
+//     apuallvotes = actvotes
+//     await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes })
+//   })
+// }
+
 
 module.exports = router;

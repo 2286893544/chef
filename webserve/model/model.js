@@ -106,6 +106,9 @@ const userInfoSchema = new mongoose.Schema({
     maxLength: 11,
     default: 12345678901
   },
+  pwd: {
+    type: String
+  },
   resumeText: String,//富文本可以先不添加
   visitNum: {//访问量默认，后期进行修改
     type: Number,

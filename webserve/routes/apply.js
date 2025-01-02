@@ -33,59 +33,52 @@ router.post("/apply", async (req, res) => {
   }
 })
 
-// 模拟数据
-const data = {
-  name: "张三",
-  age: 30,
-  contact: "123456789",
-  gender: "男",
-  position: "前端工程师",
-  resumeText: "拥有5年开发经验，熟悉React和Vue。擅长组件开发、性能优化，热爱开源。",
-  label: "认真负责, 团队合作, 创新精神",
-  cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s", // 模拟封面图片
-  additionalImages: [
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQqlGa6l0K84mRAqdeQ6dRDIEfLE8Ai_iMYg&s", // 模拟荣誉图片1
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s", // 模拟荣誉图片2
-  ],
-};
 
-// 报名信息数据处理
 const convertToQuillHTML = (data) => {
   let htmlContent = `
     <body><div class="quill-editor-content" style="font-family: Arial, sans-serif; line-height: 1.6; color: #fff; text-align: center; background-color: #333; padding: 20px; border-radius: 8px;">
   `;
 
-  // 添加封面图片
-  if (data.cover) {
+  // 添加个人头像
+  if (data.profileImage) {
     htmlContent += `
       <div style="margin-bottom: 20px;">
-        <img src="${data.cover}" alt="Cover Image" style="width: 100%; max-width: 300px; height: auto; border-radius: 8px; border: 2px solid #fff; margin: auto;" />
+        <img src="${data.profileImage}" alt="Profile Image" style="width: 100%; max-width: 150px; height: auto; border-radius: 50%; border: 2px solid #fff; margin: auto;" />
       </div>
     `;
   }
 
   // 添加姓名和职位
   htmlContent += `
-    <div style="margin-bottom: 10px; color: #fff;">
-      <h1 style="font-size: 20px; margin: 0;">${data.name}</h1>
-      <p style="font-size: 14px; color: #ddd; margin: 5px 0;"><strong>${data.position}</strong></p>
+    <div style="margin-bottom: 10px;">
+      <h1 style="font-size: 24px; margin: 0;">${data.name}</h1>
+      <p style="font-size: 16px; margin: 5px 0;"><strong>${data.position}</strong></p>
     </div>
   `;
 
-  // 添加简历文本
-  if (data.resumeText) {
+  // 添加年龄和联系方式
+  htmlContent += `
+    <div style="margin-bottom: 20px;">
+      <p><strong>年龄:</strong> ${data.age}</p>
+      <p><strong>联系方式:</strong> ${data.contact}</p>
+    </div>
+  `;
+
+  // 添加简历
+  if (data.resume) {
     htmlContent += `
-      <div style="margin-bottom: 20px; color: #ddd; padding: 10px; text-align: left; font-size: 14px; background: #444; border-radius: 8px;">
-        <p style="margin: 0; white-space: pre-wrap;">${data.resumeText}</p>
+      <div style="margin-bottom: 20px; padding: 10px; text-align: left; font-size: 14px;border-radius: 8px;">
+        <p style="margin: 0; white-space: pre-wrap;">${data.resume}</p>
       </div>
     `;
   }
 
   // 如果有荣誉图片
-  if (data.additionalImages && data.additionalImages.length > 0) {
+  if (data.honorImages && data.honorImages.length > 0) {
     htmlContent += `
       <div style="margin-bottom: 20px;">
-        ${data.additionalImages
+        <h3 style="font-size: 18px; color: #fff;">荣誉照片</h3>
+        ${data.honorImages
         .map(
           (imgUrl) => `
               <div style="margin-bottom: 10px;">
@@ -98,14 +91,54 @@ const convertToQuillHTML = (data) => {
     `;
   }
 
+  // 如果有人物照片
+  if (data.personImages && data.personImages.length > 0) {
+    htmlContent += `
+      <div style="margin-bottom: 20px;">
+        <h3 style="font-size: 18px; color: #fff;">人物照片</h3>
+        ${data.personImages
+        .map(
+          (imgUrl) => `
+              <div style="margin-bottom: 10px;">
+                <img src="${imgUrl}" alt="Person Image" style="width: 100%; max-width: 300px; border-radius: 8px; border: 2px solid #fff;" />
+              </div>
+            `
+        )
+        .join("")}
+      </div>
+    `;
+  }
+
+  // 添加荣誉证书
+  if (data.honorType) {
+    htmlContent += `
+      <div style="margin-bottom: 20px; color: #ddd;">
+        <p><strong>荣誉证书:</strong> ${data.honorType}</p>
+      </div>
+    `;
+  }
+
   htmlContent += `</div></body>`;
   return htmlContent;
 };
 
-
-
 // 调用函数并输出 HTML
+const data = {
+  name: "张三",
+  age: 30,
+  contact: "123456789",
+  gender: "男",
+  position: "前端开发工程师",
+  resume: "具备5年丰富的前端开发经验，擅长Vue、React、Node.js等技术栈。",
+  profileImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s",
+  honorImages: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s"],
+  personImages: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s"],
+  honorType: "最佳前端开发奖"
+};
+
 const htmlOutput = convertToQuillHTML(data);
+console.log(htmlOutput);
+
 
 
 module.exports = router;

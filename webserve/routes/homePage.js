@@ -48,74 +48,156 @@ const updateVotesMiddleware = async (req, res, next) => {
   });
 };
 //获取所有首页选手
+// router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
+//   let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query
+
+//   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
+//   let ids = idArr.filter(item => item.isApply).map(i => i._id)
+//   let pieline = [
+//     {
+//       $lookup: {
+//         localField: "position",
+//         foreignField: "_id",
+//         from: "position",
+//         as: "position"
+//       }
+//     },
+
+//   ];
+//   if (fsc == '最热' || fsc == '排行') {
+//     pieline.push(
+//       {
+//         $sort: {
+//           vote: -1
+//         }
+//       }
+//     )
+//   }
+//   if (fsc == '最新') {
+//     pieline.push(
+//       {
+//         $sort: {
+//           addTime: -1
+//         }
+//       }
+//     )
+//   }
+//   if (searchcontent) {
+//     pieline.push({
+//       $match: {
+//         $or: [
+//           { name: { $regex: searchcontent } }, // 模糊匹配名称
+//           { mark: Number(searchcontent) }, // 精确匹配编号
+//         ],
+//       },
+//     });
+//   }
+//   if (positionid) {
+//     pieline.push({
+//       $match: {
+//         "position._id": new ObjectId(positionid), // 转换为 ObjectId
+//       },
+//     });
+//   }
+//   pieline.push({
+//     $skip: (nowPage - 1) * pageSize
+//   })
+//   pieline.push(
+//     {
+//       $limit: Number(pageSize)
+//     }
+//   )
+//   let users = await userInfoModel.aggregate(pieline)
+//   let userstotal = await userInfoModel.countDocuments()
+//   res.send({
+//     code: 200,
+//     users: users,
+//     userstotal: userstotal,
+//     ids: ids
+//   })
+// })
 router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
-  let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query
+  try {
+    let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;
 
-  let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
-  let ids = idArr.filter(item => item.isApply).map(i => i._id)
-  let pieline = [
-    {
-      $lookup: {
-        localField: "position",
-        foreignField: "_id",
-        from: "position",
-        as: "position"
-      }
-    },
+    // 获取已报名用户的ID
+    let idArr = await userInfoModel.find({ isApply: true }).select('_id').lean();
+    let ids = idArr.map(i => i._id);
 
-  ];
-  if (fsc == '最热' || fsc == '排行') {
-    pieline.push(
+    // 构建基础聚合管道
+    let pipeline = [
+      { $match: { _id: { $in: ids } } },
       {
-        $sort: {
-          vote: -1
+        $lookup: {
+          localField: "position",
+          foreignField: "_id",
+          from: "position",
+          as: "position"
         }
-      }
-    )
-  }
-  if (fsc == '最新') {
-    pieline.push(
-      {
-        $sort: {
-          addTime: -1
-        }
-      }
-    )
-  }
-  if (searchcontent) {
-    pieline.push({
-      $match: {
-        $or: [
-          { name: { $regex: searchcontent } }, // 模糊匹配名称
-          { mark: Number(searchcontent) }, // 精确匹配编号
-        ],
       },
-    });
-  }
-  if (positionid) {
-    pieline.push({
-      $match: {
-        "position._id": new ObjectId(positionid), // 转换为 ObjectId
-      },
-    });
-  }
-  pieline.push({
-    $skip: (nowPage - 1) * pageSize
-  })
-  pieline.push(
-    {
-      $limit: Number(pageSize)
+    ];
+
+    // 添加排序
+    if (fsc === '最热' || fsc === '排行') {
+      pipeline.push({ $sort: { vote: -1 } });
+    } else if (fsc === '最新') {
+      pipeline.push({ $sort: { addTime: -1 } });
     }
-  )
-  let users = await userInfoModel.aggregate(pieline)
-  let userstotal = await userInfoModel.countDocuments()
-  res.send({
-    code: 200,
-    users: users,
-    userstotal: userstotal,
-    ids: ids
-  })
-})
+
+    // 添加搜索内容过滤
+    if (searchcontent) {
+      const mark = Number(searchcontent);
+      pipeline.push({
+        $match: {
+          $or: [
+            { name: { $regex: searchcontent, $options: 'i' } }, // 模糊匹配名称，忽略大小写
+            { mark: !isNaN(mark) ? mark : null }, // 精确匹配编号，如果不是数字则忽略
+          ].filter(condition => condition.mark !== null) // 过滤掉无效的mark条件
+        }
+      });
+    }
+
+    // 添加职位ID过滤
+    if (positionid) {
+      pipeline.push({
+        $match: {
+          "position._id": new ObjectId(positionid),
+        },
+      });
+    }
+
+    // 使用 $facet 同时获取分页数据和总数
+    pipeline.push({
+      $facet: {
+        users: [
+          { $skip: (Number(nowPage) - 1) * Number(pageSize) },
+          { $limit: Number(pageSize) }
+        ],
+        totalCount: [
+          { $count: "count" }
+        ]
+      }
+    });
+
+    // 执行聚合管道
+    let result = await userInfoModel.aggregate(pipeline);
+
+    // 提取结果
+    const users = result[0].users;
+    const userstotal = result[0].totalCount.length > 0 ? result[0].totalCount[0].count : 0;
+
+    res.send({
+      code: 200,
+      users: users,
+      userstotal: userstotal,
+      ids: ids
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ code: 500, message: '服务器内部错误' });
+  }
+});
+
 // 获取轮播图
 router.get('/getCarousel', async (req, res) => {
   let carousel;
@@ -450,10 +532,16 @@ router.get("/sinaplyvotes", async (req, res) => {
   //所有的记录
   let sends = await voteModel.aggregate([
     {
+      $addFields: {
+        dovoter: { $toObjectId: "$dovoter" }, // 将字符串转换为 ObjectId
+        actvoter: { $toObjectId: "$actvoter" } // 同理转换另一个字段
+      }
+    },
+    {
       $lookup: {
         from: "userInfo",
         localField: "dovoter",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc"
       }
     },
@@ -461,20 +549,25 @@ router.get("/sinaplyvotes", async (req, res) => {
       $lookup: {
         from: "userInfo",
         localField: "actvoter",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc2"
       }
     }
   ])
   let flowers = await aftdoorModel.aggregate([
     {
-      $match: { openid: { $exists: true } }
+      $match: { nid: { $exists: true } }
+    },
+    {
+      $addFields: {
+        nid: { $toObjectId: "$nid" }, // 将字符串转换为 ObjectId
+      }
     },
     {
       $lookup: {
         from: "userInfo",
-        localField: "openid",
-        foreignField: "openid",
+        localField: "nid",
+        foreignField: "_id",
         as: "desc"
       }
     },
@@ -482,7 +575,7 @@ router.get("/sinaplyvotes", async (req, res) => {
       $lookup: {
         from: "userInfo",
         localField: "apid",
-        foreignField: "openid",
+        foreignField: "_id",
         as: "desc2"
       }
     }
@@ -513,14 +606,14 @@ router.get("/sinaplyvotes", async (req, res) => {
   console.log(result);
 
   let filterdata;
-  if (voice == 'active') {
+  if (voice === 'active') {
     filterdata = result.filter((item) => {
-      item.desc[0]._id = vid
+      item.desc[0]._id = new ObjectId(vid)
     })
   }
-  if (voice == 'passive') {
+  if (voice === 'passive') {
     filterdata = result.filter((item) => {
-      item.desc2[0]._id = vid
+      item.desc2[0]._id = new ObjectId(vid)
     })
   }
   const skip = (page - 1) * pageSize;

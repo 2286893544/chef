@@ -116,7 +116,7 @@ const userInfoSchema = new mongoose.Schema({
   },
   richText: {
     type: String,
-    default: "暂无"
+    default: ""
   },//富文本可以先不添加
   addTime: {//默认添加
     type: Date,

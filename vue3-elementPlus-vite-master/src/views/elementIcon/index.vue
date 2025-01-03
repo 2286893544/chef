@@ -38,7 +38,7 @@
 					<el-button type="primary" @click="gorich(scope.row)">简介</el-button>
 					<el-button type="primary" @click="goComment(scope.row._id)">留言板</el-button>
 					<el-button type="primary" size="small" @click="setdialogvisiblew('upd', scope.row)">编辑</el-button>
-					<el-button type="danger">删除</el-button>
+					<el-button type="danger" @click="deluser(scope.row._id)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -248,9 +248,17 @@ const resetForm = () => {
 }
 //添加
 const addactive = async () => {
-	let res: any = await service.post("/adduser", ruleForm)
+	let res: any = await service.post("/adduser", {...ruleForm, isApply: true})
 	if (res.code == 200) {
 		centerDialogVisible.value = false
+		getdusers()
+	}
+}
+//删除
+
+const deluser = async(userid: any) => {
+	let res: any = await service.post("/deluser", userid)
+	if (res.code == 200) {
 		getdusers()
 	}
 }

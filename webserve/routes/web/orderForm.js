@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var {
   orderFormModel,//票数操作库
-} = require("../model/model");
+} = require("../../model/model");
 
 // 查询指定订单
 router.get('/getOrder', async (req, res) => {

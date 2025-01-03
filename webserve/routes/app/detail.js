@@ -4,7 +4,7 @@ var {
   carouselModel,  //  轮播图
   userInfoModel,//用户
   commentModel,//留言板
-} = require("../model/model");
+} = require("../../model/model");
 
 // 获取轮播图
 router.get('/getCarousel', async (req, res) => {

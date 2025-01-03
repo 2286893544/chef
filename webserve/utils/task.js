@@ -12,9 +12,11 @@ let tasks = {}; // 存储当前运行的任务，用于管理任务状态
  * @param {Date} executeAt - 任务执行时间
  * @param {Function} callback - 回调函数，定义任务触发时的逻辑
  */
+
 async function scheduleTask(taskId, executeAt, callback) {
   // 检查任务是否已经存在
   if (tasks[taskId]) {
+    console.log('----- 调度任务日志 -----')
     console.log(`任务 ${taskId} 已存在，跳过重复调度`);
     return;
   }
@@ -22,12 +24,14 @@ async function scheduleTask(taskId, executeAt, callback) {
   // 检查任务是否已经完成
   const existingTask = await TaskModel.findOne({ _id: taskId });
   if (existingTask && existingTask.status === 'completed') {
+    console.log('----- 调度任务日志 -----')
     console.log(`任务 ${taskId} 已经完成，跳过调度`);
     return;
   }
 
   const now = new Date();
   if (executeAt < now) {
+    console.log('----- 调度任务日志 -----')
     console.log(`任务 ${taskId} 的时间 ${executeAt} 已过期，立即执行任务逻辑`);
     callback().then(() => {
       console.log(`任务 ${taskId} 已立即执行完成`);
@@ -41,6 +45,7 @@ async function scheduleTask(taskId, executeAt, callback) {
 
   // 设置任务执行时间
   const job = schedule.scheduleJob(executeAt, async () => {
+    console.log('----- 调度任务日志 -----')
     console.log(`触发任务 ${taskId}`);
     try {
       await callback();
@@ -54,6 +59,7 @@ async function scheduleTask(taskId, executeAt, callback) {
   });
 
   tasks[taskId] = job;
+  console.log('----- 调度任务日志 -----')
   console.log(`任务 ${taskId} 已调度，将在 ${formatDate(executeAt)} 执行`);
 }
 
@@ -66,11 +72,14 @@ async function updateTaskStatus(taskId, status) {
   try {
     const result = await TaskModel.updateOne({ _id: taskId }, { status });
     if (result.nModified === 0) {
+      console.log('----- 调度任务日志 -----')
       console.error(`任务 ${taskId} 状态更新失败: 找不到对应任务`);
     } else {
+      console.log('----- 调度任务日志 -----')
       console.log(`任务 ${taskId} 状态更新为 ${status}`);
     }
   } catch (err) {
+    console.log('----- 调度任务日志 -----')
     console.error(`更新任务 ${taskId} 状态失败:`, err);
   }
 }
@@ -79,6 +88,7 @@ async function updateTaskStatus(taskId, status) {
  * 重新加载未完成的任务
  */
 async function reloadTasks() {
+  console.log('----- 调度任务日志 -----')
   console.log("重新加载未完成任务...");
   const pendingTasks = await TaskModel.find({ status: 'pending' });
 
@@ -89,12 +99,14 @@ async function reloadTasks() {
         { $inc: { vote: task.voteIncrement } }
       );
       const logMessage = `用户 ${task.userId} 的票数增加了 ${task.voteIncrement}`;
+      console.log('----- 调度任务日志 -----')
       console.log(logMessage);
       writeLog('vote.txt', logMessage);
     });
   });
 
   const reloadMessage = `重新加载了 ${pendingTasks.length} 个未完成的任务`;
+  console.log('----- 调度任务日志 -----')
   console.log(reloadMessage);
   writeLog('vote.txt', reloadMessage);
 }
@@ -110,6 +122,7 @@ function scheduleDailyVoteReset() {
   const scheduleTime = now.clone().endOf('day').add(1, 'minute');  // 获取第二天的 00:01
 
   schedule.scheduleJob(scheduleTime, async () => {
+    console.log('----- 调度任务日志 -----')
     console.log('开始执行每日投票数量重置任务...');
     writeLog('renewal.txt', '开始执行每日投票数量重置任务...');
 
@@ -117,15 +130,18 @@ function scheduleDailyVoteReset() {
       const voteIncrement = 2;
       const result = await userInfoModel.updateMany({}, { $inc: { voteNum: voteIncrement } });
       const successMessage = `成功为 ${result.modifiedCount} 个用户恢复了 ${voteIncrement} 张投票次数`;
+      console.log('----- 调度任务日志 -----')
       console.log(successMessage);
       writeLog('renewal.txt', successMessage);
     } catch (err) {
       const errorMessage = `每日投票数量重置任务失败: ${err.message}`;
+      console.log('----- 调度任务日志 -----')
       console.error(errorMessage);
       writeLog('renewal.txt', errorMessage);
     }
   });
 
+  console.log('----- 调度任务日志 -----')
   console.log('已成功调度每日凌晨 12 点的投票数量重置任务');
   writeLog('renewal.txt', '已成功调度每日凌晨 12 点的投票数量重置任务');
 }

@@ -3,7 +3,7 @@ var router = express.Router();
 var {
   activityMsgModel, //  活动信息
   userInfoModel,//用户
-} = require("../model/model");
+} = require("../../model/model");
 
 // 获取服务器数据展示
 router.get("/getShow", async (req, res) => {
@@ -20,7 +20,7 @@ router.get("/getShow", async (req, res) => {
 router.get("/getRank", async (req, res) => {
   let userRank; // 前三名
   let userRanks; // 其他名次
-  let { page = 1, pagesize = 8, position = '' } = req.query;
+  let { page = 1, pagesize = 6, position = '' } = req.query;
   let total;
 
   try {
@@ -35,33 +35,33 @@ router.get("/getRank", async (req, res) => {
 
     // 获取全局的前三名，确保是 isApply: true 的用户
     topUsers = await userInfoModel.find(filterConditions)
-      .sort({ vote: -1 })
+      .sort({ vote: -1, mark: 1 })  // 先按 vote 排序，如果 vote 相同，按 mark 升序排序
       .limit(3)
       .lean();
 
     // 获取前三名的用户ID
     const topUserIds = topUsers.map(user => user._id);
 
+    // 获取总记录数，排除前三名的数据
+    total = await userInfoModel.find({
+      ...filterConditions,
+      _id: { $nin: topUserIds }
+    }).countDocuments();
+
     // 获取分页后的数据，排除前三名，确保 isApply: true
     data = await userInfoModel.find({
       ...filterConditions,
       _id: { $nin: topUserIds } // 排除前三名
     })
-      .sort({ vote: -1 })
-      .skip((page - 1) * pagesize)
-      .limit(pagesize)
+      .sort({ vote: -1, mark: 1 })  // 先按 vote 排序，如果 vote 相同，按 mark 升序排序
+      .skip((page - 1) * pagesize)  // 分页跳过已显示的数据
+      .limit(pagesize)  // 限制每页的数量
       .lean();
 
-    // 获取总记录数（符合 isApply: true 条件，不排除前三名）
-    total = await userInfoModel.find(filterConditions).countDocuments();
-
-    // 将前三名与分页数据合并
+    // 将前三名与分页数据合并，确保没有重复的用户
     userRank = topUsers;
     userRanks = data; // 排除前三名后的分页数据
 
-  } catch (err) {
-    res.status(500).send({ msg: "服务器错误", code: 500, ok: false });
-  } finally {
     res.status(200).send({
       msg: "获取成功",
       code: 200,
@@ -70,8 +70,14 @@ router.get("/getRank", async (req, res) => {
       userRanks,
       total,  // 返回的 total 是所有 isApply: true 的用户总数
     });
+
+  } catch (err) {
+    res.status(500).send({ msg: "服务器错误", code: 500, ok: false });
   }
 });
+
+
+
 
 
 

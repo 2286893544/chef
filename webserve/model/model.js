@@ -137,7 +137,7 @@ const userInfoSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  isAudit: {
+  isAudit: { // 简历审核是否通过
     type: Boolean,
     default: false
   }
@@ -252,8 +252,8 @@ const taskSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'completed'], default: 'pending' }, // 任务状态
   createdAt: { type: Date, default: Date.now }, // 创建时间
 });
-
 const TaskModel = mongoose.model('Task', taskSchema, 'Task');
+
 const ctrlSchema = new mongoose.Schema({
   act: String,
   pwd: String

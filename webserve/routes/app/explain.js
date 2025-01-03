@@ -9,7 +9,7 @@ var {
   commentModel,//留言板
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
-} = require("../model/model");
+} = require("../../model/model");
 
 // 活动说明页 - 图片
 router.get('/getExplain', async (req, res) => {

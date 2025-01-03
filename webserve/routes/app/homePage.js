@@ -9,7 +9,7 @@ var {
   commentModel,//留言板
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
-} = require("../model/model");
+} = require("../../model/model");
 const { ObjectId } = require('mongodb');
 // 异步中间件：获取投票数据并更新用户的投票数
 const updateVotesMiddleware = async (req, res, next) => {

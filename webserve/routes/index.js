@@ -47,10 +47,10 @@ const updateVotesMiddleware = async (req, res, next) => {
 
 //注册
 router.post('/register', async(req, res) => {
-  let { phoneNum, pwd } = req.body
+  let { phoneNum, pwd, avtor } = req.body
    // 验证请求体
-   if (!phoneNum || !pwd) {
-    return res.status(400).json({ error: '手机号和密码不能为空' });
+   if (!phoneNum || !pwd || !avtor) {
+    return res.status(400).json({ error: '手机号和密码,头像不能为空' });
   }
 
   // 检查用户是否已注册
@@ -58,7 +58,7 @@ router.post('/register', async(req, res) => {
   if (existingUser) {
     return res.status(400).json({ error: '手机号已注册' });
   }
-  await userInfoModel.create({ phone: phoneNum, pwd: pwd })
+  await userInfoModel.create({ phone: phoneNum, pwd: pwd, avtor: avtor })
   res.send({
     code: 200,
     msg: "reg ok!"

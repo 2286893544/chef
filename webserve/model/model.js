@@ -114,7 +114,10 @@ const userInfoSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  richText: String,//富文本可以先不添加
+  richText: {
+    type: String,
+    default: "暂无"
+  },//富文本可以先不添加
   addTime: {//默认添加
     type: Date,
     default: Date.now,
@@ -133,6 +136,10 @@ const userInfoSchema = new mongoose.Schema({
   gitflower: {
     type: Number,
     default: 0
+  },
+  isAudit: {
+    type: Boolean,
+    default: false
   }
 })
 const counterSchema = new mongoose.Schema({

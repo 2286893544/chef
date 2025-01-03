@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const mongoose = require('mongoose');
 var {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
@@ -10,7 +11,6 @@ var {
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
 } = require("../model/model");
-const { wxPay } = require('../utils/jsSDK');  // 引入jsSDK中的wxPay方法
 
 // 获取职位信息
 router.get("/getPosition", async (req, res) => {
@@ -23,27 +23,60 @@ router.get("/getPosition", async (req, res) => {
 })
 
 // 报名  -- 测试中
-router.post("/apply", async (req, res) => {
+router.put("/addApply", async (req, res) => {
   try {
-    let { name, age, contact, gender, position, resume, profileImage, additionalImages } = req.body;
-    // const data = convertToQuillHTML(req.body);
+    let { _id, name, age, contact, gender, position, profileImage } = req.body;
 
+    // 确保 _id 是 ObjectId 类型
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.json({ code: 400, msg: "无效的用户 ID" });
+    }
+
+    // 转换富文本为 HTML
+    const data = convertToQuillHTML(req.body);
+
+    // 检查是否传递了必要的字段
+    if (!name || !age || !contact || !gender || !position) {
+      return res.json({ code: 400, msg: "所有字段都必须填写" });
+    }
+
+    // 更新数据库
+    const result = await userInfoModel.updateOne(
+      { _id },
+      {
+        name,
+        age,
+        phone: contact, // 确保字段名一致
+        gender,
+        position,
+        richText: data,
+        avtor: profileImage
+      }
+    );
+
+    if (result.nModified === 0) {
+      return res.json({ code: 404, msg: "未找到用户或没有更改" });
+    }
+
+    console.log(data);  // 打印转换后的 HTML 内容
+    res.json({ code: 200, msg: "报名成功，请等待管理员审核" });
   } catch (err) {
-    res.json({ code: 500, msg: "服务器错误" })
+    console.error("Error during update:", err);  // 打印详细的错误信息
+    res.json({ code: 500, msg: "服务器错误" });
   }
-})
+});
 
 
 const convertToQuillHTML = (data) => {
   let htmlContent = `
-    <body><div class="quill-editor-content" style="font-family: Arial, sans-serif; line-height: 1.6; color: #fff; text-align: center; background-color: #333; padding: 20px; border-radius: 8px;">
+    <head></head><body><div class="quill-editor-content" style="font-family: Arial, sans-serif; line-height: 1.6; text-align: center; padding: 20px; border-radius: 8px;">
   `;
 
   // 添加个人头像
   if (data.profileImage) {
     htmlContent += `
       <div style="margin-bottom: 20px;">
-        <img src="${data.profileImage}" alt="Profile Image" style="width: 100%; max-width: 150px; height: auto; border-radius: 50%; border: 2px solid #fff; margin: auto;" />
+        <img src="${data.profileImage}" alt="Profile Image" style="max-width: 50%; height: auto;" margin: auto;" />
       </div>
     `;
   }
@@ -56,14 +89,6 @@ const convertToQuillHTML = (data) => {
     </div>
   `;
 
-  // 添加年龄和联系方式
-  htmlContent += `
-    <div style="margin-bottom: 20px;">
-      <p><strong>年龄:</strong> ${data.age}</p>
-      <p><strong>联系方式:</strong> ${data.contact}</p>
-    </div>
-  `;
-
   // 添加简历
   if (data.resume) {
     htmlContent += `
@@ -73,47 +98,43 @@ const convertToQuillHTML = (data) => {
     `;
   }
 
-  // 如果有荣誉图片
-  if (data.honorImages && data.honorImages.length > 0) {
-    htmlContent += `
-      <div style="margin-bottom: 20px;">
-        <h3 style="font-size: 18px; color: #fff;">荣誉照片</h3>
-        ${data.honorImages
-        .map(
-          (imgUrl) => `
-              <div style="margin-bottom: 10px;">
-                <img src="${imgUrl}" alt="Honor Image" style="width: 100%; max-width: 300px; border-radius: 8px; border: 2px solid #fff;" />
-              </div>
-            `
-        )
-        .join("")}
-      </div>
-    `;
-  }
-
   // 如果有人物照片
   if (data.personImages && data.personImages.length > 0) {
     htmlContent += `
-      <div style="margin-bottom: 20px;">
-        <h3 style="font-size: 18px; color: #fff;">人物照片</h3>
-        ${data.personImages
+        <div style="margin-bottom: 20px;">
+          ${data.personImages
         .map(
           (imgUrl) => `
-              <div style="margin-bottom: 10px;">
-                <img src="${imgUrl}" alt="Person Image" style="width: 100%; max-width: 300px; border-radius: 8px; border: 2px solid #fff;" />
-              </div>
-            `
+                <div style="margin-bottom: 10px;">
+                  <img src="${imgUrl}" alt="Person Image" style="max-width: 50%; height: auto;" margin: auto;" />
+                </div>
+              `
         )
         .join("")}
-      </div>
-    `;
+        </div>
+      `;
   }
 
   // 添加荣誉证书
   if (data.honorType) {
     htmlContent += `
-      <div style="margin-bottom: 20px; color: #ddd;">
-        <p><strong>荣誉证书:</strong> ${data.honorType}</p>
+        <div style="margin-bottom: 20px;">
+          <p><strong></strong> ${data.honorType}</p>
+        </div>
+      `;
+  }
+
+  // 如果有荣誉图片
+  if (data.honorImages && data.honorImages.length > 0) {
+    htmlContent += `
+      <div style="margin-bottom: 20px;">
+        ${data.honorImages.map(
+      (imgUrl) => `
+              <div style="margin-bottom: 10px;">
+                <img src="${imgUrl}" alt="Honor Image" style="max-width: 50%; height: auto;" margin: auto;" />
+              </div>
+            `
+    ).join("")}
       </div>
     `;
   }
@@ -121,23 +142,6 @@ const convertToQuillHTML = (data) => {
   htmlContent += `</div></body>`;
   return htmlContent;
 };
-
-// 调用函数并输出 HTML
-const data = {
-  name: "张三",
-  age: 30,
-  contact: "123456789",
-  gender: "男",
-  position: "前端开发工程师",
-  resume: "具备5年丰富的前端开发经验，擅长Vue、React、Node.js等技术栈。",
-  profileImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s",
-  honorImages: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s"],
-  personImages: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRKFXnQPm3COQ9nPZiMmbhvfo-sAHvBozV_A&s"],
-  honorType: "最佳前端开发奖"
-};
-
-const htmlOutput = convertToQuillHTML(data);
-console.log(htmlOutput);
 
 
 

@@ -150,19 +150,33 @@ function jobChartinit() {
           text: '职业划分票数',
           left: 'center'
         },
-        xAxis: { type: 'category' },
-        yAxis: { minInterval: 1 },
-        animationDurationUpdate: 500,
+        grid: {
+          top: '20%',  // 增加顶部边距，避免Y轴标签被遮挡
+          left: '15%', // 增加左侧边距，确保标签有足够的显示空间
+          right: '10%', // 右侧边距增加，确保右侧不被遮挡
+          bottom: '20%' // 增加底部边距，确保图表底部有足够空间
+        },
+        xAxis: {
+          type: 'category',
+          axisLabel: {
+            textStyle: {
+              fontSize: 12,  // 调整字体大小
+              color: '#000'  // 设置字体颜色
+            }
+          }
+        },
+        yAxis: {
+          minInterval: 1,
+          axisLabel: {
+            textStyle: {
+              fontSize: 12,  // 调整Y轴标签字体大小
+              color: '#000'  // 设置Y轴标签颜色
+            }
+          }
+        },
         series: {
           type: 'bar',
-          dimensions: ['x', 'y', 'groupId', 'childGroupId'],
-          encode: {
-            x: 'x',
-            y: 'y',
-            itemGroupId: 'groupId',
-            itemChildGroupId: 'childGroupId'
-          },
-          data,
+          data: data,
           universalTransition: {
             enabled: true,
             divideShape: 'clone'
@@ -209,7 +223,6 @@ function jobChartinit() {
       const currentOption: any = myEcharts.getOption();
       currentOption.graphic[0].elements[0].style.text = lookState.value; // 更新文本
       myEcharts.setOption(currentOption); // 重新设置图表的配置
-
     };
 
     let option = allOptions['things']; // 初始层级是 "things"
@@ -275,7 +288,7 @@ onMounted(() => {
 }
 
 .chart-container {
-  width: 80%;
+  width: 98%;
   margin: 0 auto;
   margin-top: 40px;
   display: flex;
@@ -283,10 +296,9 @@ onMounted(() => {
   /* 允许在小屏幕下换行 */
   justify-content: space-around;
   align-items: center;
-  margin-top: 10vh;
 
   .chart {
-    width: 40%;
+    width: 45%;
     height: 350px;
     margin-bottom: 20px;
   }
@@ -309,7 +321,6 @@ onMounted(() => {
   .chart-container {
     width: 100%;
     flex-direction: column;
-    margin-top: 20vh;
 
     .chart {
       width: 80%;
@@ -337,9 +348,13 @@ onMounted(() => {
   }
 
   .chart-container {
-    margin-top: 10vh;
-    flex-direction: column;
-    height: 70vh;
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 12px;
 
     .chart {
       width: 90%;

@@ -22,6 +22,8 @@ var app = express();
 
 // 引入任务系统的重新加载功能
 const { reloadTasks, scheduleDailyVoteReset } = require('./utils/task');
+// 引入订单处理函数
+const { orderDispose } = require('./utils/orderDispose');
 
 // ** 任务重启时重新加载未完成任务 **
 reloadTasks()
@@ -33,6 +35,8 @@ reloadTasks()
   });
 // ** 调度每日投票数量重置任务 **
 scheduleDailyVoteReset();
+// ** 调度订单处理任务 **
+orderDispose();
 
 // ** 配置视图引擎 ** 
 app.set('views', path.join(__dirname, 'views')); // 设置视图文件路径

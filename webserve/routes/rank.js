@@ -17,67 +17,65 @@ router.get("/getShow", async (req, res) => {
   }
 })
 
-// 获取用户数据
-// router.get("/getRank", async (req, res) => {
-//   let userRank; // 前三名
-//   let userRanks;
-//   let { page = 1, pagesize = 8, position = '' } = req.query;
-//   let total;
-//   try {
-//     let data;
-//     if (position) {
-//       data = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean()
-//       total = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).countDocuments()
-//     } else {
-//       data = await userInfoModel.find({ isApply: true }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean()
-//       total = await userInfoModel.find({ isApply: true }).countDocuments()
-//     }
-//     userRank = data.filter((item, index) => index < 3)
-//     userRanks = data.filter((item, index) => index >= 3)
-//   } catch (err) {
-//     res.status(500).send({ msg: "服务器错误", code: 500, ok: false })
-//   } finally {
-//     res.status(200).send({ msg: "获取成功", code: 200, ok: true, userRank, userRanks, total })
-//   }
-// })
-
-
 router.get("/getRank", async (req, res) => {
   let userRank; // 前三名
   let userRanks; // 其他名次
   let { page = 1, pagesize = 8, position = '' } = req.query;
   let total;
+
   try {
     let data;
+    let topUsers;
+    let filterConditions = { isApply: true }; // 确保只查询 isApply 为 true 的数据
+
+    // 如果有职位，加入职位筛选条件
     if (position) {
-      // 获取全局的前三名
-      const topUsers = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).sort({ vote: -1 }).limit(3).lean();
-
-      // 获取分页后的数据
-      data = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean();
-      total = await userInfoModel.find({ $and: [{ position }, { isApply: true }] }).countDocuments();
-
-      // 将前三名与分页数据合并
-      userRank = topUsers;
-      userRanks = data.filter((item) => !topUsers.includes(item)); // 排除前三名，剩下的为 userRanks
-    } else {
-      // 获取全局的前三名
-      const topUsers = await userInfoModel.find({ isApply: true }).sort({ vote: -1 }).limit(3).lean();
-
-      // 获取分页后的数据
-      data = await userInfoModel.find({ isApply: true }).sort({ vote: -1 }).skip((page - 1) * pagesize).limit(pagesize).lean();
-      total = await userInfoModel.find({ isApply: true }).countDocuments();
-
-      // 将前三名与分页数据合并
-      userRank = topUsers;
-      userRanks = data.filter((item) => !topUsers.includes(item)); // 排除前三名，剩下的为 userRanks
+      filterConditions.position = position;
     }
+
+    // 获取全局的前三名，确保是 isApply: true 的用户
+    topUsers = await userInfoModel.find(filterConditions)
+      .sort({ vote: -1 })
+      .limit(3)
+      .lean();
+
+    // 获取前三名的用户ID
+    const topUserIds = topUsers.map(user => user._id);
+
+    // 获取分页后的数据，排除前三名，确保 isApply: true
+    data = await userInfoModel.find({
+      ...filterConditions,
+      _id: { $nin: topUserIds } // 排除前三名
+    })
+      .sort({ vote: -1 })
+      .skip((page - 1) * pagesize)
+      .limit(pagesize)
+      .lean();
+
+    // 获取总记录数（符合 isApply: true 条件，不排除前三名）
+    total = await userInfoModel.find(filterConditions).countDocuments();
+
+    // 将前三名与分页数据合并
+    userRank = topUsers;
+    userRanks = data; // 排除前三名后的分页数据
+
   } catch (err) {
     res.status(500).send({ msg: "服务器错误", code: 500, ok: false });
   } finally {
-    res.status(200).send({ msg: "获取成功", code: 200, ok: true, userRank, userRanks, total });
+    res.status(200).send({
+      msg: "获取成功",
+      code: 200,
+      ok: true,
+      userRank,
+      userRanks,
+      total,  // 返回的 total 是所有 isApply: true 的用户总数
+    });
   }
 });
+
+
+
+
 
 
 // 首页根据用户职位

@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const schedule = require('node-schedule');
 const moment = require('moment-timezone'); // 引入 moment-timezone
 const { userInfoModel, TaskModel } = require('../model/model'); // 引入数据库模型
@@ -132,4 +130,8 @@ function scheduleDailyVoteReset() {
   writeLog('renewal.txt', '已成功调度每日凌晨 12 点的投票数量重置任务');
 }
 
-module.exports = { scheduleTask, reloadTasks, scheduleDailyVoteReset };
+module.exports = {
+  scheduleTask, // 设置任务执行时间
+  reloadTasks, // 重新加载未完成的任务
+  scheduleDailyVoteReset // 定时任务：每天凌晨 12 点更新用户投票数量（考虑时区）
+};

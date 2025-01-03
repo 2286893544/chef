@@ -114,7 +114,10 @@ const userInfoSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  richText: String,//富文本可以先不添加
+  richText: {
+    type: String,
+    default: ""
+  },//富文本可以先不添加
   addTime: {//默认添加
     type: Date,
     default: Date.now,
@@ -133,6 +136,10 @@ const userInfoSchema = new mongoose.Schema({
   gitflower: {
     type: Number,
     default: 0
+  },
+  isAudit: { // 简历审核是否通过
+    type: Boolean,
+    default: false
   }
 })
 const counterSchema = new mongoose.Schema({
@@ -245,8 +252,8 @@ const taskSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'completed'], default: 'pending' }, // 任务状态
   createdAt: { type: Date, default: Date.now }, // 创建时间
 });
-
 const TaskModel = mongoose.model('Task', taskSchema, 'Task');
+
 const ctrlSchema = new mongoose.Schema({
   act: String,
   pwd: String

@@ -9,7 +9,7 @@ var {
   commentModel,//留言板
   acspeakModel,//活动说明页
   aftdoorModel,//票数操作库
-} = require("../model/model");
+} = require("../../model/model");
 const { ObjectId } = require('mongodb');
 // 异步中间件：获取投票数据并更新用户的投票数
 const updateVotesMiddleware = async (req, res, next) => {
@@ -47,75 +47,6 @@ const updateVotesMiddleware = async (req, res, next) => {
     next();
   });
 };
-//获取所有首页选手
-// router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
-//   let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query
-
-//   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
-//   let ids = idArr.filter(item => item.isApply).map(i => i._id)
-//   let pieline = [
-//     {
-//       $lookup: {
-//         localField: "position",
-//         foreignField: "_id",
-//         from: "position",
-//         as: "position"
-//       }
-//     },
-
-//   ];
-//   if (fsc == '最热' || fsc == '排行') {
-//     pieline.push(
-//       {
-//         $sort: {
-//           vote: -1
-//         }
-//       }
-//     )
-//   }
-//   if (fsc == '最新') {
-//     pieline.push(
-//       {
-//         $sort: {
-//           addTime: -1
-//         }
-//       }
-//     )
-//   }
-//   if (searchcontent) {
-//     pieline.push({
-//       $match: {
-//         $or: [
-//           { name: { $regex: searchcontent } }, // 模糊匹配名称
-//           { mark: Number(searchcontent) }, // 精确匹配编号
-//         ],
-//       },
-//     });
-//   }
-//   if (positionid) {
-//     pieline.push({
-//       $match: {
-//         "position._id": new ObjectId(positionid), // 转换为 ObjectId
-//       },
-//     });
-//   }
-//   pieline.push({
-//     $skip: (nowPage - 1) * pageSize
-//   })
-//   pieline.push(
-//     {
-//       $limit: Number(pageSize)
-//     }
-//   )
-//   let users = await userInfoModel.aggregate(pieline)
-//   let userstotal = await userInfoModel.countDocuments()
-//   res.send({
-//     code: 200,
-//     users: users,
-//     userstotal: userstotal,
-//     ids: ids
-//   })
-// })
 router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
   try {
     let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;

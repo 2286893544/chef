@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel, aftdoorModel, ctrlModel } = require("../model/model")
+var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel, aftdoorModel, ctrlModel } = require("../../model/model")
 var multiparty = require('multiparty')
 var fs = require('fs')
 const { ObjectId } = require('mongodb');
@@ -167,38 +167,6 @@ router.post("/upload", (req, res) => {
         path: imgpath
       });
     }
-  })
-})
-
-router.post("/uploadr", (req, res) => {
-  //创建一个表单对象
-  let form = new multiparty.Form()
-  //设计图片上传路径
-  form.uploadDir = 'upload'
-  //解析form对象
-  form.parse(req, (err, file, data) => {
-    if (err) {
-      res.status(500).json({ code: 500, msg: err })
-    } else {
-      let imgSrc = data.file[0].path
-      let patharr = imgSrc.split("\\")
-      let imgpath = patharr.join("/")
-      res.send({
-        code: 200,
-        errno: 0,
-        data: {
-          url: `http://1.92.114.25:6624/${imgpath}`
-        }
-      })
-    }
-  })
-})
-// 添加轮播图
-router.post("/addCarousel", (req, res) => {
-  carouselModel.create(req.body)
-  res.status(200).send({
-    code: 200,
-    msg: "添加成功"
   })
 })
 
@@ -602,10 +570,9 @@ router.get("/getShow", async (req, res) => {
 
 router.get("/getDetail", async (req, res) => {
   try {
-    // 获取并处理用户数据
-    let data = await userInfoModel.find().lean();
-    data = data.filter(item => item.isApply); // 筛选有效用户
-    data.sort((a, b) => b.vote - a.vote); // 根据票数排序
+    // 获取并处理用户数据，排除票数为0的用户
+    let data = await userInfoModel.find({ vote: { $gt: 0 }, isApply: true }).lean(); // 筛选票数大于0且已申请的用户
+    data.sort((a, b) => b.vote - a.vote || a.mark - b.mark); // 根据票数降序，票数相同则按 mark 升序
 
     // 获取职位数据并构建职位ID到职位名称的映射
     let poData = await positionModel.find().lean();
@@ -647,7 +614,7 @@ router.get("/getDetail", async (req, res) => {
 
     // 生成职位类型数据（只取每个职位的前10条数据）
     Object.values(jobTypeData).forEach(({ children }) => {
-      // 只取前20条数据
+      // 只取前10条数据
       const limitedChildren = children.slice(0, 10);
       if (limitedChildren.length > 0) {
         data_things.push(limitedChildren);
@@ -666,6 +633,7 @@ router.get("/getDetail", async (req, res) => {
     });
   }
 });
+
 
 
 
@@ -815,22 +783,6 @@ router.get("/getapuservotes", async (req, res) => {
     apuallvotes
   })
 })
-//函数获取所有选手并修改票数
-// let pudaplyuVote  = async() => {
-//   console.log(1)
-  
-//   let aplyusers = await userInfoModel.find({isApply: true})
-//   aplyusers.forEach( async(item) => {
-//     let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments()
-//     let aftdoorvotels = await aftdoorModel.find({ apid: item._id })
-//     let apuallvotes = 0;
-//     aftdoorvotels.forEach((item) => {
-//       actvotes += item.opa
-//     })
-//     apuallvotes = actvotes
-//     await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes })
-//   })
-// }
 
 
 module.exports = router;

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { userInfoModel, orderFormModel, TaskModel } = require('../model/model');
-const { wxPay, getHash } = require('../utils/jsSDK');
-const { scheduleTask } = require('../utils/task');
+const { userInfoModel, orderFormModel, TaskModel } = require('../../model/model');
+const { wxPay, getHash } = require('../../utils/jsSDK');
+const { scheduleTask } = require('../../utils/task');
 
 /**
  * 支付接口

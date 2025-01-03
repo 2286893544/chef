@@ -6,22 +6,24 @@ var logger = require('morgan'); // 用于日志记录
 var cors = require('cors'); // 解决跨域问题
 
 // 引入路由文件
-const indexRouter = require('./routes/index'); // 默认首页路由
-const homePageRouter = require('./routes/homePage');    // 首页
-const applyRouter = require('./routes/apply');          // 报名
-const explainRouter = require('./routes/explain');      // 说明
-const rankRouter = require('./routes/rank');            // 排名
-const detailRouter = require('./routes/detail');        // 详情
-const paymentRouter = require('./routes/payment');      // 支付
-const orderFormRouter = require('./routes/orderForm');  // 订单系统
-const users = require('./routes/users');               // 用户·系统
-const loginRouter = require('./routes/login');         // 登录
+const indexRouter = require('./routes/web/index'); // 默认首页路由
+const paymentRouter = require('./routes/web/payment');      // 支付
+const orderFormRouter = require('./routes/web/orderForm');  // 订单系统
+const loginRouter = require('./routes/web/login');         // 登录
+
+const homePageRouter = require('./routes/app/homePage');    // 首页
+const applyRouter = require('./routes/app/apply');          // 报名
+const explainRouter = require('./routes/app/explain');      // 说明
+const rankRouter = require('./routes/app/rank');            // 排名
+const detailRouter = require('./routes/app/detail');        // 详情
 
 // 初始化 Express 应用
 var app = express();
 
 // 引入任务系统的重新加载功能
 const { reloadTasks, scheduleDailyVoteReset } = require('./utils/task');
+// 引入订单处理函数
+const { orderDispose } = require('./utils/orderDispose');
 
 // ** 任务重启时重新加载未完成任务 **
 reloadTasks()
@@ -33,6 +35,8 @@ reloadTasks()
   });
 // ** 调度每日投票数量重置任务 **
 scheduleDailyVoteReset();
+// ** 调度订单处理任务 **
+orderDispose();
 
 // ** 配置视图引擎 ** 
 app.set('views', path.join(__dirname, 'views')); // 设置视图文件路径
@@ -57,7 +61,6 @@ app.use('/detail', detailRouter); // 详情模块
 app.use('/payment', paymentRouter); // 支付模块
 app.use('/orderForm', orderFormRouter); // 订单模块
 app.use('/login', loginRouter); // 登录模块
-app.use('/users', users); // 用户模块
 
 // ** 捕获 404 错误，并交由错误处理中间件处理 **
 app.use(function (req, res, next) {

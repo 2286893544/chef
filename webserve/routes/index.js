@@ -377,7 +377,14 @@ router.post("/adduser", (req, res) => {
     code: 200
   })
 })
-
+//删除
+router.post("/deluser", async(req, res) => {
+  let { userid } = req.body
+  await userInfoModel.deleteOne({ _id: userid })
+  res.send({
+    code: 200
+  })
+})
 //获取所有用户
 router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query

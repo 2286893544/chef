@@ -362,6 +362,11 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   let ids = idArr.filter(item => item.isApply).map(i => i._id)
   let pieline = [
     {
+      $match: {
+        isApply: true
+      }
+    },
+    {
       $lookup: {
         localField: "position",
         foreignField: "_id",

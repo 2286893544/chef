@@ -27,21 +27,21 @@ const handleCurrentChange = (val: number) => {
 }
 //获取数据
 let votehisdata = ref([])
-let getvotedata = async() => {
-    let res: any = await service.get("/homePage/voteshistory", { params: { page: page.value, pageSize: pageSize.value } })
+let getvotedata = async () => {
+	let res: any = await service.get("/homePage/voteshistory", { params: { page: page.value, pageSize: pageSize.value } })
 
-    votehisdata.value = res.pageData
-    total.value = res.totalItems
-    loadState.value = false
+	votehisdata.value = res.pageData
+	total.value = res.totalItems
+	loadState.value = false
 }
 onMounted(() => {
-    getvotedata()
-    
+	getvotedata()
+
 })
 </script>
 <template>
-    <div>
-        <el-table :data="votehisdata" style="width: 100%; margin-top: 20px">
+	<div>
+		<el-table :data="votehisdata" style="width: 97%; margin: 0 auto; margin-top: 20px">
 			<el-table-column label="用户" align="center">
 				<template v-slot="scope">
 					<!-- {{ scope.row.send }} -->
@@ -56,18 +56,29 @@ onMounted(() => {
 			</el-table-column>
 			<el-table-column label="记录" align="center">
 				<template v-slot="scope">
-                    <!-- {{ scope.row.vote === 1 ? `${scope.row.send}给${scope.row.acp}投了1票` : `${scope.row.send}给${scope.row.acp}赠送了${scope.row.vote}朵鲜花` }} -->
-					{{ scope.row.vote === 1 ? `${scope.row.desc[0].name}给${scope.row.desc2[0].name}投了1票` : `${scope.row.desc[0].name}给${scope.row.desc2[0].name}赠送了${scope.row.vote}朵鲜花` }}
+					<!-- {{ scope.row.vote === 1 ? `${scope.row.send}给${scope.row.acp}投了1票` : `${scope.row.send}给${scope.row.acp}赠送了${scope.row.vote}朵鲜花` }} -->
+					{{ scope.row.vote === 1 ? `${scope.row.desc[0].name}给${scope.row.desc2[0].name}投了1票` :
+						`${scope.row.desc[0].name}给${scope.row.desc2[0].name}赠送了${scope.row.vote}朵鲜花` }}
 				</template>
 			</el-table-column>
-			
+
 		</el-table>
-        <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+
+		<div class="pagination">
+			<el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
 				:background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
 				@size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        <loading :loadState="loadState" />
-    </div>
+			<loading :loadState="loadState" />
+		</div>
+	</div>
 </template>
 <style scoped>
-
+.pagination {
+	width: 98%;
+	margin: 0 auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 20px;
+}
 </style>

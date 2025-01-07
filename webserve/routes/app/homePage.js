@@ -150,11 +150,27 @@ router.get('/getActivityMsg', async (req, res) => {
     if (new Date() > data[0].endTime) {
       return res.json({ code: 500, msg: '活动已结束' })
     } else {
-      res.json({ code: 200, msg: '获取活动信息成功', data })
+      let peopleNum = await userInfoModel.find({ isApply: true }).countDocuments()
+      let vote = await userInfoModel.find({ isApply: true })
+      let voteNum = 0
+      vote.forEach(i => {
+        voteNum += i.vote
+      });
+      res.json({ code: 200, msg: '获取活动信息成功', data, peopleNum, voteNum })
     }
 
   } catch (err) {
     res.json({ code: 500, msg: '获取活动信息失败', err })
+  }
+})
+
+// 更新活动信息的访问量+1
+router.put('/addActivityVisit', async (req, res) => {
+  try {
+    let data = await activityMsgModel.findOneAndUpdate({}, { $inc: { visit: 1 } }, { new: true })
+    res.json({ code: 200, msg: '更新成功', data })
+  } catch (err) {
+    res.json({ code: 500, msg: '更新失败', err })
   }
 })
 

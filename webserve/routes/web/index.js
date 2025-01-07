@@ -4,7 +4,6 @@ var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, 
 var multiparty = require('multiparty')
 var fs = require('fs')
 const { ObjectId } = require('mongodb');
-var axios = require('axios')
 var fs = require('fs')
 var path = require('path')
 const jwt = require('jsonwebtoken');
@@ -46,10 +45,10 @@ const updateVotesMiddleware = async (req, res, next) => {
 };
 
 //注册
-router.post('/register', async(req, res) => {
+router.post('/register', async (req, res) => {
   let { phoneNum, pwd, avtor } = req.body
-   // 验证请求体
-   if (!phoneNum || !pwd || !avtor) {
+  // 验证请求体
+  if (!phoneNum || !pwd || !avtor) {
     return res.status(400).json({ error: '手机号和密码,头像不能为空' });
   }
 
@@ -65,16 +64,16 @@ router.post('/register', async(req, res) => {
   })
 })
 //登录
-router.post("/login", async(req, res) => {
+router.post("/login", async (req, res) => {
   const { phoneNumber, password } = req.body;
   console.log(phoneNumber, password);
-  
+
   if (!phoneNumber || !password) {
     return res.status(400).json({ error: '手机号和密码不能为空' });
   }
 
   // 检查用户是否存在
-  const user = await userInfoModel.findOne({phone: phoneNumber})
+  const user = await userInfoModel.findOne({ phone: phoneNumber })
   if (!user) {
     return res.status(401).json({ error: '手机号或密码错误' });
   }
@@ -90,10 +89,10 @@ router.post("/login", async(req, res) => {
   return res.json({ message: '登录成功', token, user, code: 200 });
 })
 //后台注册账号
-router.post('/adregister', async(req, res) => {
+router.post('/adregister', async (req, res) => {
   let { act, pwd } = req.body
-   // 验证请求体
-   if (!act || !pwd) {
+  // 验证请求体
+  if (!act || !pwd) {
     return res.status(400).json({ error: '账号和密码不能为空' });
   }
 
@@ -109,14 +108,14 @@ router.post('/adregister', async(req, res) => {
   })
 })
 //后台登录
-router.post("/adlogin", async(req, res) => {
+router.post("/adlogin", async (req, res) => {
   const { act, pwd } = req.body;
   if (!act || !pwd) {
     return res.status(400).json({ error: '账号和密码不能为空' });
   }
 
   // 检查用户是否存在
-  const user = await ctrlModel.findOne({act: act})
+  const user = await ctrlModel.findOne({ act: act })
   if (!user) {
     return res.status(401).json({ error: '账号或密码错误' });
   }
@@ -170,6 +169,15 @@ router.post("/upload", (req, res) => {
   })
 })
 
+// 添加轮播图
+router.post("/addCarousel", (req, res) => {
+  carouselModel.create(req.body)
+  res.status(200).send({
+    code: 200,
+    msg: "添加成功"
+  })
+})
+
 // 请求轮播图数据
 router.get("/getCarousel", async (req, res) => {
   let { page = 1, pageSize = 5 } = req.query
@@ -206,7 +214,6 @@ router.delete("/delCarousel/:_id", async (req, res) => {
     // 删除文件
     fs.unlink(filePath, async (err) => {
       if (err) {
-        console.error("文件删除失败:", err);
         return res.status(500).send({ message: '文件删除失败', error: err.message });
       }
 
@@ -215,7 +222,6 @@ router.delete("/delCarousel/:_id", async (req, res) => {
       res.status(200).send({ code: 200, msg: "删除成功", data });
     });
   } catch (error) {
-    console.error("删除轮播图时发生错误:", error);
     res.status(500).send({ code: 500, msg: "服务器错误", error: error.message });
   }
 });
@@ -346,8 +352,9 @@ router.post("/adduser", (req, res) => {
   })
 })
 //删除
-router.post("/deluser", async(req, res) => {
-  let { userid } = req.body
+router.delete("/deluser/:userid", async (req, res) => {
+  let { userid } = req.params
+  console.log(userid)
   await userInfoModel.deleteOne({ _id: userid })
   res.send({
     code: 200

@@ -16,3 +16,21 @@
 [2025-01-03 14:15:00] 已更新 1 个未支付订单为失败状态
 [2025-01-03 14:25:00] 没有符合条件的未支付订单
 [2025-01-03 14:35:00] 没有符合条件的未支付订单
+[2025-01-06 09:40:00] 没有符合条件的未支付订单
+[2025-01-06 12:39:31] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:28:29] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:28:29] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:28:30] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:28:30] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:28:30] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:28:30] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:28:59] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net
+[2025-01-06 13:29:00] 处理订单失败: getaddrinfo ENOTFOUND ac-8wysl2j-shard-00-01.5pee4jn.mongodb.net

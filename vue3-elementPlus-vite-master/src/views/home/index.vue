@@ -25,70 +25,93 @@
 </template>
 
 <script setup lang="ts">
-  // 引入ECharts
-  import service from '@/utils/request'
-  import * as echarts from 'echarts'
-  import { ref, onMounted, reactive } from 'vue'
-  import loading from '@/components/loading.vue'
-  import { ElMessage } from 'element-plus'
+// 引入ECharts
+import service from '@/utils/request'
+import * as echarts from 'echarts'
+import { ref, onMounted, reactive } from 'vue'
+import loading from '@/components/loading.vue'
+import { ElMessage } from 'element-plus'
 
-  type activityMsgType = {
-    _id: String
-    endTime: String
-    joinNum: Number
-    rule: String
-    startTime: String
-    title: String
-    visitNum: Number
-    accumulatedNum: Number
-  }
-  const activesData = ref<activityMsgType>({
-    _id: '',
-    endTime: '',
-    joinNum: 0,
-    rule: '',
-    startTime: '',
-    title: '',
-    visitNum: 0,
-    accumulatedNum: 0
-  })
-  const jobDistributionNum = ref([])
-  let jobList = reactive([])
-  const lookState = ref<string>('')
-  const loadState = ref<boolean>(false)
+type activityMsgType = {
+  _id: String
+  endTime: String
+  joinNum: Number
+  rule: String
+  startTime: String
+  title: String
+  visitNum: Number
+  accumulatedNum: Number
+}
+const activesData = ref<activityMsgType>({
+  _id: '',
+  endTime: '',
+  joinNum: 0,
+  rule: '',
+  startTime: '',
+  title: '',
+  visitNum: 0,
+  accumulatedNum: 0
+})
+const jobDistributionNum = ref([])
+let jobList = reactive([])
+const lookState = ref<string>('')
+const loadState = ref<boolean>(false)
 
-  // 使用ref来引用DOM元素
-  const ageChart = ref<HTMLDivElement | null>(null)
-  const jobChart = ref<HTMLDivElement | null>(null)
+// 使用ref来引用DOM元素
+const ageChart = ref<HTMLDivElement | null>(null)
+const jobChart = ref<HTMLDivElement | null>(null)
 
-  function getactives() {
-    service.get('/getactives').then((res: any) => {
+function getactives() {
+  service.get('/getactives').then((res: any) => {
+    if (res.activityMsgs.length > 0) {
       activesData.value = res.activityMsgs[0]
-    })
-  }
-  function getuser() {
-    try {
-      service.get('/getShow').then((res: any) => {
+    }
+  })
+}
+function getuser() {
+  try {
+    service.get('/getShow').then((res: any) => {
+      if (res.jobDistribution.length > 0) {
         jobDistributionNum.value = res.jobDistribution
-        ageChartinit()
-      })
-    } catch (err) {
-      ElMessage.error(`获取数据失败,${err}`)
-    }
+      }
+      ageChartinit()
+    })
+  } catch (err) {
+    ElMessage.error(`获取数据失败,${err}`)
   }
-  async function getDetail() {
-    try {
-      await service.get('/getDetail').then((res: any) => {
+}
+async function getDetail() {
+  try {
+    await service.get('/getDetail').then((res: any) => {
+      if (res.data_things > 0) {
         jobList = res.data_things
-        jobChartinit()
-      })
-    } catch (err) {
-      ElMessage.error(`获取数据失败,${err}`)
-    }
+      }
+      jobChartinit()
+    })
+  } catch (err) {
+    ElMessage.error(`获取数据失败,${err}`)
   }
-  function ageChartinit() {
-    if (ageChart.value) {
-      const myEcharts = echarts.init(ageChart.value)
+}
+
+function ageChartinit() {
+  if (ageChart.value) {
+    const myEcharts = echarts.init(ageChart.value);
+    if (jobDistributionNum.value.length === 0) {
+      // 数据为空，显示“暂无数据”的提示
+      myEcharts.setOption({
+        title: {
+          text: '职位分布 (无数据)',
+          left: 'center',
+          top: 'center',
+          textStyle: {
+            fontSize: 20,
+            color: '#999'
+          }
+        },
+        series: []  // 空的 series 表示无数据
+      });
+    } else {
+      // 正常的数据渲染
       // 设置图表的选项
       myEcharts.setOption({
         title: {
@@ -133,8 +156,27 @@
       })
     }
   }
-  function jobChartinit() {
-    if (jobChart.value) {
+}
+
+function jobChartinit() {
+  if (jobChart.value) {
+    const myEcharts = echarts.init(jobChart.value);
+    if (jobList.length === 0) {
+      // 数据为空，显示“暂无数据”的提示
+      myEcharts.setOption({
+        title: {
+          text: '职业划分票数 (无数据)',
+          left: 'center',
+          top: 'center',
+          textStyle: {
+            fontSize: 20,
+            color: '#999'
+          }
+        },
+        series: []  // 空的 series 表示无数据
+      });
+    } else {
+      // 正常的数据渲染
       const myEcharts = echarts.init(jobChart.value)
 
       // 获取屏幕宽度来决定旋转角度
@@ -248,125 +290,127 @@
       })
     }
   }
+}
 
-  onMounted(() => {
-    loadState.value = true
-    Promise.all([getactives(), getuser(), getDetail()])
-      .then(() => {
-        loadState.value = false
-      })
-      .catch(() => {
-        loadState.value = true
-      })
-  })
+
+onMounted(() => {
+  loadState.value = true
+  Promise.all([getactives(), getuser(), getDetail()])
+    .then(() => {
+      loadState.value = false
+    })
+    .catch(() => {
+      loadState.value = true
+    })
+})
 </script>
 
 <style lang="less" scoped>
-  .actives-data {
-    width: 80%;
-    height: auto;
-    margin: 0 auto;
+.actives-data {
+  width: 80%;
+  height: auto;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  .actives-data-div {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    flex-wrap: wrap;
+    text-align: center;
 
-    .actives-data-div {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      text-align: center;
-
-      p {
-        width: 100%;
-      }
-
-      p:nth-child(1) {
-        font-size: 18px;
-        margin-bottom: 8px;
-      }
-
-      p:nth-child(2) {
-        font-size: 28px;
-        color: red;
-        font-family: electronicFont;
-        font-weight: bold;
-      }
+    p {
+      width: 100%;
     }
+
+    p:nth-child(1) {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    p:nth-child(2) {
+      font-size: 28px;
+      color: red;
+      font-family: electronicFont;
+      font-weight: bold;
+    }
+  }
+}
+
+.chart-container {
+  width: 98%;
+  margin: 0 auto;
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+
+  .chart {
+    width: 45%;
+    height: 350px;
+    margin-bottom: 20px;
+  }
+}
+
+/* 平板及以下设备 */
+@media (max-width: 768px) {
+  .actives-data {
+    width: 95%;
+  }
+
+  .actives-data-div p:nth-child(1) {
+    font-size: 16px;
+  }
+
+  .actives-data-div p:nth-child(2) {
+    font-size: 22px;
   }
 
   .chart-container {
-    width: 98%;
-    margin: 0 auto;
-    margin-top: 40px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: center;
+    width: 100%;
+    flex-direction: column;
 
     .chart {
-      width: 45%;
-      height: 350px;
-      margin-bottom: 20px;
+      width: 80%;
+      height: 300px;
     }
   }
+}
 
-  /* 平板及以下设备 */
-  @media (max-width: 768px) {
-    .actives-data {
-      width: 95%;
-    }
-
-    .actives-data-div p:nth-child(1) {
-      font-size: 16px;
-    }
-
-    .actives-data-div p:nth-child(2) {
-      font-size: 22px;
-    }
-
-    .chart-container {
-      width: 100%;
-      flex-direction: column;
-
-      .chart {
-        width: 80%;
-        height: 300px;
-      }
-    }
+/* 小屏设备（如手机，max-width: 480px） */
+@media (max-width: 480px) {
+  .actives-data {
+    width: 100%;
+    margin-top: 10px;
   }
 
-  /* 小屏设备（如手机，max-width: 480px） */
-  @media (max-width: 480px) {
-    .actives-data {
-      width: 100%;
-      margin-top: 10px;
-    }
+  .actives-data-div p:nth-child(1) {
+    font-size: 12px;
+  }
 
-    .actives-data-div p:nth-child(1) {
-      font-size: 12px;
-    }
+  .actives-data-div p:nth-child(2) {
+    font-size: 16px;
+  }
 
-    .actives-data-div p:nth-child(2) {
-      font-size: 16px;
-    }
+  .chart-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 12px;
 
-    .chart-container {
-      margin-top: 15px;
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      width: 100%;
-      margin-bottom: 20px;
-      font-size: 12px;
-
-      .chart {
-        width: 90%;
-        margin: 0 auto;
-        height: 250px;
-      }
+    .chart {
+      width: 90%;
+      margin: 0 auto;
+      height: 250px;
     }
   }
+}
 </style>

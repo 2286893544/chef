@@ -85,7 +85,10 @@ const userInfoSchema = new mongoose.Schema({
     type: Number,
     unique: true,
   },
-  avtor: String,//头像
+  avtor: {
+    type: String,
+    default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAJX82J0tJmJfIyI0utQZIP1S9hG6zYI_3ZA&s"
+  },//头像
   age: Number,//年龄
   gender: Boolean,//性别
   label: String,//标签

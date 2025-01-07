@@ -9,11 +9,7 @@
       <el-table-column label="编号" align="center">
         <template v-slot="scope">{{ scope.row.mark }}号</template>
       </el-table-column>
-      <el-table-column label="头像" align="center">
-        <template v-slot="scope">
-          <img :src="scope.row.avtor" alt="图片路径错误" style="height: 50px" />
-        </template>
-      </el-table-column>
+      <el-table-column prop="phone" label="手机号" align="center" />
       <el-table-column label="职位" align="center">
         <template v-slot="scope">
           {{ scope.row.position[0].jobTitle }}
@@ -38,7 +34,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="500" align="center">
+      <el-table-column label="操作" :width="500" align="center">
         <template v-slot="scope">
           <el-button type="primary" @click="gosinaply(scope.row)">
             投票
@@ -65,7 +61,7 @@
     </div>
 
     <!--添加修改活动-->
-    <el-dialog v-model="centerDialogVisible" :title="formstatus == 'add' ? '添加用户' : '修改用户'" width="500" align-center>
+    <el-dialog v-model="centerDialogVisible" :title="formstatus == 'add' ? '添加用户' : '修改用户'" :width="800" align-center>
       <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" :rules="rules" label-width="auto"
         class="demo-ruleForm" :size="formSize" status-icon show-close="false">
         <el-form-item label="用户姓名" prop="name">
@@ -256,7 +252,7 @@ const addactive = async () => {
 //删除
 
 const deluser = async (userid: any) => {
-  let res: any = await service.post('/deluser', userid)
+  let res: any = await service.delete(`/deluser/${userid}`)
   if (res.code == 200) {
     getdusers()
   }
@@ -314,5 +310,9 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   margin-top: 20px;
+}
+
+.avatar {
+  width: 30vw;
 }
 </style>

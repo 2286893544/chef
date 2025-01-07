@@ -10,7 +10,7 @@
         <el-button type="primary">上传图片</el-button>
         <template #tip>
           <div class="el-upload__tip">
-            大小不超过500KB的jpg/png文件，且一次只能上传最多7张
+            大小不超过8MB的jpg/png文件，且一次只能上传最多7张
           </div>
         </template>
       </el-upload>
@@ -61,6 +61,7 @@ import { ref, onMounted } from 'vue'
 import service from '@/utils/request';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import loading from '@/components/loading.vue';
+import { compressImage } from '@/utils/compressImage';
 
 
 // 定义轮播图的类型
@@ -137,20 +138,39 @@ const handleExceed = (files: any, uploadFiles: any) => {
 }
 
 // 文件上传前校验
-const beforeUpload = (file: any) => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
-  const isLt500KB = file.size / 1024 < 500;
+const beforeUpload = async (file: File): Promise<File> => {
+  try {
+    // 检查文件类型
+    const isJpgOrPng = ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type);
+    if (!isJpgOrPng) {
+      ElMessage.error('上传文件格式只能是 JPG/PNG/JPEG!');
+      // 阻止上传
+      return Promise.reject(new Error('文件格式不正确'));
+    }
 
-  if (!isJpgOrPng) {
-    alert('上传文件格式只能是 JPG/PNG/JPEG!');
-  }
-  if (!isLt500KB) {
-    alert('上传文件大小不能超过 500KB!');
-  }
+    // 检查文件大小是否小于 8MB
+    const isLt8MB = file.size / 1024 / 1024 < 8;
+    if (!isLt8MB) {
+      const sizeNum = (file.size / 1024 / 1024).toFixed(1);
+      ElMessage.error(`您上传的文件大小为 ${sizeNum}MB. 上传文件大小不能超过 8MB!`);
+      // 阻止上传
+      return Promise.reject(new Error('文件大小超限'));
+    }
 
-  // 返回 true 允许上传，false 阻止上传
-  return isJpgOrPng && isLt500KB;
+    // 压缩图片
+    const compressedFile = await compressImage(file, { quality: 0.8, maxWidth: 800, maxHeight: 800 });
+
+    // 返回压缩后的文件，允许上传
+    return compressedFile;
+  } catch (error) {
+    ElMessage.error('图片压缩失败');
+    console.error('压缩错误:', error);
+    // 阻止上传
+    return Promise.reject(new Error('图片压缩失败'));
+  }
 }
+
+
 
 
 // 更改每页数量

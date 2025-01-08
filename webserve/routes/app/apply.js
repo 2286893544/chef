@@ -22,7 +22,7 @@ router.get("/getPosition", async (req, res) => {
   }
 })
 
-// 报名  -- 测试中
+// 报名
 router.put("/addApply", async (req, res) => {
   try {
     let { _id, name, age, contact, gender, position, profileImage } = req.body;
@@ -50,15 +50,15 @@ router.put("/addApply", async (req, res) => {
         gender,
         position,
         richText: data,
-        avtor: profileImage
+        avtor: profileImage,
+        isApply: false,
+        isAudit: true
       }
     );
 
     if (result.nModified === 0) {
       return res.json({ code: 404, msg: "未找到用户或没有更改" });
     }
-
-    console.log(data);  // 打印转换后的 HTML 内容
     res.json({ code: 200, msg: "报名成功，请等待管理员审核" });
   } catch (err) {
     console.error("Error during update:", err);  // 打印详细的错误信息

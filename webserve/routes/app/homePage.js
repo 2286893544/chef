@@ -142,25 +142,16 @@ router.get('/getCarousel', async (req, res) => {
   }
 })
 
-// 获取活动信息
-router.get('/getActivityMsg', async (req, res) => {
-  let data;
+// 添加访问量
+router.get('/getVisit', async (req, res) => {
   try {
-    data = await activityMsgModel.find().lean()
-    if (new Date() > data[0].endTime) {
-      return res.json({ code: 500, msg: '活动已结束' })
-    } else {
-      let peopleNum = await userInfoModel.find({ isApply: true }).countDocuments()
-      let vote = await userInfoModel.find({ isApply: true })
-      let voteNum = 0
-      vote.forEach(i => {
-        voteNum += i.vote
-      });
-      res.json({ code: 200, msg: '获取活动信息成功', data, peopleNum, voteNum })
+    const updatedActivity = await activityMsgModel.findOneAndUpdate({ isStart: true }, { $inc: { visit: 1 } }, { new: true })
+    if (!updatedActivity) {
+      return res.status(404).json({ code: 404, msg: '活动未找到' });
     }
-
+    res.json({ code: 200, msg: '更新成功', data: updatedActivity })
   } catch (err) {
-    res.json({ code: 500, msg: '获取活动信息失败', err })
+    res.json({ code: 500, msg: '更新失败', err })
   }
 })
 

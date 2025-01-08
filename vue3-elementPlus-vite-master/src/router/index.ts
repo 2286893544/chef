@@ -59,10 +59,12 @@ const router = createRouter({
         // 礼物记录
         { path: "/present", name: "present", component: () => import("views/present/index.vue") },
         // 个人礼物记录
-        { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") }
+        { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") },
+        // 简历审核
+        { path: "/audit", name: "audit", component: () => import("views/audit/index.vue") },
       ]
     },
-    { path: "/login", name: "login", component: ()=>import("views/login/log.vue") }
+    { path: "/login", name: "login", component: () => import("views/login/log.vue") }
   ]
 })
 // 全局前置守卫

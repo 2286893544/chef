@@ -40,7 +40,7 @@
             投票
           </el-button>
           <el-button type="primary" @click="goGift(scope.row)">礼物</el-button>
-          <el-button type="primary" @click="gorich(scope.row)">简介</el-button>
+          <el-button type="primary" @click="gorich(scope.row)">简历</el-button>
           <el-button type="primary" @click="goComment(scope.row._id)">
             留言板
           </el-button>

@@ -5,8 +5,8 @@
         添加活动
       </el-button>
     </div>
+    <!-- 表格 -->
     <div class="activeTb">
-      <!-- 表格 -->
       <el-table :data="activels" style="width: 100%; margin-top: 20px">
         <el-table-column prop="title" label="活动标题" align="center" />
         <el-table-column prop="announcement" label="活动公告" align="center" />
@@ -22,6 +22,12 @@
               type="danger">已结束</el-text>
             <el-text v-if="checkActivityStatus(scope.row.startTime, scope.row.endTime) === '进行中'" class="mx-1"
               type="success">进行中</el-text>
+          </template>
+        </el-table-column>
+        <el-table-column label="是否启动" align="center">
+          <template v-slot="scope">
+            <el-switch v-model="scope.row.isStart" class="ml-2" @change="setStart(scope.row._id)"
+              style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
           </template>
         </el-table-column>
         <el-table-column label="开始时间" align="center">
@@ -67,6 +73,10 @@
         <el-form-item label="结束时间" prop="endTime">
           <el-date-picker v-model="ruleForm.endTime" type="datetime" placeholder="请选择结束时间" />
         </el-form-item>
+        <el-form-item label="是否启动" prop="endTime">
+          <el-switch v-model="ruleForm.isStart" class="ml-2"
+            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
+        </el-form-item>
         <el-form-item label="活动规则" prop="rule">
           <el-input v-model="ruleForm.rule" style="width: 480px" :autosize="{ minRows: 4, maxRows: 6 }" type="textarea"
             placeholder="请输入活动规则" />
@@ -95,6 +105,7 @@ import { ref, onMounted, reactive } from 'vue'
 import service from '@/utils/request'
 import dayjs from 'dayjs'
 import loading from '@/components/loading.vue'
+import { ElMessage } from 'element-plus'
 
 //时间戳转化为事件
 const getfullTime = (date: Date) => {
@@ -131,6 +142,7 @@ const setdialogvisiblew = (status: String, data: any) => {
     ruleForm.startTime = data.startTime
     ruleForm.endTime = data.endTime
     ruleForm.rule = data.rule
+
   }
 }
 //表单
@@ -142,7 +154,8 @@ interface RuleForm {
   startTime: String
   endTime: String
   rule: String
-  announcement: String
+  announcement: String,
+  isStart: Boolean
 }
 
 const formSize = ref('default')
@@ -155,7 +168,8 @@ let ruleForm = reactive<RuleForm>({
   startTime: '',
   endTime: '',
   rule: '',
-  announcement: ''
+  announcement: '',
+  isStart: false
 })
 
 const rules = reactive({
@@ -203,6 +217,7 @@ const addactive = async () => {
   if (res.code == 200) {
     centerDialogVisible.value = false
     getactives()
+    ElMessage.success('添加成功')
   }
 }
 //修改
@@ -220,6 +235,7 @@ const delact = async (id: any) => {
   let res: any = await service.delete(`/delactive?delid=${id}`)
   if (res.code == 200) {
     getactives()
+    ElMessage.success('删除成功！')
   }
 }
 //活动状态
@@ -236,6 +252,20 @@ const checkActivityStatus = (startt: any, endt: any) => {
     return "进行中"; // 当前时间在活动的开始和结束之间
   }
 }
+
+// 修改活动状态
+const setStart = async (_id: String) => {
+  try {
+    let result: any = await service.put(`/updateActiveStatus/${_id}`)
+    if (result.code == 200) {
+      ElMessage.success("更新成功！")
+      getactives()
+    }
+  } catch (err) {
+    ElMessage.error("更新失败！")
+  }
+}
+
 onMounted(() => {
   getactives()
 })

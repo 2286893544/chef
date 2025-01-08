@@ -46,7 +46,11 @@ const activityMsgSchema = new mongoose.Schema({
   startTime: Date,
   endTime: Date,
   rule: String,
-  announcement: String
+  announcement: String,
+  isStart: {
+    type: Boolean,
+    default: false
+  }
 })
 const activityMsgModel = mongoose.model("activityMsg", activityMsgSchema, "activityMsg")
 

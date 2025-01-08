@@ -24,6 +24,8 @@ var app = express();
 const { reloadTasks, scheduleDailyVoteReset } = require('./utils/task');
 // 引入订单处理函数
 const { orderDispose } = require('./utils/orderDispose');
+// 引入投票更新中间件
+const { updateActivityInfo } = require('./utils/visitNum');
 
 // ** 任务重启时重新加载未完成任务 **
 reloadTasks()
@@ -37,6 +39,8 @@ reloadTasks()
 scheduleDailyVoteReset();
 // ** 调度订单处理任务 **
 orderDispose();
+// ** 调度每3秒更新活动信息的票数和参赛人数任务 **
+updateActivityInfo();
 
 // ** 配置视图引擎 ** 
 app.set('views', path.join(__dirname, 'views')); // 设置视图文件路径

@@ -166,8 +166,21 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
           isAffix: false,
           isHide: false,
           isKeepAlive: true,
-          title: '普通用户',
+          title: '简历审核',
           index: '8'
+        },
+        name: 'audit',
+        path: '/audit'
+      },
+      {
+        meta: {
+          auth: ['admin', 'test'],
+          icon: 'iconfont el-icon-s-grid',
+          isAffix: false,
+          isHide: false,
+          isKeepAlive: true,
+          title: '普通用户',
+          index: '9'
         },
         name: 'comnu',
         path: '/comnu'

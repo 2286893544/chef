@@ -227,24 +227,12 @@ router.delete("/delCarousel/:_id", async (req, res) => {
 });
 
 
-// 更改轮播图状态
-router.put("/updateCarousel/:_id", async (req, res) => {
-  try {
-    let data = await carouselModel.findOne({ _id: req.params._id })
-    if (data.isDelete) {
-      await carouselModel.updateOne({ _id: req.params._id }, { isDelete: false })
-    } else {
-      await carouselModel.updateOne({ _id: req.params._id }, { isDelete: true })
-    }
-    res.status(200).send({ code: 200, msg: "修改成功" })
-  } catch (err) {
-    res.status(500).send({ code: 500, msg: "修改失败", err })
-  }
-})
-
-
 //添加活动信息
-router.post("/addactivityMsg", (req, res) => {
+router.post("/addactivityMsg", async (req, res) => {
+  let data = await activityMsgModel.find()
+  data.forEach(async (item) => {
+    await activityMsgModel.updateOne({ _id: item._id }, { isStart: false })
+  })
   activityMsgModel.create(req.body)
   res.send({
     code: 200
@@ -266,6 +254,27 @@ router.post("/updactive", async (req, res) => {
     code: 200
   })
 })
+// 更新活动信息状态，确保只有一个活动的isStart为true
+router.put("/updateActiveStatus/:_id", async (req, res) => {
+  try {
+    const { _id } = req.params;
+
+    // 先将所有活动的 isStart 更新为 false
+    await activityMsgModel.updateMany({}, { isStart: false });
+
+    // 然后将指定活动的 isStart 更新为 true
+    const result = await activityMsgModel.updateOne({ _id }, { isStart: true });
+
+    if (result.nModified === 0) {
+      return res.status(404).send({ code: 404, msg: "活动未找到或未修改" });
+    }
+
+    res.status(200).send({ code: 200, msg: "更新成功" });
+  } catch (err) {
+    res.status(500).send({ code: 500, msg: "更新失败", err })
+  }
+})
+
 //删除活动信息
 router.delete("/delactive", async (req, res) => {
   await activityMsgModel.deleteOne({ _id: req.query.delid })
@@ -364,7 +373,6 @@ router.delete("/deluser/:userid", async (req, res) => {
 router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query
   //调用函数修改选手票数
-  // await pudaplyuVote()
   let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
   let ids = idArr.filter(item => item.isApply).map(i => i._id)
   let pieline = [
@@ -653,10 +661,10 @@ router.get("/getDetail", async (req, res) => {
 
 
 // 更新富文本
-router.put('/changeRichText', async (req, res) => {
+router.put('/changeRichTextMsg', async (req, res) => {
   let { id, content } = req.body;
   try {
-    await userInfoModel.updateOne({ _id: id }, { richText: content });
+    await userInfoModel.updateOne({ _id: id }, { richText: content, isAudit: true });
   } catch (err) {
     res.status(500).send({
       code: 500,
@@ -827,6 +835,36 @@ router.get("/getcomnuser", async(req, res) => {
     comus: comusers,
     comustl: comuserstotal
   })
+
+// 获取简历审核数据
+router.get("/getAuditData", async (req, res) => {
+  try {
+    let { page = 1, pagesize = 5, name = '', phone = '' } = req.query;
+    let result = [];
+    if (name) result.push({ name: new RegExp(name) });
+    if (phone) result.push({ phone });
+    result.push({ isAudit: true })
+
+    const query = result.length > 0 ? { $and: result } : {}
+
+    const data = await userInfoModel.find(query).skip((page - 1) * pagesize).limit(pagesize)
+    const total = await userInfoModel.find(query).countDocuments()
+
+    res.status(200).send({ code: 200, msg: "获取成功", data, total })
+  } catch (err) {
+    res.status(500).send({ code: 500, msg: "获取失败", err })
+  }
+})
+
+// 简历通过审核
+router.put("/passAudit", async (req, res) => {
+  try {
+    let { _id } = req.body
+    await userInfoModel.updateOne({ _id  }, { isAudit: false, isApply: true })
+    res.status(200).send({ code: 200, msg: "审核成功" })
+  } catch (err) {
+    res.status(500).send({ code: 500, msg: "审核失败", err })
+  }
 })
 
 module.exports = router;

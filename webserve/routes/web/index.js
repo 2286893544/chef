@@ -835,7 +835,7 @@ router.get("/getcomnuser", async(req, res) => {
     comus: comusers,
     comustl: comuserstotal
   })
-
+})
 // 获取简历审核数据
 router.get("/getAuditData", async (req, res) => {
   try {

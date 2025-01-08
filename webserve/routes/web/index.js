@@ -795,6 +795,38 @@ router.get("/getapuservotes", async (req, res) => {
     apuallvotes
   })
 })
-
+//获取未参赛的所有用户
+router.get("/getcomnuser", async(req, res) => {
+  let { phone, nowpage = 1, pagesize = 5 } = req.query
+  let pile = [
+    {
+      $match: {
+        isApply: false
+      }
+    }
+  ]
+  if (phone) {
+    pile.push({
+      $match: {
+        phone: { $regex: phone }
+      }
+    })
+  }
+  pile.push({
+    $skip: (nowpage - 1) * pagesize
+  })
+  pile.push(
+    {
+      $limit: Number(pagesize)
+    }
+  )
+  let comusers = await userInfoModel.aggregate(pile)
+  let comuserstotal = await userInfoModel.countDocuments()
+  res.send({
+    code: 200,
+    comus: comusers,
+    comustl: comuserstotal
+  })
+})
 
 module.exports = router;

@@ -98,7 +98,7 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
           isAffix: false,
           isHide: false,
           isKeepAlive: true,
-          title: '用户管理',
+          title: '选手管理',
           index: '4'
         },
         name: 'athlete',
@@ -158,6 +158,19 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
         },
         name: 'present',
         path: '/present'
+      },
+      {
+        meta: {
+          auth: ['admin', 'test'],
+          icon: 'iconfont el-icon-s-grid',
+          isAffix: false,
+          isHide: false,
+          isKeepAlive: true,
+          title: '普通用户',
+          index: '8'
+        },
+        name: 'comnu',
+        path: '/comnu'
       },
     ],
   },

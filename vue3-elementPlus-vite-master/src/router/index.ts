@@ -59,7 +59,9 @@ const router = createRouter({
         // 礼物记录
         { path: "/present", name: "present", component: () => import("views/present/index.vue") },
         // 个人礼物记录
-        { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") }
+        { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") },
+        //普通用户管理
+        { path: '/comnu', name: 'comnu', component: () => import('views/comnu/index.vue'), },
       ]
     },
     { path: "/login", name: "login", component: ()=>import("views/login/log.vue") }

@@ -60,6 +60,8 @@ const router = createRouter({
         { path: "/present", name: "present", component: () => import("views/present/index.vue") },
         // 个人礼物记录
         { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") },
+        //普通用户管理
+        { path: '/comnu', name: 'comnu', component: () => import('views/comnu/index.vue'), },
         // 简历审核
         { path: "/audit", name: "audit", component: () => import("views/audit/index.vue") },
       ]

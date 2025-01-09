@@ -67,9 +67,15 @@
         <el-form-item label="用户姓名" prop="name">
           <el-input v-model="ruleForm.name" placeholder="请输入用户姓名"></el-input>
         </el-form-item>
+        <el-form-item label="用户电话" prop="phone">
+          <el-input v-model="ruleForm.phone" placeholder="请输入用户电话"></el-input>
+        </el-form-item>
+        <el-form-item label="用户密码" prop="pwd">
+          <el-input v-model="ruleForm.pwd" placeholder="请输入用户密码"></el-input>
+        </el-form-item>
         <el-form-item label="用户封面" prop="cover">
           <el-upload class="avatar-uploader" :action="ActionUrl + '/upload'" :show-file-list="false"
-            :on-success="handlePreview" :on-error="handleError">
+          :before-upload="beforeUpload" :on-success="handlePreview" :on-error="handleError">
             <img v-if="ruleForm.cover" :src="ruleForm.cover" class="avatar" />
             <el-button v-else type="primary">上传图片</el-button>
           </el-upload>
@@ -113,6 +119,7 @@ import service from '@/utils/request'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import loading from '@/components/loading.vue'
+import { compressImage } from '@/utils/compressImage'
 
 const fileList = ref([])
 const ActionUrl = ref<String>('')
@@ -187,6 +194,8 @@ const setdialogvisiblew = (status: String, data: any) => {
     updid.value = data._id
     prevote.value = data.vote
     ruleForm.name = data.name
+    ruleForm.phone = data.phone
+    ruleForm.pwd = data.pwd
     ruleForm.cover = data.cover
     ruleForm.age = data.age
     ruleForm.gender = data.gender
@@ -198,6 +207,8 @@ const setdialogvisiblew = (status: String, data: any) => {
 //表单
 interface RuleForm {
   name: string
+  phone: string
+  pwd: string
   cover: string
   age: number
   gender: boolean
@@ -210,6 +221,8 @@ const formSize = ref('default')
 const ruleFormRef = ref()
 let ruleForm = reactive<RuleForm>({
   name: '',
+  phone: '',
+  pwd: '',
   cover: '',
   age: 0,
   gender: true,
@@ -220,6 +233,8 @@ let ruleForm = reactive<RuleForm>({
 
 const rules = reactive({
   name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+  phone: [{ required: true, message: '请输入电话', trigger: 'blur' }],
+  pwd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   cover: [{ required: true, message: '请上传封面', trigger: 'blur' }],
   age: [{ required: true, message: '请输入年龄', trigger: 'blur' }],
   gender: [{ required: true, message: '请选择性别', trigger: 'blur' }],
@@ -293,6 +308,38 @@ let positionls = ref<any>([])
 const getpositions = async () => {
   let res = await service.get('/getPosition')
   positionls.value = res.data
+}
+// 文件上传前校验
+const beforeUpload = async (file: File): Promise<File> => {
+  try {
+    // 检查文件类型
+    const isJpgOrPng = ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type);
+    if (!isJpgOrPng) {
+      ElMessage.error('上传文件格式只能是 JPG/PNG/JPEG!');
+      // 阻止上传
+      return Promise.reject(new Error('文件格式不正确'));
+    }
+
+    // 检查文件大小是否小于 8MB
+    const isLt8MB = file.size / 1024 / 1024 < 8;
+    if (!isLt8MB) {
+      const sizeNum = (file.size / 1024 / 1024).toFixed(1);
+      ElMessage.error(`您上传的文件大小为 ${sizeNum}MB. 上传文件大小不能超过 8MB!`);
+      // 阻止上传
+      return Promise.reject(new Error('文件大小超限'));
+    }
+
+    // 压缩图片
+    const compressedFile = await compressImage(file, { quality: 0.8, maxWidth: 800, maxHeight: 800 });
+
+    // 返回压缩后的文件，允许上传
+    return compressedFile;
+  } catch (error) {
+    ElMessage.error('图片压缩失败');
+    console.error('压缩错误:', error);
+    // 阻止上传
+    return Promise.reject(new Error('图片压缩失败'));
+  }
 }
 //onMounted
 onMounted(() => {

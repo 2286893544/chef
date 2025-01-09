@@ -32,8 +32,10 @@ router.put("/addApply", async (req, res) => {
       return res.json({ code: 400, msg: "无效的用户 ID" });
     }
 
+    const posId = await positionModel.findOne({ _id: position });
+
     // 转换富文本为 HTML
-    const data = convertToQuillHTML(req.body);
+    const data = convertToQuillHTML(req.body, posId.jobTitle);
 
     // 检查是否传递了必要的字段
     if (!name || !age || !contact || !gender || !position) {
@@ -50,7 +52,7 @@ router.put("/addApply", async (req, res) => {
         gender,
         position,
         richText: data,
-        avtor: profileImage,
+        cover: profileImage,
         isApply: false,
         isAudit: true
       }
@@ -67,7 +69,7 @@ router.put("/addApply", async (req, res) => {
 });
 
 
-const convertToQuillHTML = (data) => {
+const convertToQuillHTML = (data, jobName) => {
   let htmlContent = `
     <head></head><body><div class="quill-editor-content" style="font-family: Arial, sans-serif; line-height: 1.6; text-align: center; padding: 20px; border-radius: 8px;">
   `;
@@ -75,7 +77,7 @@ const convertToQuillHTML = (data) => {
   // 添加个人头像
   if (data.profileImage) {
     htmlContent += `
-      <div style="margin-bottom: 20px;">
+      <div style="width:90%; margin:0 auto; margin-bottom: 20px;">
         <img src="${data.profileImage}" alt="Profile Image" style="max-width: 50%; height: auto;" margin: auto;" />
       </div>
     `;
@@ -83,16 +85,16 @@ const convertToQuillHTML = (data) => {
 
   // 添加姓名和职位
   htmlContent += `
-    <div style="margin-bottom: 10px;">
+    <div style="width:90%; margin:0 auto; margin-bottom: 10px;">
       <h1 style="font-size: 24px; margin: 0;">${data.name}</h1>
-      <p style="font-size: 16px; margin: 5px 0;"><strong>${data.position}</strong></p>
+      <p style="font-size: 16px; margin: 5px 0;"><strong>${jobName}</strong></p>
     </div>
   `;
 
   // 添加简历
   if (data.resume) {
     htmlContent += `
-      <div style="margin-bottom: 20px; padding: 10px; text-align: left; font-size: 14px;border-radius: 8px;">
+      <div style="width:90%; margin:0 auto; margin-bottom: 20px; padding: 10px; text-align: left; font-size: 14px;border-radius: 8px;">
         <p style="margin: 0; white-space: pre-wrap;">${data.resume}</p>
       </div>
     `;
@@ -101,7 +103,7 @@ const convertToQuillHTML = (data) => {
   // 如果有人物照片
   if (data.personImages && data.personImages.length > 0) {
     htmlContent += `
-        <div style="margin-bottom: 20px;">
+        <div style="width:90%; margin:0 auto; margin-bottom: 20px;">
           ${data.personImages
         .map(
           (imgUrl) => `
@@ -118,7 +120,7 @@ const convertToQuillHTML = (data) => {
   // 添加荣誉证书
   if (data.honorType) {
     htmlContent += `
-        <div style="margin-bottom: 20px;">
+        <div style="width:90%; margin:0 auto; margin-bottom: 20px;">
           <p><strong></strong> ${data.honorType}</p>
         </div>
       `;
@@ -127,10 +129,10 @@ const convertToQuillHTML = (data) => {
   // 如果有荣誉图片
   if (data.honorImages && data.honorImages.length > 0) {
     htmlContent += `
-      <div style="margin-bottom: 20px;">
+      <div style="width:90%; margin:0 auto; margin-bottom: 20px;">
         ${data.honorImages.map(
       (imgUrl) => `
-              <div style="margin-bottom: 10px;">
+              <div style="width:90%; margin:0 auto; margin-bottom: 10px;">
                 <img src="${imgUrl}" alt="Honor Image" style="max-width: 50%; height: auto;" margin: auto;" />
               </div>
             `

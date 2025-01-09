@@ -83,7 +83,7 @@ function getuser() {
 async function getDetail() {
   try {
     await service.get('/getDetail').then((res: any) => {
-      if (res.data_things > 0) {
+      if (res.data_things.length > 0) {
         jobList = res.data_things
       }
       jobChartinit()

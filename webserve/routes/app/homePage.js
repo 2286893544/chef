@@ -202,20 +202,14 @@ router.get('/getPosition', async (req, res) => {
 
 // 更新 - 界面访问量
 router.put('/addVisit', async (req, res) => {
-  let data;
   try {
-    data = await visitModel.findOneAndUpdate({}, { $inc: { visit: 1 } }, { new: true })
+    let data = await activityMsgModel.findOneAndUpdate({ isStart: true }, { $inc: { visitNum: 1 } }, { new: true })
+    res.json({ code: 200, msg: '更新成功', data })
   } catch (err) {
     res.json({
       code: 500,
       msg: "服务器错误",
       err
-    })
-  } finally {
-    res.json({
-      code: 200,
-      msg: "成功",
-      data
     })
   }
 })

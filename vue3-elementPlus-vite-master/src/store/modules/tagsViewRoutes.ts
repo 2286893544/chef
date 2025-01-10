@@ -98,11 +98,39 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
           isAffix: false,
           isHide: false,
           isKeepAlive: true,
-          title: '选手管理',
+          title: '用户管理',
           index: '4'
         },
-        name: 'athlete',
-        path: '/athlete'
+        name: 'alluser',
+        path: '/alluser',
+        children: [
+          {
+            meta: {
+              auth: ['admin', 'test'],
+              icon: 'iconfont el-icon-s-grid',
+              isAffix: false,
+              isHide: false,
+              isKeepAlive: true,
+              title: '普通用户',
+              index: '4-1'
+            },
+            name: 'comnu',
+            path: '/alluser/comnu'
+          },
+          {
+            meta: {
+              auth: ['admin', 'test'],
+              icon: 'iconfont el-icon-menu',
+              isAffix: true,
+              isHide: false,
+              isKeepAlive: true,
+              title: '选手管理',
+              index: '4-2'
+            },
+            name: 'athlete',
+            path: '/alluser/athlete'
+          },
+        ]
       },
       // 轮播图管理
       {
@@ -171,19 +199,6 @@ const tagsViewRoutesModule: Module<TagsViewRoutesState, RootStateTypes> = {
         },
         name: 'audit',
         path: '/audit'
-      },
-      {
-        meta: {
-          auth: ['admin', 'test'],
-          icon: 'iconfont el-icon-s-grid',
-          isAffix: false,
-          isHide: false,
-          isKeepAlive: true,
-          title: '普通用户',
-          index: '9'
-        },
-        name: 'comnu',
-        path: '/comnu'
       },
     ],
   },

@@ -27,8 +27,18 @@ const router = createRouter({
             { path: 'acspk', name: 'acspk', component: () => import('views/acspeak/index.vue'), },
           ]
         },
+        //用户
+        {
+          path: "/alluser", name: "alluser", component: () => import("views/elementIcon/fabr.vue"),
+          children: [
+            { path: 'athlete', name: 'athlete', component: () => import('views/elementIcon/index.vue')},
+            //普通用户管理
+            { path: 'comnu', name: 'comnu', component: () => import('views/comnu/index.vue')},
+            
+          ]
+        },
         { path: '/icon', name: 'icon', component: () => import('views/icon/index.vue'), },
-        { path: '/athlete', name: 'athlete', component: () => import('views/elementIcon/index.vue'), },
+        
         // 轮播图管理
         {
           path: '/carousel', name: 'carousel', component: () => import('views/carousel/index.vue'),
@@ -60,8 +70,7 @@ const router = createRouter({
         { path: "/present", name: "present", component: () => import("views/present/index.vue") },
         // 个人礼物记录
         { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") },
-        //普通用户管理
-        { path: '/comnu', name: 'comnu', component: () => import('views/comnu/index.vue'), },
+        
         // 简历审核
         { path: "/audit", name: "audit", component: () => import("views/audit/index.vue") },
       ]

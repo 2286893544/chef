@@ -226,6 +226,21 @@ router.delete("/delCarousel/:_id", async (req, res) => {
   }
 });
 
+// 更改轮播图状态
+router.put("/updateCarousel/:_id", async (req, res) => {
+  try {
+    let data = await carouselModel.findOne({ _id: req.params._id })
+    if (data.isDelete) {
+      await carouselModel.updateOne({ _id: req.params._id }, { isDelete: false })
+    } else {
+      await carouselModel.updateOne({ _id: req.params._id }, { isDelete: true })
+    }
+    res.status(200).send({ code: 200, msg: "修改成功" })
+  } catch (err) {
+    res.status(500).send({ code: 500, msg: "修改失败", err })
+  }
+})
+
 
 //添加活动信息
 router.post("/addactivityMsg", async (req, res) => {
@@ -860,7 +875,7 @@ router.get("/getAuditData", async (req, res) => {
 router.put("/passAudit", async (req, res) => {
   try {
     let { _id } = req.body
-    await userInfoModel.updateOne({ _id  }, { isAudit: false, isApply: true })
+    await userInfoModel.updateOne({ _id }, { isAudit: false, isApply: true })
     res.status(200).send({ code: 200, msg: "审核成功" })
   } catch (err) {
     res.status(500).send({ code: 500, msg: "审核失败", err })

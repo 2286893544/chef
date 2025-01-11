@@ -432,7 +432,7 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
     }
   )
   let users = await userInfoModel.aggregate(pieline)
-  let userstotal = await userInfoModel.countDocuments()
+  let userstotal = await userInfoModel.find({ isApply: true }).countDocuments()
   res.send({
     code: 200,
     users: users,
@@ -844,7 +844,7 @@ router.get("/getcomnuser", async(req, res) => {
     }
   )
   let comusers = await userInfoModel.aggregate(pile)
-  let comuserstotal = await userInfoModel.countDocuments()
+  let comuserstotal = await userInfoModel.find({ isApply: false}).countDocuments()
   res.send({
     code: 200,
     comus: comusers,

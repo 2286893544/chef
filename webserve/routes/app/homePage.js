@@ -234,8 +234,8 @@ router.post('/udvote', async (req, res) => {
     });
 
     // 步骤 3: 判断用户是否已投票超过两个候选人
-    if (voteRecords.length === 2) {
-      return res.status(400).json({ message: '每天只能投两次' });
+    if (voteRecords.length === 10) {
+      return res.status(400).json({ message: '每天只能投十次' });
     }
 
     // 步骤 4: 如果用户已投票一次，检查第二次是否传递了多个候选人

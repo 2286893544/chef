@@ -269,26 +269,34 @@ router.post("/updactive", async (req, res) => {
     code: 200
   })
 })
-// 更新活动信息状态，确保只有一个活动的isStart为true
+// 更新活动信息状态
 router.put("/updateActiveStatus/:_id", async (req, res) => {
   try {
     const { _id } = req.params;
 
-    // 先将所有活动的 isStart 更新为 false
-    await activityMsgModel.updateMany({}, { isStart: false });
+    // 查找活动并获取当前的 isStart 状态
+    const activity = await activityMsgModel.findById(_id);
+    
+    if (!activity) {
+      return res.status(404).send({ code: 404, msg: "活动未找到" });
+    }
 
-    // 然后将指定活动的 isStart 更新为 true
-    const result = await activityMsgModel.updateOne({ _id }, { isStart: true });
+    // 取反 isStart 字段
+    const newStatus = !activity.isStart;
+
+    // 更新指定活动的 isStart 字段
+    const result = await activityMsgModel.updateOne({ _id }, { isStart: newStatus });
 
     if (result.nModified === 0) {
-      return res.status(404).send({ code: 404, msg: "活动未找到或未修改" });
+      return res.status(404).send({ code: 404, msg: "活动未修改" });
     }
 
     res.status(200).send({ code: 200, msg: "更新成功" });
   } catch (err) {
-    res.status(500).send({ code: 500, msg: "更新失败", err })
+    res.status(500).send({ code: 500, msg: "更新失败", err });
   }
-})
+});
+
 
 //删除活动信息
 router.delete("/delactive", async (req, res) => {
@@ -844,7 +852,7 @@ router.get("/getcomnuser", async(req, res) => {
     }
   )
   let comusers = await userInfoModel.aggregate(pile)
-  let comuserstotal = await userInfoModel.find({ isApply: false}).countDocuments()
+  let comuserstotal = await userInfoModel.countDocuments()
   res.send({
     code: 200,
     comus: comusers,

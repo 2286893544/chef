@@ -57,8 +57,8 @@ onMounted(() => {
 			<el-table-column label="记录" align="center">
 				<template v-slot="scope">
 					<!-- {{ scope.row.vote === 1 ? `${scope.row.send}给${scope.row.acp}投了1票` : `${scope.row.send}给${scope.row.acp}赠送了${scope.row.vote}朵鲜花` }} -->
-					{{ scope.row.vote === 1 ? `${scope.row.desc[0].phone}给${scope.row.desc2[0].name}投了1票` :
-						`${scope.row.desc[0].phone}给${scope.row.desc2[0].name}赠送了${scope.row.vote}朵鲜花` }}
+					{{ scope.row.vote ? `${scope.row.desc[0].phone}给${scope.row.desc2[0].name}投了${scope.row.vote}票` :
+						`` }}
 				</template>
 			</el-table-column>
 

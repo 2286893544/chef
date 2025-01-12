@@ -55,15 +55,6 @@
         <el-form-item label="活动名称" prop="title">
           <el-input v-model="ruleForm.title" placeholder="请输入活动名称"></el-input>
         </el-form-item>
-        <el-form-item label="参赛人数" prop="joinNum">
-          <el-input v-model.number="ruleForm.joinNum" placeholder="请输入参赛人数"></el-input>
-        </el-form-item>
-        <el-form-item label="累计票数" prop="accumulatedNum">
-          <el-input v-model.number="ruleForm.accumulatedNum" placeholder="请输入累计票数"></el-input>
-        </el-form-item>
-        <el-form-item label="累计访问量" prop="visitNum">
-          <el-input v-model.number="ruleForm.visitNum" placeholder="请输入累计访问量"></el-input>
-        </el-form-item>
         <el-form-item label="活动公告" prop="visitNum">
           <el-input v-model.number="ruleForm.announcement" placeholder="请输入活动公告"></el-input>
         </el-form-item>
@@ -135,9 +126,6 @@ const setdialogvisiblew = (status: String, data: any) => {
   if (data) {
     updid.value = data._id
     ruleForm.title = data.title
-    ruleForm.joinNum = data.joinNum
-    ruleForm.accumulatedNum = data.accumulatedNum
-    ruleForm.visitNum = data.visitNum
     ruleForm.announcement = data.announcement
     ruleForm.startTime = data.startTime
     ruleForm.endTime = data.endTime
@@ -148,9 +136,6 @@ const setdialogvisiblew = (status: String, data: any) => {
 //表单
 interface RuleForm {
   title: String
-  joinNum: Number
-  accumulatedNum: Number
-  visitNum: Number
   startTime: String
   endTime: String
   rule: String
@@ -162,9 +147,6 @@ const formSize = ref('default')
 const ruleFormRef = ref()
 let ruleForm = reactive<RuleForm>({
   title: '',
-  joinNum: 0,
-  accumulatedNum: 0,
-  visitNum: 0,
   startTime: '',
   endTime: '',
   rule: '',
@@ -175,15 +157,6 @@ let ruleForm = reactive<RuleForm>({
 const rules = reactive({
   title: [
     { required: true, message: "请输入活动名称", trigger: 'blur' }
-  ],
-  joinNum: [
-    { required: true, message: "请输入参赛人数", trigger: 'blur' }
-  ],
-  accumulatedNum: [
-    { required: true, message: "请输入累计票数", trigger: 'blur' }
-  ],
-  visitNum: [
-    { required: true, message: "请输入累计访问量", trigger: 'blur' }
   ],
   announcement: [
     { required: true, message: "请输入活动公告", trigger: 'blur' }
@@ -203,12 +176,10 @@ const rules = reactive({
 
 const resetForm = () => {
   centerDialogVisible.value = false
-  ruleForm.title = '',
-    ruleForm.joinNum = 0,
-    ruleForm.accumulatedNum = 0,
-    ruleForm.visitNum = 0,
-    ruleForm.startTime = '',
-    ruleForm.endTime = '',
+  ruleForm.title = ''
+    ruleForm.startTime = ''
+    ruleForm.announcement = ''
+    ruleForm.endTime = ''
     ruleForm.rule = ''
 }
 //添加

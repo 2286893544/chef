@@ -53,7 +53,6 @@ const activesData = ref<activityMsgType>({
   accumulatedNum: 0
 })
 const jobDistributionNum = ref([])
-let jobList = reactive([])
 const lookState = ref<string>('')
 const loadState = ref<boolean>(false)
 
@@ -83,10 +82,11 @@ function getuser() {
 async function getDetail() {
   try {
     await service.get('/getDetail').then((res: any) => {
-      if (res.data_things.length > 0) {
-        jobList = res.data_things
+      if (res.data_things[0].length > 0) {
+        jobChartinit(res.data_things)
+      } else {
+        jobChartinit([])
       }
-      jobChartinit()
     })
   } catch (err) {
     ElMessage.error(`获取数据失败,${err}`)
@@ -158,10 +158,10 @@ function ageChartinit() {
   }
 }
 
-function jobChartinit() {
+function jobChartinit(jobListData: any) {
   if (jobChart.value) {
     const myEcharts = echarts.init(jobChart.value);
-    if (jobList.length === 0) {
+    if (jobListData.length === 0) {
       // 数据为空，显示“暂无数据”的提示
       myEcharts.setOption({
         title: {
@@ -191,7 +191,7 @@ function jobChartinit() {
 
       // 定义所有的 Option 配置
       const allOptions: any = {}
-      jobList.forEach((data) => {
+      jobListData.forEach((data: any) => {
         const optionId = data[0][2]
         const option = {
           id: optionId,

@@ -184,19 +184,6 @@ const routesListModule: Module<RoutesListState, RootStateTypes> = {
         name: 'present',
         path: '/present'
       },
-      {
-        meta: {
-          auth: ['admin', 'test'],
-          icon: 'iconfont el-icon-s-grid',
-          isAffix: false,
-          isHide: false,
-          isKeepAlive: true,
-          title: '简历审核',
-          index: '8'
-        },
-        name: 'audit',
-        path: '/audit'
-      },
     ],
   },
   mutations: {

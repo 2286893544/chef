@@ -119,15 +119,6 @@ const beforeUpload = async (file: File): Promise<File> => {
       return Promise.reject(new Error('文件格式不正确'));
     }
 
-    // 检查文件大小是否小于 8MB
-    const isLt8MB = file.size / 1024 / 1024 < 8;
-    if (!isLt8MB) {
-      const sizeNum = (file.size / 1024 / 1024).toFixed(1);
-      ElMessage.error(`您上传的文件大小为 ${sizeNum}MB. 上传文件大小不能超过 8MB!`);
-      // 阻止上传
-      return Promise.reject(new Error('文件大小超限'));
-    }
-
     // 压缩图片
     const compressedFile = await compressImage(file, { quality: 0.8, maxWidth: 800, maxHeight: 800 });
 

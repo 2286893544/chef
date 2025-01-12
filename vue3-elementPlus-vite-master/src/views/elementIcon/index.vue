@@ -40,7 +40,6 @@
             投票
           </el-button>
           <el-button type="primary" @click="goGift(scope.row)">礼物</el-button>
-          <el-button type="primary" @click="gorich(scope.row)">简历</el-button>
           <el-button type="primary" @click="goComment(scope.row._id)">
             留言板
           </el-button>
@@ -75,7 +74,7 @@
         </el-form-item>
         <el-form-item label="用户封面" prop="cover">
           <el-upload class="avatar-uploader" :action="ActionUrl + '/upload'" :show-file-list="false"
-          :before-upload="beforeUpload" :on-success="handlePreview" :on-error="handleError">
+            :before-upload="beforeUpload" :on-success="handlePreview" :on-error="handleError">
             <img v-if="ruleForm.cover" :src="ruleForm.cover" class="avatar" />
             <el-button v-else type="primary">上传图片</el-button>
           </el-upload>
@@ -125,11 +124,6 @@ const fileList = ref([])
 const ActionUrl = ref<String>('')
 const router = useRouter()
 const loadState = ref<boolean>(false)
-//
-let gorich = (id: any) => {
-  router.push(`/riched/${id._id}`)
-  sessionStorage.setItem('richText', JSON.stringify(id.richText))
-}
 //
 let gosinaply = (id: any) => {
   router.push(`/sinaply/${id._id}`)
@@ -318,15 +312,6 @@ const beforeUpload = async (file: File): Promise<File> => {
       ElMessage.error('上传文件格式只能是 JPG/PNG/JPEG!');
       // 阻止上传
       return Promise.reject(new Error('文件格式不正确'));
-    }
-
-    // 检查文件大小是否小于 8MB
-    const isLt8MB = file.size / 1024 / 1024 < 8;
-    if (!isLt8MB) {
-      const sizeNum = (file.size / 1024 / 1024).toFixed(1);
-      ElMessage.error(`您上传的文件大小为 ${sizeNum}MB. 上传文件大小不能超过 8MB!`);
-      // 阻止上传
-      return Promise.reject(new Error('文件大小超限'));
     }
 
     // 压缩图片

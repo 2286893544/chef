@@ -53,9 +53,6 @@ const router = createRouter({
             { path: 'positionIdx', name: "positionIdx", component: () => import('views/position/position.vue') },
           ]
         },
-        {
-          path: "/riched/:id", name: "riched", component: () => import("views/riched/riched.vue")
-        },
         // 留言板
         {
           path: "/comment/:id", name: "comment", component: () => import("views/comment/comment.vue"),
@@ -70,9 +67,6 @@ const router = createRouter({
         { path: "/present", name: "present", component: () => import("views/present/index.vue") },
         // 个人礼物记录
         { path: "/gift/:id", name: "gift", component: () => import("views/gift/index.vue") },
-        
-        // 简历审核
-        { path: "/audit", name: "audit", component: () => import("views/audit/index.vue") },
       ]
     },
     { path: "/login", name: "login", component: () => import("views/login/log.vue") }

@@ -50,17 +50,37 @@ const updateVotesMiddleware = async (req, res, next) => {
 //游客进入页面根据Fingerprint生成id,存储游客id创建游客
 router.post("/addtourist", async (req, res) => {
   let { deviceid } = req.body;
-  
-  // 检查 deviceid 是否已经存在
-  const existingUser = await userInfoModel.findOne({ deviceid: deviceid });
-  
-  if (existingUser) {
-    // 如果 deviceid 已经存在，返回提示信息
+
+  try {
+    // 检查 deviceid 是否已经存在
+    const existingUser = await userInfoModel.findOne({ deviceid: deviceid });
+
+    if (existingUser) {
+      // 如果 deviceid 已经存在，返回提示信息
+      return res.send({
+        code: 400,
+        msg: "Device ID already exists",
+        id: existingUser._id // 返回已存在记录的 _id
+      });
+    }
+
+    // 创建新的用户记录
+    const newUser = await userInfoModel.create({ deviceid: deviceid });
+
+    // 返回创建的用户的 _id
     return res.send({
-      code: 400,
-      msg: "Device ID already exists"
+      code: 200,
+      msg: "Tourist added successfully",
+      id: newUser._id // 返回新创建记录的 _id
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({
+      code: 500,
+      msg: "Server error",
     });
   }
+});
 
   // 如果不存在，创建新的记录
   await userInfoModel.create({ deviceid: deviceid });

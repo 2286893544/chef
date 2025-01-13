@@ -282,13 +282,24 @@ router.post('/udvote', async (req, res) => {
       actvoter: candidate_id,
       votetime: vtime,
     }));
-    // 步骤 7: 获取所有被投票的候选人票数
-    const voteCounts = await voteModel.aggregate([
-      { $group: { _id: "$candidate_id", totalVotes: { $sum: 1 } } }
-    ]);
 
+    // 步骤 7: 获取所有被投票的候选人票数
     await voteModel.insertMany(votesToInsert);
-    return res.status(200).json({ message: '投票成功' });
+
+    // 步骤 8: 计算当前用户已投票的总数
+    const totalVotes = await voteModel.find({
+      dovoter: voter_id,
+      votetime: { $gte: new Date(today) }
+    }).countDocuments();
+
+    // 步骤 9: 计算剩余可投票数
+    const remainingVotes = 10 - totalVotes;
+
+    return res.status(200).json({
+      message: '投票成功',
+      totalVotes,        // 用户当前已投的票数
+      remainingVotes     // 用户还可以投的票数
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: '错误' });

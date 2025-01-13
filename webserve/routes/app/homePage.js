@@ -145,7 +145,8 @@ router.get('/getCarousel', async (req, res) => {
 // 添加访问量
 router.get('/getVisit', async (req, res) => {
   try {
-    const updatedActivity = await activityMsgModel.findOneAndUpdate({ isStart: true }, { $inc: { visit: 1 } }, { new: true })
+    const updatedActivity = await activityMsgModel.findOneAndUpdate({ isStart: true }, { $inc: { visitNum: 1 } }, { new: true })
+    console.log(updatedActivity)
     if (!updatedActivity) {
       return res.status(404).json({ code: 404, msg: '活动未找到' });
     }
@@ -158,7 +159,7 @@ router.get('/getVisit', async (req, res) => {
 // 更新活动信息的访问量+1
 router.put('/addActivityVisit', async (req, res) => {
   try {
-    let data = await activityMsgModel.findOneAndUpdate({}, { $inc: { visit: 1 } }, { new: true })
+    let data = await activityMsgModel.findOneAndUpdate({}, { $inc: { visitNum: 1 } }, { new: true })
     res.json({ code: 200, msg: '更新成功', data })
   } catch (err) {
     res.json({ code: 500, msg: '更新失败', err })

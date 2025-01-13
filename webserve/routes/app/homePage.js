@@ -48,14 +48,28 @@ const updateVotesMiddleware = async (req, res, next) => {
   });
 };
 //游客进入页面根据Fingerprint生成id,存储游客id创建游客
-router.post("/addtourist", async(req, res) => {
-  let { deviceid } = req.body
-  userInfoModel.create({deviceid: deviceid})
+router.post("/addtourist", async (req, res) => {
+  let { deviceid } = req.body;
+  
+  // 检查 deviceid 是否已经存在
+  const existingUser = await userInfoModel.findOne({ deviceid: deviceid });
+  
+  if (existingUser) {
+    // 如果 deviceid 已经存在，返回提示信息
+    return res.send({
+      code: 400,
+      msg: "Device ID already exists"
+    });
+  }
+
+  // 如果不存在，创建新的记录
+  await userInfoModel.create({ deviceid: deviceid });
+
   res.send({
     code: 200,
-    msg: "view ok!"
-  })
-})
+    msg: "Tourist added successfully!"
+  });
+});
 router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
   try {
     let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;

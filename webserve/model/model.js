@@ -40,9 +40,18 @@ const registerModel = mongoose.model("register", registerSchema, "register")
 //活动信息
 const activityMsgSchema = new mongoose.Schema({
   title: String,
-  joinNum: Number,
-  accumulatedNum: Number,
-  visitNum: Number,
+  joinNum: {
+    type: Number,
+    default: 0
+  },
+  accumulatedNum: {
+    type: Number,
+    default: 0
+  },
+  visitNum: {
+    type: Number,
+    default: 0
+  },
   startTime: Date,
   endTime: Date,
   rule: String,
@@ -93,13 +102,6 @@ const userInfoSchema = new mongoose.Schema({
     type: String,
     default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAJX82J0tJmJfIyI0utQZIP1S9hG6zYI_3ZA&s"
   },//头像
-  age: Number,//年龄
-  gender: Boolean,//性别
-  label: String,//标签
-  jurisdictiom: {//投票权限可以不要
-    type: Boolean,
-    default: true
-  },
   voteNum: {//投票的剩余票数,可以不添加
     type: Number,
     default: 2
@@ -108,23 +110,10 @@ const userInfoSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "position"
   },
-  phone: {
-    type: Number,
-    maxLength: 11,
-    default: 12345678901
-  },
-  pwd: {
-    type: String
-  },
-  resumeText: String,//富文本可以先不添加
   visitNum: {//访问量默认，后期进行修改
     type: Number,
     default: 0
   },
-  richText: {
-    type: String,
-    default: ""
-  },//富文本可以先不添加
   addTime: {//默认添加
     type: Date,
     default: Date.now,
@@ -139,7 +128,6 @@ const userInfoSchema = new mongoose.Schema({
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
   },
-  openid: String,
   gitflower: {
     type: Number,
     default: 0
@@ -147,7 +135,8 @@ const userInfoSchema = new mongoose.Schema({
   isAudit: { // 简历审核是否通过
     type: Boolean,
     default: false
-  }
+  },
+  deviceid: String,//设备指纹游客唯一id
 })
 const counterSchema = new mongoose.Schema({
   _id: { type: String, required: true }, // 计数器名称

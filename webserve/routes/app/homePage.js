@@ -47,6 +47,15 @@ const updateVotesMiddleware = async (req, res, next) => {
     next();
   });
 };
+//游客进入页面根据Fingerprint生成id,存储游客id创建游客
+router.post("/addtourist", async(req, res) => {
+  let { deviceid } = req.body
+  userInfoModel.create({deviceid: deviceid})
+  res.send({
+    code: 200,
+    msg: "view ok!"
+  })
+})
 router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
   try {
     let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;
@@ -421,18 +430,49 @@ router.get("/voteshistory", async (req, res) => {
       }
     }
   ])
-  let result = []
+  // let result = []
+  // sends.forEach((item) => {
+  //   result.push(
+  //     {
+  //       send: item.dovoter,
+  //       acp: item.actvoter,
+  //       vote: 1,
+  //       desc: item.desc,
+  //       desc2: item.desc2
+  //     }
+  //   )
+  // })
+  let result = [];
+  let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
+  
   sends.forEach((item) => {
-    result.push(
-      {
+    const send = item.dovoter.toString();
+    const acp = item.actvoter.toString();
+    const vote = 1; // 这里的投票数为 1，按需修改
+  
+    // 生成一个唯一的键来标识 `send` 和 `acp` 的组合
+    const key = `${send}-${acp}`;
+  
+    // 检查该组合是否已经存在
+    if (voteMap.has(key)) {
+      // 如果存在，累加投票数
+      voteMap.get(key).vote += vote;
+    } else {
+      // 如果不存在，创建新的记录
+      voteMap.set(key, {
         send: item.dovoter,
         acp: item.actvoter,
-        vote: 1,
+        vote: vote,
         desc: item.desc,
         desc2: item.desc2
-      }
-    )
-  })
+      });
+    }
+  });
+  
+  // 将 Map 转换为结果数组
+  voteMap.forEach((value) => {
+    result.push(value);
+  });
   flowers.forEach((item) => {
     result.push(
       {
@@ -513,18 +553,49 @@ router.get("/sinaplyvotes", async (req, res) => {
       }
     }
   ])
-  let result = []
-  sends.forEach((item) => {
-    result.push(
-      {
-        send: item.dovoter,
-        acp: item.actvoter,
-        vote: 1,
-        desc: item.desc,
-        desc2: item.desc2
-      }
-    )
-  })
+  // let result = []
+  // sends.forEach((item) => {
+  //   result.push(
+  //     {
+  //       send: item.dovoter,
+  //       acp: item.actvoter,
+  //       vote: 1,
+  //       desc: item.desc,
+  //       desc2: item.desc2
+  //     }
+  //   )
+  // })
+  let result = [];
+let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
+
+sends.forEach((item) => {
+  const send = item.dovoter.toString();
+  const acp = item.actvoter.toString();
+  const vote = 1; // 这里的投票数为 1，按需修改
+
+  // 生成一个唯一的键来标识 `send` 和 `acp` 的组合
+  const key = `${send}-${acp}`;
+
+  // 检查该组合是否已经存在
+  if (voteMap.has(key)) {
+    // 如果存在，累加投票数
+    voteMap.get(key).vote += vote;
+  } else {
+    // 如果不存在，创建新的记录
+    voteMap.set(key, {
+      send: item.dovoter,
+      acp: item.actvoter,
+      vote: vote,
+      desc: item.desc,
+      desc2: item.desc2
+    });
+  }
+});
+
+// 将 Map 转换为结果数组
+voteMap.forEach((value) => {
+  result.push(value);
+});
   flowers.forEach((item) => {
     result.push(
       {

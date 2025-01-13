@@ -48,14 +48,28 @@ const updateVotesMiddleware = async (req, res, next) => {
   });
 };
 //游客进入页面根据Fingerprint生成id,存储游客id创建游客
-router.post("/addtourist", async(req, res) => {
-  let { deviceid } = req.body
-  userInfoModel.create({deviceid: deviceid})
+router.post("/addtourist", async (req, res) => {
+  let { deviceid } = req.body;
+  
+  // 检查 deviceid 是否已经存在
+  const existingUser = await userInfoModel.findOne({ deviceid: deviceid });
+  
+  if (existingUser) {
+    // 如果 deviceid 已经存在，返回提示信息
+    return res.send({
+      code: 400,
+      msg: "Device ID already exists"
+    });
+  }
+
+  // 如果不存在，创建新的记录
+  await userInfoModel.create({ deviceid: deviceid });
+
   res.send({
     code: 200,
-    msg: "view ok!"
-  })
-})
+    msg: "Tourist added successfully!"
+  });
+});
 router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
   try {
     let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;
@@ -268,13 +282,24 @@ router.post('/udvote', async (req, res) => {
       actvoter: candidate_id,
       votetime: vtime,
     }));
-    // 步骤 7: 获取所有被投票的候选人票数
-    const voteCounts = await voteModel.aggregate([
-      { $group: { _id: "$candidate_id", totalVotes: { $sum: 1 } } }
-    ]);
 
+    // 步骤 7: 获取所有被投票的候选人票数
     await voteModel.insertMany(votesToInsert);
-    return res.status(200).json({ message: '投票成功' });
+
+    // 步骤 8: 计算当前用户已投票的总数
+    const totalVotes = await voteModel.find({
+      dovoter: voter_id,
+      votetime: { $gte: new Date(today) }
+    }).countDocuments();
+
+    // 步骤 9: 计算剩余可投票数
+    const remainingVotes = 10 - totalVotes;
+
+    return res.status(200).json({
+      message: '投票成功',
+      totalVotes,        // 用户当前已投的票数
+      remainingVotes     // 用户还可以投的票数
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: '错误' });

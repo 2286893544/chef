@@ -898,5 +898,16 @@ router.put("/passAudit", async (req, res) => {
     res.status(500).send({ code: 500, msg: "审核失败", err })
   }
 })
-
+//获取总人数，总票数，总访问量
+router.get("/totalrpf", async(req, res) => {
+  let rens = await userInfoModel.find({ isApply: true }).countDocuments()
+  let votes = await voteModel.find().countDocuments()
+  let visitData = await activityMsgModel.find().limit(1); // 获取第一条数据
+  let visitNum = visitData[0].visitNum; // 访问第一条数据的 visitNum 字段
+  res.send({
+    totalr: rens,
+    totalv: votes,
+    totalt: visitNum
+  })
+})
 module.exports = router;

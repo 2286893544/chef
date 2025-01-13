@@ -57,7 +57,7 @@ onMounted(() => {
 			<el-table-column label="用户" align="center">
 				<template v-slot="scope">
 					<!-- {{ scope.row.send }} -->
-					{{ scope.row.phone }}
+					{{ scope.row.deviceid }}
 				</template>
 			</el-table-column>
 

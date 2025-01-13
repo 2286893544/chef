@@ -276,7 +276,7 @@ router.put("/updateActiveStatus/:_id", async (req, res) => {
 
     // 查找活动并获取当前的 isStart 状态
     const activity = await activityMsgModel.findById(_id);
-    
+
     if (!activity) {
       return res.status(404).send({ code: 404, msg: "活动未找到" });
     }
@@ -827,7 +827,7 @@ router.get("/getapuservotes", async (req, res) => {
   })
 })
 //获取未参赛的所有用户
-router.get("/getcomnuser", async(req, res) => {
+router.get("/getcomnuser", async (req, res) => {
   let { phone, nowpage = 1, pagesize = 5 } = req.query
   let pile = [
     {

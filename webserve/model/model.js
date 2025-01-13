@@ -169,6 +169,10 @@ const commentSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isPass: {
+    type: Boolean,
+    default: false
+  },
   content: String,
   cid: {
     type: mongoose.Schema.Types.ObjectId,

@@ -12,22 +12,22 @@ router.post('/pay', async (req, res) => {
     const { order_id, total_fee, title, backendUrl, buyerId, sellerId } = req.body;
 
     // 检查必要参数
-    if(!order_id){
+    if (!order_id) {
       return res.status(400).json({ code: 400, msg: '缺少订单号' });
     }
-    if(!total_fee){
+    if (!total_fee) {
       return res.status(400).json({ code: 400, msg: '缺少金额' });
     }
-    if(!title){
+    if (!title) {
       return res.status(400).json({ code: 400, msg: '缺少标题' });
     }
-    if(!backendUrl){
+    if (!backendUrl) {
       return res.status(400).json({ code: 400, msg: '缺少后台回调地址' });
     }
-    if(!buyerId){
+    if (!buyerId) {
       return res.status(400).json({ code: 400, msg: '缺少买家ID' });
     }
-    if(!sellerId){
+    if (!sellerId) {
       return res.status(400).json({ code: 400, msg: '缺少卖家ID' });
     }
 

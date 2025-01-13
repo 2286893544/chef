@@ -19,6 +19,11 @@
           <el-switch v-model="scope.row.audit" @click="changeState(scope.row._id)" />
         </template>
       </el-table-column>
+      <el-table-column prop="content" label="是否显示" align="center">
+        <template v-slot="scope">
+          <el-switch v-model="scope.row.isPass" @click="changeShow(scope.row._id)" />
+        </template>
+      </el-table-column>
       <el-table-column label="内容" align="center">
         <template v-slot="scope">
           <span class="w-100px mb-2 contentText">
@@ -28,7 +33,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template v-slot="scope">
-          <el-button type="danger" size="small" @click="deleteComment(scope.row)">删除</el-button>
+          <el-button type="danger" size="small" @click="deleteComment(scope.row._id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -42,6 +47,8 @@
       </div>
     </div>
 
+    <loading :loadState="loadState" />
+
   </div>
 </template>
 
@@ -50,6 +57,7 @@ import service from '@/utils/request';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
+import loading from '@/components/loading.vue';
 
 type commentType = {
   _id: String,
@@ -68,18 +76,22 @@ const page = ref<number>(1)
 const pageSize = ref<number>(3)
 const total = ref<number>(0)
 const router = useRouter()
+const loadState = ref<boolean>(false)
 
 function goBack() {
   router.back()
 }
 
 function getComment() {
+  loadState.value = true
   service.get(`/getComment`, { params: { cid, page: page.value, pageSize: pageSize.value } }).then((res: any) => {
     if (res.code === 200) {
       comment.value = res.data
       total.value = res.total
+      loadState.value = false
     } else {
       ElMessage.error(res.msg)
+      loadState.value = false
     }
   })
 }
@@ -110,6 +122,7 @@ function deleteComment(id: String) {
     }
   )
     .then(() => {
+      console.log(id)
       service.delete(`/delComment`, { params: { id } }).then((res: any) => {
         if (res.code === 200) {
           ElMessage.success(res.msg)
@@ -133,6 +146,21 @@ function changeState(_id: string) {
       if (res.code === 200) {
         ElMessage.success('更新成功')
         getComment()
+      }
+    })
+  } catch (err) {
+    ElMessage.error('修改失败')
+  }
+}
+
+function changeShow(_id: String) {
+  try {
+    service.put(`/updateShow`, { _id }).then((res: any) => {
+      if (res.code === 200) {
+        ElMessage.success('更新成功')
+        getComment()
+      } else {
+        ElMessage.error(res.msg)
       }
     })
   } catch (err) {

@@ -527,28 +527,37 @@ router.get("/getComment", async (req, res) => {
 
 // 更改审核状态
 router.put("/updateComment", async (req, res) => {
-
-  const { _id } = req.body
   try {
+    const { _id } = req.body
     let data = await commentModel.findOne({ _id })
     if (data.audit) {
       await commentModel.updateOne({ _id }, { audit: false })
     } else {
       await commentModel.updateOne({ _id }, { audit: true })
     }
+    res.status(200).send({ code: 200, msg: "更新成功" })
   } catch (err) {
-    res.status(500).send({
-      code: 500,
-      msg: "更新失败",
-      err
-    })
-  } finally {
-    res.status(200).send({
-      code: 200,
-      msg: "更新成功"
-    })
+    res.status(500).send({ code: 500, msg: "更新失败", err })
   }
 })
+
+// 更新审核显示状态
+router.put("/updateShow", async (req, res) => {
+  try {
+    const { _id } = req.body
+    let data = await commentModel.findOne({ _id })
+    if (data.isShow) {
+      await commentModel.updateOne({ _id }, { isPass: false })
+    } else {
+      await commentModel.updateOne({ _id }, { isPass: true })
+    }
+    res.status(200).send({ code: 200, msg: "更新成功" })
+  } catch (err) {
+    res.status(500).send({ code: 500, msg: "更新失败", err })
+  }
+})
+
+
 // 删除留言
 router.delete("/delComment", async (req, res) => {
   try {

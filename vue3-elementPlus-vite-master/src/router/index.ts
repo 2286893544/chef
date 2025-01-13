@@ -55,7 +55,7 @@ const router = createRouter({
         },
         // 留言板
         {
-          path: "/comment/:id", name: "comment", component: () => import("views/comment/comment.vue"),
+          path: "/comment/:id", name: "comment", component: () => import("views/comment/index.vue"),
         },
         //投票记录
         { path: '/votehistory', name: 'votehistory', component: () => import('views/vote/index.vue'), },

@@ -47,6 +47,15 @@ const updateVotesMiddleware = async (req, res, next) => {
     next();
   });
 };
+//游客进入页面根据Fingerprint生成id,存储游客id创建游客
+router.post("/addtourist", async(req, res) => {
+  let { deviceid } = req.body
+  userInfoModel.create({deviceid: deviceid})
+  res.send({
+    code: 200,
+    msg: "view ok!"
+  })
+})
 router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
   try {
     let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;

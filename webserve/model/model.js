@@ -135,7 +135,8 @@ const userInfoSchema = new mongoose.Schema({
   isAudit: { // 简历审核是否通过
     type: Boolean,
     default: false
-  }
+  },
+  deviceid: String,//设备指纹游客唯一id
 })
 const counterSchema = new mongoose.Schema({
   _id: { type: String, required: true }, // 计数器名称

@@ -127,7 +127,7 @@ function scheduleDailyVoteReset() {
     writeLog('renewal.txt', '开始执行每日投票数量重置任务...');
 
     try {
-      const voteIncrement = 2;
+      const voteIncrement = 10;
       const result = await userInfoModel.updateMany({}, { $inc: { voteNum: voteIncrement } });
       const successMessage = `成功为 ${result.modifiedCount} 个用户恢复了 ${voteIncrement} 张投票次数`;
       console.log('----- 调度任务日志 -----')

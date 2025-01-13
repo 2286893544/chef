@@ -51,11 +51,11 @@
           {{ scope.row.avgOrderAmount ? scope.row.avgOrderAmount.toFixed(2) : '0' }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <!-- <el-table-column label="操作" align="center">
         <template v-slot="scope">
           <el-button type="danger" @click="delOrderForm(scope.row._id)">删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <!-- 分页 -->
@@ -121,16 +121,16 @@ function getOrderInfo() {
 }
 
 // 删除订单
-function delOrderForm(_id: string) {
-  service.delete(`/orderForm/deleteOrder/${_id}`).then((res: any) => {
-    if (res.code === 200) {
-      getOrderInfo()
-      ElMessage.success(res.msg)
-    } else {
-      ElMessage.error(res.msg)
-    }
-  })
-}
+// function delOrderForm(_id: string) {
+//   service.delete(`/orderForm/deleteOrder/${_id}`).then((res: any) => {
+//     if (res.code === 200) {
+//       getOrderInfo()
+//       ElMessage.success(res.msg)
+//     } else {
+//       ElMessage.error(res.msg)
+//     }
+//   })
+// }
 
 const handleSizeChange = (val: number) => {
   formInline.page = 1;

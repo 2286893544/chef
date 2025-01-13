@@ -45,7 +45,7 @@ onMounted(() => {
 			<el-table-column label="用户" align="center">
 				<template v-slot="scope">
 					<!-- {{ scope.row.send }} -->
-					{{ scope.row.desc[0].phone }}
+					{{ scope.row.desc[0].deviceid }}
 				</template>
 			</el-table-column>
 			<el-table-column label="选手" align="center">

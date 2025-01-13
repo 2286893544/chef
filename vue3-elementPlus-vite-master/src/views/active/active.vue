@@ -10,9 +10,6 @@
       <el-table :data="activels" style="width: 100%; margin-top: 20px">
         <el-table-column prop="title" label="活动标题" align="center" />
         <el-table-column prop="announcement" label="活动公告" align="center" />
-        <el-table-column prop="joinNum" label="参赛人数" align="center" />
-        <el-table-column prop="accumulatedNum" label="累计票数" align="center" />
-        <el-table-column prop="visitNum" label="访问总量" align="center" />
         <el-table-column prop="rule" label="活动规则" align="center" />
         <el-table-column label="活动状态" align="center">
           <template v-slot="scope">

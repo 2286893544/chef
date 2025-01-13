@@ -137,6 +137,7 @@ const userInfoSchema = new mongoose.Schema({
     default: false
   },
   deviceid: String,//设备指纹游客唯一id
+  introduce: String,//简介
 })
 const counterSchema = new mongoose.Schema({
   _id: { type: String, required: true }, // 计数器名称

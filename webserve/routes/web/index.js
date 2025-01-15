@@ -881,25 +881,6 @@ router.get("/getcomnuser", async (req, res) => {
     comustl: comuserstotal
   })
 })
-// 获取简历审核数据
-router.get("/getAuditData", async (req, res) => {
-  try {
-    let { page = 1, pagesize = 5, name = '', phone = '' } = req.query;
-    let result = [];
-    if (name) result.push({ name: new RegExp(name) });
-    if (phone) result.push({ phone });
-    result.push({ isAudit: true })
-
-    const query = result.length > 0 ? { $and: result } : {}
-
-    const data = await userInfoModel.find(query).skip((page - 1) * pagesize).limit(pagesize)
-    const total = await userInfoModel.find(query).countDocuments()
-
-    res.status(200).send({ code: 200, msg: "获取成功", data, total })
-  } catch (err) {
-    res.status(500).send({ code: 500, msg: "获取失败", err })
-  }
-})
 
 // 简历通过审核
 router.put("/passAudit", async (req, res) => {

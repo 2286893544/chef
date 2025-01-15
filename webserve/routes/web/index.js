@@ -394,10 +394,12 @@ router.delete("/deluser/:userid", async (req, res) => {
 })
 //获取所有用户
 router.get("/getuser", updateVotesMiddleware, async (req, res) => {
-  let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query
-  //调用函数修改选手票数
-  let idArr = await userInfoModel.find().lean() //无分页，判断是否报名
-  let ids = idArr.filter(item => item.isApply).map(i => i._id)
+  let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query;
+  
+  // 调用函数修改选手票数
+  let idArr = await userInfoModel.find().lean(); // 无分页，判断是否报名
+  let ids = idArr.filter(item => item.isApply).map(i => i._id);
+  
   let pieline = [
     {
       $match: {
@@ -412,8 +414,8 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
         as: "position"
       }
     },
-
   ];
+  
   if (searchcontent) {
     pieline.push({
       $match: {
@@ -424,6 +426,7 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
       },
     });
   }
+  
   if (positionid) {
     pieline.push({
       $match: {
@@ -431,23 +434,33 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
       },
     });
   }
+  
+  // 添加排序：先显示 isAudit 为 true 的，后显示 false 的
+  pieline.push({
+    $sort: {
+      isAudit: -1 // -1 为降序，即先显示 true 的
+    }
+  });
+  
   pieline.push({
     $skip: (nowPage - 1) * pageSize
-  })
-  pieline.push(
-    {
-      $limit: Number(pageSize)
-    }
-  )
-  let users = await userInfoModel.aggregate(pieline)
-  let userstotal = await userInfoModel.find({ isApply: true }).countDocuments()
+  });
+
+  pieline.push({
+    $limit: Number(pageSize)
+  });
+
+  let users = await userInfoModel.aggregate(pieline);
+  let userstotal = await userInfoModel.find({ isApply: true }).countDocuments();
+  
   res.send({
     code: 200,
     users: users,
     userstotal: userstotal,
     ids: ids
-  })
-})
+  });
+});
+
 
 //获取所有选手
 router.get("/getuserapply", async (req, res) => {
@@ -892,7 +905,7 @@ router.get("/getAuditData", async (req, res) => {
 router.put("/passAudit", async (req, res) => {
   try {
     let { _id } = req.body
-    await userInfoModel.updateOne({ _id }, { isAudit: false, isApply: true })
+    await userInfoModel.updateOne({ _id }, { isAudit: true, isApply: true })
     res.status(200).send({ code: 200, msg: "审核成功" })
   } catch (err) {
     res.status(500).send({ code: 500, msg: "审核失败", err })

@@ -88,13 +88,13 @@ router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
   try {
     let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;
 
-    // 获取已报名用户的ID
-    let idArr = await userInfoModel.find({ isApply: true }).select('_id').lean();
+    // 获取已报名且审核通过的用户的ID（isApply 和 isAudit 都为 true）
+    let idArr = await userInfoModel.find({ isApply: true, isAudit: true }).select('_id').lean();
     let ids = idArr.map(i => i._id);
 
     // 构建基础聚合管道
     let pipeline = [
-      { $match: { _id: { $in: ids } } },
+      { $match: { _id: { $in: ids } } }, // 只查询已报名且审核通过的用户
       {
         $lookup: {
           localField: "position",
@@ -165,6 +165,7 @@ router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
     res.status(500).send({ code: 500, message: '服务器内部错误' });
   }
 });
+
 
 // 获取轮播图
 router.get('/getCarousel', async (req, res) => {

@@ -3,6 +3,10 @@
     <el-button type="primary" style="margin: 20px;" @click="setdialogvisiblew('add', null)">
       添加用户
     </el-button>
+      <label for="">搜索:</label><el-input v-model="searchcontent" style="width: 233px;" placeholder="按照姓名或者编号搜索" clearable />
+      <el-button type="primary" style="margin: 20px;" @click="dosearch">
+        搜索
+      </el-button>
     <!-- 表格 -->
     <el-table :data="userls" style="width: 97%; margin: 0 auto;">
       <el-table-column prop="name" label="姓名" align="center" />
@@ -21,7 +25,7 @@
       </el-table-column>
       <el-table-column label="简历审核" align="center">
         <template v-slot="scope">
-          <el-tag type="success" v-if="scope.row.isApply">已审核</el-tag>
+          <el-tag type="success" v-if="scope.row.isAudit">已审核</el-tag>
           <el-tag type="danger" v-else style="cursor: pointer" @click="ElMessage.warning('请前去审核')">
             待审核
           </el-tag>
@@ -35,6 +39,9 @@
           </el-button>
           <el-button type="primary" size="small" @click="setdialogvisiblew('upd', scope.row)">
             编辑
+          </el-button>
+          <el-button v-if="!scope.row.isAudit" type="primary" size="small" @click="allowisaudit(scope.row._id)">
+            通过审核
           </el-button>
           <el-button type="danger" @click="deluser(scope.row._id)">
             删除
@@ -56,7 +63,7 @@
         <el-form-item label="用户姓名" prop="name">
           <el-input v-model="ruleForm.name" placeholder="请输入用户姓名"></el-input>
         </el-form-item>
-        <el-form-item label="用户封面" prop="cover">
+        <el-form-item label="用户封面" prop="avtor">
           <el-upload class="avatar-uploader" :action="ActionUrl + '/upload'" :show-file-list="false"
             :before-upload="beforeUpload" :on-success="handlePreview" :on-error="handleError">
             <img v-if="ruleForm.avtor" :src="ruleForm.avtor" class="avatar" />
@@ -110,6 +117,8 @@ let gosinaply = (id: any) => {
 const goGift = (id: any) => {
   router.push(`/gift/${id._id}`)
 }
+//搜索条件
+let searchcontent = ref('')
 //分页
 let page = ref(1)
 let pageSize = ref(5)
@@ -136,7 +145,7 @@ let userls = ref([])
 let getdusers = async () => {
   loadState.value = true
   let res: any = await service.get('/getuser', {
-    params: { nowPage: page.value, pageSize: pageSize.value }
+    params: { nowPage: page.value, pageSize: pageSize.value, searchcontent: searchcontent.value }
   })
   userls.value = res.users
   total.value = res.userstotal
@@ -166,8 +175,8 @@ const setdialogvisiblew = (status: String, data: any) => {
     updid.value = data._id
     prevote.value = data.vote
     ruleForm.name = data.name
-    ruleForm.cover = data.cover
-    ruleForm.label = data.label
+    ruleForm.avtor = data.avtor
+    ruleForm.introduce = data.introduce
     ruleForm.position = data.position[0]._id
     ruleForm.vote = data.vote
   }
@@ -215,6 +224,11 @@ const addactive = async () => {
   })
   if (res.code == 200) {
     centerDialogVisible.value = false
+    ruleForm.name = ''
+    ruleForm.avtor = ''
+    ruleForm.introduce = ''
+    ruleForm.position = ''
+    ruleForm.vote = 0
     getdusers()
   }
 }
@@ -243,7 +257,10 @@ const updactive = async () => {
     getdusers()
   }
 }
-
+//搜搜
+const dosearch = () => {
+  getdusers()
+}
 // 上传成功时
 const handlePreview = (uploadFile: any) => {
   const imgsrc = import.meta.env.VITE_GLOB_API_URL + '/' + uploadFile.path
@@ -284,6 +301,15 @@ const beforeUpload = async (file: File): Promise<File> => {
     console.error('压缩错误:', error);
     // 阻止上传
     return Promise.reject(new Error('图片压缩失败'));
+  }
+}
+//审核简历
+const allowisaudit = async(id:any) => {
+  let res: any = await service.put('passAudit', {
+      _id: id
+  })
+  if (res.code == 200) {
+    getdusers()
   }
 }
 //onMounted

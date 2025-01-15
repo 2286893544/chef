@@ -10,6 +10,7 @@ const indexRouter = require('./routes/web/index'); // 默认首页路由
 const paymentRouter = require('./routes/web/payment');      // 支付
 const orderFormRouter = require('./routes/web/orderForm');  // 订单系统
 const loginRouter = require('./routes/web/login');         // 登录
+const uoloadFileRouter = require('./routes/web/uploadFile');   // 上传文件
 
 const homePageRouter = require('./routes/app/homePage');    // 首页
 const applyRouter = require('./routes/app/apply');          // 报名
@@ -54,6 +55,7 @@ app.use(express.urlencoded({ extended: false })); // 解析 URL 编码的数据
 app.use(cookieParser()); // 解析 Cookie
 app.use(express.static(path.join(__dirname, 'public'))); // 设置静态文件路径
 app.use('/upload', express.static(path.join(__dirname, 'upload'))); // 文件上传路径
+app.use('/img', express.static(path.join(__dirname, 'images'))); // 文件上传路径
 
 // ** 注册路由 **
 app.use('/', indexRouter); // 默认首页
@@ -65,6 +67,7 @@ app.use('/detail', detailRouter); // 详情模块
 app.use('/payment', paymentRouter); // 支付模块
 app.use('/orderForm', orderFormRouter); // 订单模块
 app.use('/login', loginRouter); // 登录模块
+app.use('/uploadFile', uoloadFileRouter); // 上传文件模块
 
 // ** 捕获 404 错误，并交由错误处理中间件处理 **
 app.use(function (req, res, next) {

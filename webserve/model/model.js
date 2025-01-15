@@ -144,6 +144,24 @@ const counterSchema = new mongoose.Schema({
   seq: { type: Number, default: 0 },     // 当前计数器的值
 });
 
+const Counter = mongoose.model('Counter', counterSchema);
+userInfoSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    // 获取并更新计数器
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: 'mark' },          // 计数器名称
+      { $inc: { seq: 1 } },     // 自增计数器
+      { new: true, upsert: true } // 如果不存在则创建计数器
+    );
+
+    // 设置 mark 为新的计数器值
+    this.mark = counter.seq;
+  }
+  next();
+});
+const userInfoModel = mongoose.model("userInfo", userInfoSchema, "userInfo")
+
+
 // 留言板
 const commentSchema = new mongoose.Schema({
   uid: {
@@ -183,21 +201,7 @@ const commentSchema = new mongoose.Schema({
 const commentModel = mongoose.model("comment", commentSchema, "comment")
 
 
-const Counter = mongoose.model('Counter', counterSchema);
-userInfoSchema.pre('save', async function (next) {
-  if (this.isNew) {
-    // 获取并更新计数器
-    const counter = await Counter.findByIdAndUpdate(
-      { _id: 'mark' },          // 计数器名称
-      { $inc: { seq: 1 } },     // 自增计数器
-      { new: true, upsert: true } // 如果不存在则创建计数器
-    );
 
-    // 设置 mark 为新的计数器值
-    this.mark = counter.seq;
-  }
-  next();
-});
 //投票信息
 const voteSchema = new mongoose.Schema({
   dovoter: String,//投票的用户
@@ -208,7 +212,6 @@ const voteSchema = new mongoose.Schema({
   }
 })
 const voteModel = mongoose.model("vote", voteSchema, 'vote')
-const userInfoModel = mongoose.model("userInfo", userInfoSchema, "userInfo")
 //活动说明页
 const acspeakSchema = new mongoose.Schema({
   imgsrc: String
@@ -260,6 +263,16 @@ const ctrlSchema = new mongoose.Schema({
   pwd: String
 })
 const ctrlModel = mongoose.model('ctrl', ctrlSchema, 'ctrl')
+
+const userTest = new mongoose.Schema({
+  name: String,
+  gender: Boolean,
+  phone: Number,
+  imgPath: String,
+})
+const userTestModel = mongoose.model('userTest', userTest, 'userTest')
+
+
 module.exports = {
   carouselModel,  //  轮播图
   activityMsgModel, //  活动信息
@@ -273,4 +286,5 @@ module.exports = {
   TaskModel,//任务系统
   ctrlModel,//后台管理账号
   registerModel,// 登录
+  userTestModel
 }

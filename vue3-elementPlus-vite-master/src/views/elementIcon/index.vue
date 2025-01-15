@@ -3,6 +3,12 @@
     <el-button type="primary" style="margin: 20px;" @click="setdialogvisiblew('add', null)">
       添加用户
     </el-button>
+    <el-button type="primary" @click="handleFileClick">
+      上传 Excel 表格
+    </el-button>
+
+    <!-- 隐藏的文件上传控件 -->
+    <input type="file" ref="fileInput" accept=".xls,.xlsx" @change="handleFileChange" style="display: none" />
     <!-- 表格 -->
     <el-table :data="userls" style="width: 97%; margin: 0 auto;">
       <el-table-column prop="name" label="姓名" align="center" />
@@ -42,6 +48,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <!-- 分页 -->
     <div class="pagination">
       <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
@@ -98,7 +105,6 @@ import { ElMessage } from 'element-plus'
 import loading from '@/components/loading.vue'
 import { compressImage } from '@/utils/compressImage'
 
-const fileList = ref([])
 const ActionUrl = ref<String>('')
 const router = useRouter()
 const loadState = ref<boolean>(false)
@@ -219,7 +225,6 @@ const addactive = async () => {
   }
 }
 //删除
-
 const deluser = async (userid: any) => {
   let res: any = await service.delete(`/deluser/${userid}`)
   if (res.code == 200) {
@@ -286,6 +291,50 @@ const beforeUpload = async (file: File): Promise<File> => {
     return Promise.reject(new Error('图片压缩失败'));
   }
 }
+
+const fileInput = ref<any>(null); // 参考隐藏的文件输入控件
+
+// 上传文件
+const handleFileClick = () => {
+  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+  fileInput?.click(); // 激活文件选择框
+};
+
+// 文件选择改变时触发
+const handleFileChange = async (event: Event) => {
+  const fileInput: any = event.target as HTMLInputElement;
+  const file = fileInput?.files?.[0];
+
+  if (file) {
+    try {
+      loadState.value = true;
+      const formData = new FormData();
+      formData.append('file', file); // 将文件附加到 FormData
+
+      // 发送到后端
+      const response: any = await service.post('/uploadFile/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (response.code === 200) {
+        ElMessage.success('上传成功!');
+      } else {
+        ElMessage.error('上传失败');
+      }
+      fileInput.value = null; // 清空文件输入框
+      getdusers()
+      loadState.value = false;
+    } catch (error) {
+      fileInput.value = null; // 清空文件输入框
+      console.error('上传失败:', error);
+      ElMessage.error('上传失败');
+    }
+  } else {
+    ElMessage.error('请选择文件');
+    fileInput.value = null; // 清空文件输入框
+  }
+};
+
 //onMounted
 onMounted(() => {
   getdusers()

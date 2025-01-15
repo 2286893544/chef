@@ -861,7 +861,7 @@ router.get("/getcomnuser", async (req, res) => {
     }
   )
   let comusers = await userInfoModel.aggregate(pile)
-  let comuserstotal = await userInfoModel.countDocuments()
+  let comuserstotal = await userInfoModel.find({ isApply: false }).countDocuments()
   res.send({
     code: 200,
     comus: comusers,

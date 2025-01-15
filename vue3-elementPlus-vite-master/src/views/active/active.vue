@@ -52,7 +52,7 @@
         <el-form-item label="活动名称" prop="title">
           <el-input v-model="ruleForm.title" placeholder="请输入活动名称"></el-input>
         </el-form-item>
-        <el-form-item label="活动公告" prop="visitNum">
+        <el-form-item label="活动公告" prop="announcement">
           <el-input v-model.number="ruleForm.announcement" placeholder="请输入活动公告"></el-input>
         </el-form-item>
         <el-form-item label="开始时间" prop="startTime">

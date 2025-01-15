@@ -82,14 +82,8 @@ router.post("/addtourist", async (req, res) => {
   }
 });
 
-  // 如果不存在，创建新的记录
-  await userInfoModel.create({ deviceid: deviceid });
 
-  res.send({
-    code: 200,
-    msg: "Tourist added successfully!"
-  });
-});
+
 router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
   try {
     let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;

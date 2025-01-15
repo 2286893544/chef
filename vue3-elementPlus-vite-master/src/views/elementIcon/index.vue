@@ -59,12 +59,12 @@
         <el-form-item label="用户封面" prop="cover">
           <el-upload class="avatar-uploader" :action="ActionUrl + '/upload'" :show-file-list="false"
             :before-upload="beforeUpload" :on-success="handlePreview" :on-error="handleError">
-            <img v-if="ruleForm.cover" :src="ruleForm.cover" class="avatar" />
+            <img v-if="ruleForm.avtor" :src="ruleForm.avtor" class="avatar" />
             <el-button v-else type="primary">上传图片</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="用户标签" prop="label">
-          <el-input v-model="ruleForm.label" placeholder="请输入用户标签"></el-input>
+        <el-form-item label="用户简介" prop="introduce">
+          <el-input type="textarea" v-model="ruleForm.introduce" placeholder="请输入用户简介"></el-input>
         </el-form-item>
         <el-form-item label="用户职位" prop="position">
           <el-select v-model="ruleForm.position" placeholder="请选择用户职位" style="width: 240px">
@@ -175,8 +175,8 @@ const setdialogvisiblew = (status: String, data: any) => {
 //表单
 interface RuleForm {
   name: string
-  cover: string
-  label: string
+  avtor: string
+  introduce: string
   position: string
   vote: number
 }
@@ -185,16 +185,16 @@ const formSize = ref('default')
 const ruleFormRef = ref()
 let ruleForm = reactive<RuleForm>({
   name: '',
-  cover: '',
-  label: '',
+  avtor: '',
+  introduce: '',
   position: '',
   vote: 0
 })
 
 const rules = reactive({
   name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-  cover: [{ required: true, message: '请上传封面', trigger: 'blur' }],
-  label: [{ required: true, message: '请输入标签', trigger: 'blur' }],
+  avtor: [{ required: true, message: '请上传封面', trigger: 'blur' }],
+  introduce: [{ required: true, message: '请输入简介', trigger: 'blur' }],
   position: [{ required: true, message: '请选择职位', trigger: 'blur' }],
   vote: [{ required: true, message: '请输入票数', trigger: 'blur' }]
 })
@@ -202,8 +202,8 @@ const rules = reactive({
 const resetForm = () => {
   centerDialogVisible.value = false
   ruleForm.name = ''
-  ruleForm.cover = ''
-  ruleForm.label = ''
+  ruleForm.avtor = ''
+  ruleForm.introduce = ''
   ruleForm.position = ''
   ruleForm.vote = 0
 }
@@ -249,7 +249,7 @@ const handlePreview = (uploadFile: any) => {
   const imgsrc = import.meta.env.VITE_GLOB_API_URL + '/' + uploadFile.path
   console.log(imgsrc)
 
-  ruleForm.cover = imgsrc
+  ruleForm.avtor = imgsrc
 }
 
 // 上传图片失败

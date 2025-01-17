@@ -54,8 +54,8 @@ router.put("/addApply", async (req, res) => {
         position,
         cover: profileImage,
         introduce,
-        isApply: false,
-        isAudit: true
+        isApply: true,
+        isAudit: false
       }
     );
 

@@ -60,7 +60,7 @@ router.post("/addtourist", async (req, res) => {
       return res.send({
         code: 400,
         msg: "Device ID already exists",
-        id: existingUser._id // 返回已存在记录的 _id
+        user: existingUser // 返回已存在记录的 _id
       });
     }
 
@@ -71,7 +71,7 @@ router.post("/addtourist", async (req, res) => {
     return res.send({
       code: 200,
       msg: "Tourist added successfully",
-      id: newUser._id // 返回新创建记录的 _id
+      user: newUser // 返回新创建记录的 _id
     });
   } catch (err) {
     console.error(err);

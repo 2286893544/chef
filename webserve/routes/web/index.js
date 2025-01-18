@@ -778,37 +778,6 @@ router.post("/upduserinfo", async (req, res) => {
 })
 
 
-// ·
-const convertToQuillHTML = (data) => {
-  let htmlContent = `<div class="quill-editor-content">`;
-
-  // 添加封面图片
-  if (data.cover) {
-    htmlContent += `<img src="${data.cover}" alt="Cover Image" style="width: 100%; height: auto;" />`;
-  }
-
-  // 添加姓名和职位
-  htmlContent += `<h1>${data.name}</h1>`;
-  htmlContent += `<p><strong>职位:</strong> ${data.position}</p>`;
-
-  // 添加年龄
-  htmlContent += `<p><strong>年龄:</strong> ${data.age}</p>`;
-
-  // 如果有简历文本，加入到内容中
-  if (data.resumeText) {
-    htmlContent += `<p><strong>简历:</strong> ${data.resumeText}</p>`;
-  }
-
-  // 如果有标签
-  if (data.label) {
-    htmlContent += `<p><strong>标签:</strong> ${data.label}</p>`;
-  }
-
-  htmlContent += `</div>`;
-
-  return htmlContent;
-};
-
 // 后端 API 处理逻辑
 router.put('/changeRichTexts', async (req, res) => {
   let { id, data } = req.body;  // 获取前端传来的数据

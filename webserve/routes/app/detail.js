@@ -85,10 +85,10 @@ router.get("/getappComment", async (req, res) => {
     // 基础查询条件
     let query = { cid };
 
-    // 查询审核通过的留言，或当前用户自己留言的未审核留言
+    // 查询条件：审核通过且显示的留言，或者审核未通过的留言且是当前用户的留言
     query.$or = [
-      { isPass: true, audit: true },  // 审核通过且通过审核的留言
-      { audit: false, userId }        // 未通过审核且是当前用户的留言
+      { isPass: true, audit: true },  // 审核通过且显示的留言，所有用户可以看到
+      { audit: false, uid: userId }        // 审核未通过且是当前用户的留言
     ];
 
     // 获取数据
@@ -111,6 +111,8 @@ router.get("/getappComment", async (req, res) => {
     });
   }
 });
+
+
 
 // 添加留言信息
 router.post("/addComment", async (req, res) => {

@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 var {
   carouselModel,  //  轮播图
   userInfoModel,//用户
-  commentModel,//留言板
+  commentModel,
+  positionModel,//留言板
 } = require("../../model/model");
 
 // 获取轮播图
@@ -48,6 +49,8 @@ router.get("/getUserInfo", async (req, res) => {
     } else {
       preVote = 0;
     }
+    let pList = await positionModel.find()
+    user.positionName = pList.find(item => item._id.toString() === user.position.toString()).jobTitle
 
     res.json({ code: 200, msg: "获取选手信息成功", user, userRank, preVote });
   } catch (err) {
@@ -83,14 +86,14 @@ router.get("/getComment", async (req, res) => {
 // 添加留言信息
 router.post("/addComment", async (req, res) => {
   try {
+    console.log(req.body)
     let userInfo = await userInfoModel.findOne({ _id: req.body.uid })
     req.body.avtor = userInfo.avtor
     req.body.name = userInfo.name
     await commentModel.create(req.body)
+    res.status(200).send({ code: 200, msg: "添加成功" })
   } catch (err) {
     res.status(500).send({ code: 500, msg: "添加失败", err })
-  } finally {
-    res.status(200).send({ code: 200, msg: "添加成功" })
   }
 })
 

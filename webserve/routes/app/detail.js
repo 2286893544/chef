@@ -74,6 +74,42 @@ router.get("/getComment", async (req, res) => {
     })
   }
 })
+//获取留言
+router.get("/getappComment", async (req, res) => {
+  const { cid, userId } = req.query;  // 假设 userId 会传递过来
+  let data;
+  let total;
+
+  try {
+    // 基础查询条件
+    let query = { cid };
+
+    // 查询审核通过的留言，或当前用户自己留言的未审核留言
+    query.$or = [
+      { isPass: true, audit: true },  // 审核通过且通过审核的留言
+      { audit: false, userId }        // 未通过审核且是当前用户的留言
+    ];
+
+    // 获取数据
+    data = await commentModel.find(query);
+
+    // 获取总记录数
+    total = data.length;  // 直接计算返回的数据的长度
+  }
+  catch (err) {
+    res.status(500).send({
+      code: 500,
+      msg: "获取失败",
+      err
+    });
+  } finally {
+    res.status(200).send({
+      code: 200,
+      data,
+      total
+    });
+  }
+});
 
 // 添加留言信息
 router.post("/addComment", async (req, res) => {

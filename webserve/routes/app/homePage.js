@@ -71,7 +71,7 @@ router.post("/addtourist", async (req, res) => {
     return res.send({
       code: 200,
       msg: "Tourist added successfully",
-      useruser: newUser // 返回新创建记录的 _id
+      user: newUser // 返回新创建记录的 _id
     });
   } catch (err) {
     console.error(err);

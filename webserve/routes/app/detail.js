@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 var {
   carouselModel,  //  轮播图
   userInfoModel,//用户
-  commentModel,//留言板
+  commentModel,
+  positionModel,//留言板
 } = require("../../model/model");
 
 // 获取轮播图
@@ -48,6 +49,8 @@ router.get("/getUserInfo", async (req, res) => {
     } else {
       preVote = 0;
     }
+    let pList = await positionModel.find()
+    user.positionName = pList.find(item => item._id.toString() === user.position.toString()).jobTitle
 
     res.json({ code: 200, msg: "获取选手信息成功", user, userRank, preVote });
   } catch (err) {
@@ -59,23 +62,16 @@ router.get("/getUserInfo", async (req, res) => {
 // 获取留言信息
 router.get("/getComment", async (req, res) => {
   const { cid, page, pageSize } = req.query
-  let data;
-  let total;
   try {
-    data = await commentModel.find({ cid }).skip((page - 1) * pageSize).limit(pageSize);
-    total = await commentModel.find({ cid }).countDocuments()
+    let data = await commentModel.find({ cid }).skip((page - 1) * pageSize).limit(pageSize);
+    let total = await commentModel.find({ cid }).countDocuments()
+    res.status(200).send({ code: 200, data, total })
   }
   catch (err) {
     res.status(500).send({
       code: 500,
       msg: "获取失败",
       err
-    })
-  } finally {
-    res.status(200).send({
-      code: 200,
-      data,
-      total
     })
   }
 })
@@ -119,14 +115,21 @@ router.get("/getappComment", async (req, res) => {
 // 添加留言信息
 router.post("/addComment", async (req, res) => {
   try {
-    let userInfo = await userInfoModel.findOne({ _id: req.body.uid })
+    // 校验 req.body 是否包含所需的字段
+    if (!uid || !avtor || !name) {
+      return res.status(400).send({ code: 400, msg: "缺少必要的字段" });
+    }
+
+    let userInfo = await userInfoModel.findOne({ _id: uid });
+    if (!userInfo) {
+      return res.status(404).send({ code: 404, msg: "用户不存在" });
+    }
     req.body.avtor = userInfo.avtor
     req.body.name = userInfo.name
     await commentModel.create(req.body)
+    res.status(200).send({ code: 200, msg: "添加成功" })
   } catch (err) {
     res.status(500).send({ code: 500, msg: "添加失败", err })
-  } finally {
-    res.status(200).send({ code: 200, msg: "添加成功" })
   }
 })
 

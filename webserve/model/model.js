@@ -39,7 +39,10 @@ const registerModel = mongoose.model("register", registerSchema, "register")
 
 //活动信息
 const activityMsgSchema = new mongoose.Schema({
-  title: String,
+  title: {
+    type: String,
+    default: ""
+  },
   joinNum: {
     type: Number,
     default: 0
@@ -52,10 +55,22 @@ const activityMsgSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  startTime: Date,
-  endTime: Date,
-  rule: String,
-  announcement: String,
+  startTime: {
+    type: Date,
+    default: Date.now
+  },
+  endTime: {
+    type: Date,
+    default: Date.now
+  },
+  rule: {
+    type: String,
+    default: ""
+  },
+  announcement: {
+    type: String,
+    default: ""
+  },
   isStart: {
     type: Boolean,
     default: false

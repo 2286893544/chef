@@ -60,13 +60,13 @@ router.post("/addtourist", async (req, res) => {
       return res.send({
         code: 400,
         msg: "Device ID already exists",
-        user: existingUser // 返回已存在记录的 _id
+        useruser: existingUser // 返回已存在记录的 _id
       });
     }
 
     // 创建新的用户记录
     const newUser = await userInfoModel.create({ deviceid: deviceid });
-
+    
     // 返回创建的用户的 _id
     return res.send({
       code: 200,
@@ -184,7 +184,6 @@ router.get('/getCarousel', async (req, res) => {
 router.get('/getVisit', async (req, res) => {
   try {
     const updatedActivity = await activityMsgModel.findOneAndUpdate({ isStart: true }, { $inc: { visitNum: 1 } }, { new: true })
-    console.log(updatedActivity)
     if (!updatedActivity) {
       return res.status(404).json({ code: 404, msg: '活动未找到' });
     }

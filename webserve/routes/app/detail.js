@@ -41,7 +41,6 @@ router.get("/getUserInfo", async (req, res) => {
     const uId = new mongoose.Types.ObjectId(_id)
     userRank = (data.findIndex(item => item._id.toString() === uId.toString())) + 1;
 
-    console.log(userRank)
 
     // 计算与上一名选手的票数差
     if (userRank > 1 && userRank <= data.length) {
@@ -79,23 +78,61 @@ router.get("/getComment", async (req, res) => {
 // 添加留言信息
 router.post("/addComment", async (req, res) => {
   try {
+    let { uid, cid, content } = req.body;
+
     // 校验 req.body 是否包含所需的字段
-    if (!uid || !avtor || !name) {
-      return res.status(400).send({ code: 400, msg: "缺少必要的字段" });
+    if (!uid) {
+      return res.status(400).send({ code: 400, msg: "缺少uid字段" });
+    }
+    if (!cid) {
+      return res.status(400).send({ code: 400, msg: "缺少cid字段" });
+    }
+    if (!content) {
+      return res.status(400).send({ code: 400, msg: "缺少content字段" });
     }
 
-    let userInfo = await userInfoModel.findOne({ _id: uid });
-    if (!userInfo) {
-      return res.status(404).send({ code: 404, msg: "用户不存在" });
+    // 调试：输出 uid 和 cid 的值
+    console.log("Received UID: ", uid);
+    console.log("Received CID: ", cid);
+
+    // 验证 uid 和 cid 是否为有效的 ObjectId 字符串
+    if (!mongoose.Types.ObjectId.isValid(uid)) {
+      return res.status(400).send({ msg: '无效的 UID 参数' });
     }
-    req.body.avtor = userInfo.avtor
-    req.body.name = userInfo.name
-    await commentModel.create(req.body)
-    res.status(200).send({ code: 200, msg: "添加成功" })
+    if (!mongoose.Types.ObjectId.isValid(cid)) {
+      return res.status(400).send({ msg: '无效的 CID 参数' });
+    }
+
+    // 将传过来的字符串转换为 ObjectId 类型
+    const userId = new mongoose.Types.ObjectId(uid);
+    const commentId = new mongoose.Types.ObjectId(cid);
+
+    // 校验用户是否存在
+    let userInfo = await userInfoModel.findOne({ _id: userId });
+    if (!userInfo) {
+      return res.status(404).send({ code: 404, msg: "评论用户不存在" });
+    }
+
+    let userCidInfo = await userInfoModel.findOne({ _id: commentId });
+    if (!userCidInfo) {
+      return res.status(404).send({ code: 404, msg: "被评论用户不存在" });
+    }
+
+    // 将用户信息加入到请求体中
+    req.body.avtor = userInfo.avtor;
+    req.body.name = userInfo.name;
+
+    // 创建评论
+    await commentModel.create(req.body);
+
+    // 返回成功响应
+    res.status(200).send({ code: 200, msg: "添加成功" });
   } catch (err) {
-    res.status(500).send({ code: 500, msg: "添加失败", err })
+    console.log(err);
+    res.status(500).send({ code: 500, msg: "添加失败", err });
   }
-})
+});
+
 
 
 module.exports = router;

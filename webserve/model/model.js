@@ -100,7 +100,6 @@ const positionModel = mongoose.model("position", positionSchema, "position")
 //用户
 const userInfoSchema = new mongoose.Schema({
   name: String,//姓名必填
-  cover: String,//封面必选
   isApply: {//是否参赛默认就OK
     type: Boolean,
     default: false

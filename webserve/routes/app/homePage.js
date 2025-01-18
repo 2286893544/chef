@@ -184,7 +184,6 @@ router.get('/getCarousel', async (req, res) => {
 router.get('/getVisit', async (req, res) => {
   try {
     const updatedActivity = await activityMsgModel.findOneAndUpdate({ isStart: true }, { $inc: { visitNum: 1 } }, { new: true })
-    console.log(updatedActivity)
     if (!updatedActivity) {
       return res.status(404).json({ code: 404, msg: '活动未找到' });
     }

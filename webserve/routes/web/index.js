@@ -559,7 +559,7 @@ router.put("/updateShow", async (req, res) => {
   try {
     const { _id } = req.body
     let data = await commentModel.findOne({ _id })
-    if (data.isShow) {
+    if (data.isPass) {
       await commentModel.updateOne({ _id }, { isPass: false })
     } else {
       await commentModel.updateOne({ _id }, { isPass: true })

@@ -1,62 +1,64 @@
 <template>
-  <div class="position">
-    <el-button type="primary" @click="dialogFormVisible = true">添加职位</el-button>
-    <el-table :data="tableData" style="width: 100%;margin-top: 20px;">
-      <el-table-column prop="_id" label="id" align="center" />
-      <el-table-column prop="jobTitle" label="职位" align="center" />
-      <el-table-column label="添加时间" align="center">
-        <template v-slot="scope">
-          {{ scope.row.addTime.replace('T', ' ').split('.')[0] }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="200px" align="center">
-        <template v-slot="scope">
-          <el-button type="warning" @click="editDataMsg(scope.row)">编辑</el-button>
-          <el-button type="danger" @click="open(scope.row._id)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+  <div>
+    <div class="position">
+      <el-button type="primary" @click="dialogFormVisible = true">添加职位</el-button>
+      <el-table :data="tableData" style="width: 100%;margin-top: 20px;">
+        <el-table-column prop="_id" label="id" align="center" />
+        <el-table-column prop="jobTitle" label="职位" align="center" />
+        <el-table-column label="添加时间" align="center">
+          <template v-slot="scope">
+            {{ scope.row.addTime.replace('T', ' ').split('.')[0] }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="200px" align="center">
+          <template v-slot="scope">
+            <el-button type="warning" @click="editDataMsg(scope.row)">编辑</el-button>
+            <el-button type="danger" @click="open(scope.row._id)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
+      <loading :loadState="loadState" />
 
-    <loading :loadState="loadState" />
-  </div>
+    </div>
 
-  <!-- 弹出框-添加 -->
-  <el-dialog v-model="dialogFormVisible" title="添加职位" :width="500">
-    <el-form :model="form">
-      <el-form-item label="职位名称" :label-width="formLabelWidth">
-        <el-input v-model="form.jobTitle" autocomplete="off" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="addClose()">取消</el-button>
-        <el-button type="primary" @click="addData()"> 添加 </el-button>
+    <!-- 弹出框-添加 -->
+    <el-dialog v-model="dialogFormVisible" title="添加职位" :width="500">
+      <el-form :model="form">
+        <el-form-item label="职位名称" :label-width="formLabelWidth">
+          <el-input v-model="form.jobTitle" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="addClose()">取消</el-button>
+          <el-button type="primary" @click="addData()"> 添加 </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 修改 -->
+    <el-dialog v-model="dialogFormVisibleEdit" title="编辑职位" :width="500">
+      <el-form :model="editData">
+        <el-form-item label="职位名称" :label-width="formLabelWidth">
+          <el-input v-model="editData.jobTitle" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="eidtClose()">取消</el-button>
+          <el-button type="primary" @click="editDataAdd()"> 更新 </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 分页 -->
+    <div class="demo-pagination-block">
+      <div>
+        <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+          :background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
+          @size-change="handleSizeChange" @current-change="handleCurrentChange" />
       </div>
-    </template>
-  </el-dialog>
-
-  <!-- 修改 -->
-  <el-dialog v-model="dialogFormVisibleEdit" title="编辑职位" :width="500">
-    <el-form :model="editData">
-      <el-form-item label="职位名称" :label-width="formLabelWidth">
-        <el-input v-model="editData.jobTitle" autocomplete="off" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="eidtClose()">取消</el-button>
-        <el-button type="primary" @click="editDataAdd()"> 更新 </el-button>
-      </div>
-    </template>
-  </el-dialog>
-
-  <!-- 分页 -->
-  <div class="demo-pagination-block">
-    <div>
-      <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
-        :background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
-        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
   </div>
 </template>

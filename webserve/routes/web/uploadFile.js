@@ -5,9 +5,9 @@ const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx');  // 引入 xlsx 库来解析 Excel 文件
 const { userInfoModel, positionModel } = require('../../model/model');  // 引入 MongoDB 模型
-
+const multiparty = require('multiparty');
 // 配置 multer 中间件，用于处理文件上传
-const uploadDir = path.join(__dirname, '../../uploads'); // 设置上传文件的存储路径
+const uploadDir = path.join(__dirname, '../../images'); // 设置上传文件的存储路径
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir); // 如果目录不存在，创建上传目录
 }
@@ -60,6 +60,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         position: data.position,
         avtor: baseUrl + data.图片,
         isApply: true,
+        isAudit: false
       });
       await newUser.save(); // 触发 pre('save') 钩子
     }
@@ -89,18 +90,44 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// 获取所有用户数据的接口
-router.get("/getUserTest", async (req, res) => {
-  try {
-    const users = await userTestModel.find();  // 从 MongoDB 查询所有用户数据
-    res.status(200).send({ code: 200, data: users });  // 返回查询到的用户数据
-  } catch (error) {
-    console.error('查询用户数据时出错:', error);
-    res.status(500).send({
-      message: '获取用户数据失败',
-      error: error.message,
+
+
+
+// 上传图片
+router.post('/uploadImage', async (req, res) => {
+  const form = new multiparty.Form();
+  form.uploadDir = uploadDir; // 设置文件上传路径
+
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      console.error('文件上传失败:', err);
+      return res.status(500).send({ code: 500, message: '文件上传失败' });
+    }
+
+    if (!files.files || files.files.length === 0) {
+      return res.status(400).send({ code: 400, message: '未上传文件' });
+    }
+
+    console.log(files.files)
+    const uploadedFiles = files.files.map(file => {
+      const originalFileName = file.originalFilename; // 获取原始文件名
+      const newFilePath = path.join(uploadDir, originalFileName); // 使用原始文件名作为保存的文件名
+
+      // 重命名文件
+      fs.renameSync(file.path, newFilePath);
+
+      return {
+        originalName: originalFileName,
+        path: newFilePath,
+      };
     });
-  }
+
+    res.status(200).send({
+      code: 200,
+      msg: '图片上传成功',
+      data: uploadedFiles, // 返回上传的文件信息
+    });
+  });
 });
 
 module.exports = router;

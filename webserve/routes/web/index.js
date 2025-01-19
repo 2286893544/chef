@@ -395,11 +395,11 @@ router.delete("/deluser/:userid", async (req, res) => {
 //获取所有用户
 router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query;
-  
+
   // 调用函数修改选手票数
   let idArr = await userInfoModel.find().lean(); // 无分页，判断是否报名
   let ids = idArr.filter(item => item.isApply).map(i => i._id);
-  
+
   let pieline = [
     {
       $match: {
@@ -415,7 +415,7 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
       }
     },
   ];
-  
+
   if (searchcontent) {
     pieline.push({
       $match: {
@@ -426,7 +426,7 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
       },
     });
   }
-  
+
   if (positionid) {
     pieline.push({
       $match: {
@@ -434,14 +434,14 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
       },
     });
   }
-  
+
   // 添加排序：先显示 isAudit 为 true 的，后显示 false 的
   pieline.push({
     $sort: {
       isAudit: -1 // -1 为降序，即先显示 true 的
     }
   });
-  
+
   pieline.push({
     $skip: (nowPage - 1) * pageSize
   });
@@ -452,7 +452,7 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
 
   let users = await userInfoModel.aggregate(pieline);
   let userstotal = await userInfoModel.find({ isApply: true }).countDocuments();
-  
+
   res.send({
     code: 200,
     users: users,
@@ -602,10 +602,15 @@ router.get("/getShow", async (req, res) => {
       return map;
     }, {});
 
+
     data.forEach(item => {
-      const jobName = poDataMap[item.position.toString()]; // 查找对应职位名称
-      if (jobName) {
-        item.jobName = jobName;  // 如果找到了职位名称，添加到用户对象
+      if (item.position) { // 检查 position 是否存在
+        const jobName = poDataMap[item.position.toString()]; // 查找对应职位名称
+        if (jobName) {
+          item.jobName = jobName;  // 如果找到了职位名称，添加到用户对象
+        }
+      } else {
+        item.jobName = '未知职位'; // 如果 position 不存在，设置默认值
       }
     });
 
@@ -625,11 +630,8 @@ router.get("/getShow", async (req, res) => {
       jobDistribution,
     })
   } catch (err) {
-    res.status(500).send({
-      code: 500,
-      msg: "获取失败",
-      err
-    })
+    console.log(err)
+    res.status(500).send({ code: 500, msg: "获取失败", err })
   }
 })
 
@@ -691,11 +693,8 @@ router.get("/getDetail", async (req, res) => {
       data_things   // 返回职位统计数据
     });
   } catch (err) {
-    res.status(500).send({
-      code: 500,
-      msg: "获取失败",
-      err
-    });
+    console.log(err)
+    res.status(500).send({ code: 500, msg: "获取失败", err });
   }
 });
 
@@ -862,7 +861,7 @@ router.put("/passAudit", async (req, res) => {
   }
 })
 //获取总人数，总票数，总访问量
-router.get("/totalrpf", async(req, res) => {
+router.get("/totalrpf", async (req, res) => {
   let rens = await userInfoModel.find({ isApply: true }).countDocuments()
   let votes = await voteModel.find().countDocuments()
   let visitData = await activityMsgModel.find().limit(1); // 获取第一条数据

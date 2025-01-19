@@ -278,13 +278,6 @@ const ctrlSchema = new mongoose.Schema({
 })
 const ctrlModel = mongoose.model('ctrl', ctrlSchema, 'ctrl')
 
-const userTest = new mongoose.Schema({
-  name: String,
-  gender: Boolean,
-  phone: Number,
-  imgPath: String,
-})
-const userTestModel = mongoose.model('userTest', userTest, 'userTest')
 
 
 module.exports = {
@@ -300,5 +293,4 @@ module.exports = {
   TaskModel,//任务系统
   ctrlModel,//后台管理账号
   registerModel,// 登录
-  userTestModel
 }

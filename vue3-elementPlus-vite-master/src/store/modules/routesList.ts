@@ -73,21 +73,6 @@ const routesListModule: Module<RoutesListState, RootStateTypes> = {
         },
         name: 'position',
         path: '/position',
-        children: [
-          {
-            meta: {
-              auth: ['admin', 'test'],
-              icon: 'iconfont el-icon-s-grid',
-              isAffix: false,
-              isHide: false,
-              isKeepAlive: true,
-              title: '职位',
-              index: '3-1'
-            },
-            name: 'positionIdx',
-            path: '/position/positionIdx'
-          },
-        ]
       },
       {
         meta: {
@@ -142,21 +127,6 @@ const routesListModule: Module<RoutesListState, RootStateTypes> = {
         },
         name: 'carousel',
         path: '/carousel',
-        children: [
-          {
-            meta: {
-              auth: ['admin', 'test'],
-              icon: 'iconfont el-icon-s-grid',
-              isAffix: false,
-              isHide: false,
-              isKeepAlive: true,
-              title: '轮播图',
-              index: '5-1'
-            },
-            name: 'carouseldx',
-            path: '/carousel/carouseldx'
-          },
-        ]
       },
       {
         meta: {

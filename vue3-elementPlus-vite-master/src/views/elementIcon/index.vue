@@ -3,16 +3,26 @@
     <el-button type="primary" style="margin: 20px;" @click="setdialogvisiblew('add', null)">
       添加用户
     </el-button>
-      <label for="">搜索:</label><el-input v-model="searchcontent" style="width: 233px;" placeholder="按照姓名或者编号搜索" clearable />
-      <el-button type="primary" style="margin: 20px;" @click="dosearch">
-        搜索
-      </el-button>
+    <label for="">搜索:</label><el-input v-model="searchcontent" style="width: 233px;" placeholder="按照姓名或者编号搜索"
+      clearable />
+    <el-button type="primary" style="margin: 20px;" @click="dosearch">
+      搜索
+    </el-button>
     <el-button type="primary" @click="handleFileClick">
       上传 Excel 表格
+    </el-button>
+    <!-- 上传图片按钮 -->
+    <el-button type="primary" @click="handleImageUploadClick">
+      上传图片
     </el-button>
 
     <!-- 隐藏的文件上传控件 -->
     <input type="file" ref="fileInput" accept=".xls,.xlsx" @change="handleFileChange" style="display: none" />
+
+    <!-- 隐藏的文件上传控件 -->
+    <input type="file" ref="imageInput" accept="image/*" multiple @change="handleImageUploadChange"
+      style="display: none" />
+
     <!-- 表格 -->
     <el-table :data="userls" style="width: 97%; margin: 0 auto;">
       <el-table-column prop="name" label="姓名" align="center" />
@@ -112,9 +122,11 @@ import { ElMessage } from 'element-plus'
 import loading from '@/components/loading.vue'
 import { compressImage } from '@/utils/compressImage'
 
+
 const ActionUrl = ref<String>('')
 const router = useRouter()
 const loadState = ref<boolean>(false)
+
 //
 let gosinaply = (id: any) => {
   router.push(`/sinaply/${id._id}`)
@@ -309,9 +321,9 @@ const beforeUpload = async (file: File): Promise<File> => {
   }
 }
 //审核简历
-const allowisaudit = async(id:any) => {
+const allowisaudit = async (id: any) => {
   let res: any = await service.put('passAudit', {
-      _id: id
+    _id: id
   })
   if (res.code == 200) {
     getdusers()
@@ -360,6 +372,73 @@ const handleFileChange = async (event: Event) => {
     fileInput.value = null; // 清空文件输入框
   }
 };
+
+
+
+
+// 隐藏的文件输入控件
+const imageInput = ref<HTMLInputElement | null>(null);
+
+// 点击上传图片按钮时触发
+const handleImageUploadClick = () => {
+  imageInput.value?.click(); // 激活文件选择框
+};
+
+// 文件选择改变时触发
+const handleImageUploadChange = async (event: Event) => {
+  const fileInput = event.target as HTMLInputElement;
+  const files: any = fileInput.files;
+
+  if (files && files.length > 0) {
+    try {
+      // 检查文件类型
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+      for (const file of files) {
+        if (!allowedTypes.includes(file.type)) {
+          ElMessage.error(`文件 ${file.name} 不是支持的图片格式（JPG/PNG/GIF）！`);
+          return;
+        }
+      }
+
+      // 创建 FormData 对象
+      const formData = new FormData();
+      for (const file of files) {
+        formData.append('files', file); // 使用 'files' 作为字段名
+      }
+
+      // 发送上传请求
+      const response: any = await service.post('/uploadFile/uploadImage', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`上传进度: ${percentCompleted}%`);
+        },
+      });
+
+      if (response.code === 200) {
+        ElMessage.success('图片上传成功！');
+        // 上传成功后，更新页面数据
+        getdusers();
+      } else {
+        ElMessage.error('图片上传失败！');
+      }
+    } catch (error) {
+      console.error('上传失败:', error);
+      ElMessage.error('上传失败，请重试！');
+    } finally {
+      // 清空文件输入框
+      if (fileInput) fileInput.value = '';
+    }
+  } else {
+    ElMessage.error('请选择文件！');
+  }
+};
+
+
+
+
+
 
 //onMounted
 onMounted(() => {

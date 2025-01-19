@@ -31,27 +31,21 @@ const router = createRouter({
         {
           path: "/alluser", name: "alluser", component: () => import("views/elementIcon/fabr.vue"),
           children: [
-            { path: 'athlete', name: 'athlete', component: () => import('views/elementIcon/index.vue')},
+            { path: 'athlete', name: 'athlete', component: () => import('views/elementIcon/index.vue') },
             //普通用户管理
-            { path: 'comnu', name: 'comnu', component: () => import('views/comnu/index.vue')},
-            
+            { path: 'comnu', name: 'comnu', component: () => import('views/comnu/index.vue') },
+
           ]
         },
         { path: '/icon', name: 'icon', component: () => import('views/icon/index.vue'), },
-        
+
         // 轮播图管理
         {
-          path: '/carousel', name: 'carousel', component: () => import('views/carousel/index.vue'),
-          children: [
-            { path: 'carouseldx', name: "carouseldx", component: () => import('views/carousel/carousel.vue') },
-          ]
+          path: '/carousel', name: 'carousel', component: () => import('views/carousel/carousel.vue'),
         },
         // 职位管理
         {
-          path: '/position', name: 'position', component: () => import('views/position/index.vue'),
-          children: [
-            { path: 'positionIdx', name: "positionIdx", component: () => import('views/position/position.vue') },
-          ]
+          path: '/position', name: 'position', component: () => import('views/position/position.vue'),
         },
         // 留言板
         {

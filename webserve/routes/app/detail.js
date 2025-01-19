@@ -14,10 +14,9 @@ router.get('/getCarousel', async (req, res) => {
   let { page = 1, pagesize = 5 } = req.query
   try {
     carousel = await carouselModel.find({ isDelete: true }).skip((page - 1) * pagesize).limit(pagesize)
+    res.json({ code: 200, msg: '获取轮播图成功', data: carousel })
   } catch (err) {
     res.json({ code: 500, msg: '获取轮播图失败', err })
-  } finally {
-    res.json({ code: 200, msg: '获取轮播图成功', data: carousel })
   }
 })
 
@@ -58,22 +57,6 @@ router.get("/getUserInfo", async (req, res) => {
   }
 });
 
-// 获取留言信息
-router.get("/getComment", async (req, res) => {
-  const { cid, page, pageSize } = req.query
-  try {
-    let data = await commentModel.find({ cid }).skip((page - 1) * pageSize).limit(pageSize);
-    let total = await commentModel.find({ cid }).countDocuments()
-    res.status(200).send({ code: 200, data, total })
-  }
-  catch (err) {
-    res.status(500).send({
-      code: 500,
-      msg: "获取失败",
-      err
-    })
-  }
-})
 //获取留言
 router.get("/getappComment", async (req, res) => {
   const { cid, userId } = req.query;  // 假设 userId 会传递过来
@@ -95,18 +78,18 @@ router.get("/getappComment", async (req, res) => {
 
     // 获取总记录数
     total = data.length;  // 直接计算返回的数据的长度
+
+    res.status(200).send({
+      code: 200,
+      data,
+      total
+    });
   }
   catch (err) {
     res.status(500).send({
       code: 500,
       msg: "获取失败",
       err
-    });
-  } finally {
-    res.status(200).send({
-      code: 200,
-      data,
-      total
     });
   }
 });
@@ -129,10 +112,6 @@ router.post("/addComment", async (req, res) => {
       return res.status(400).send({ code: 400, msg: "缺少content字段" });
     }
 
-    // 调试：输出 uid 和 cid 的值
-    console.log("Received UID: ", uid);
-    console.log("Received CID: ", cid);
-
     // 验证 uid 和 cid 是否为有效的 ObjectId 字符串
     if (!mongoose.Types.ObjectId.isValid(uid)) {
       return res.status(400).send({ msg: '无效的 UID 参数' });
@@ -147,10 +126,12 @@ router.post("/addComment", async (req, res) => {
 
     // 校验用户是否存在
     let userInfo = await userInfoModel.findOne({ _id: userId });
+    console.log(userId,uid)
     if (!userInfo) {
       return res.status(404).send({ code: 404, msg: "评论用户不存在" });
     }
 
+    console.log(commentId,cid)
     let userCidInfo = await userInfoModel.findOne({ _id: commentId });
     if (!userCidInfo) {
       return res.status(404).send({ code: 404, msg: "被评论用户不存在" });

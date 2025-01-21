@@ -6,6 +6,8 @@ const path = require('path');
 const xlsx = require('xlsx');  // 引入 xlsx 库来解析 Excel 文件
 const { userInfoModel, positionModel } = require('../../model/model');  // 引入 MongoDB 模型
 const multiparty = require('multiparty');
+const sharp = require('sharp');  // 引入 sharp 库进行图片处理
+
 // 配置 multer 中间件，用于处理文件上传
 const uploadDir = path.join(__dirname, '../../images'); // 设置上传文件的存储路径
 if (!fs.existsSync(uploadDir)) {
@@ -51,7 +53,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       if (position) {
         item.position = position._id; // 将职位ID添加到数据中
       }
-    })
+    });
 
     for (const data of jsonData) {
       const newUser = new userInfoModel({
@@ -90,13 +92,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-
-
-
-// 上传图片
+// 上传图片并压缩
 router.post('/uploadImage', async (req, res) => {
   const form = new multiparty.Form();
-  form.uploadDir = uploadDir; // 设置文件上传路径
 
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -108,26 +106,58 @@ router.post('/uploadImage', async (req, res) => {
       return res.status(400).send({ code: 400, message: '未上传文件' });
     }
 
-    console.log(files.files)
+    console.log(files.files);
     const uploadedFiles = files.files.map(file => {
       const originalFileName = file.originalFilename; // 获取原始文件名
-      const newFilePath = path.join(uploadDir, originalFileName); // 使用原始文件名作为保存的文件名
 
-      // 重命名文件
-      fs.renameSync(file.path, newFilePath);
-
-      return {
-        originalName: originalFileName,
-        path: newFilePath,
-      };
+      try {
+        // 压缩图片并转换为 webp 格式
+        return compressImage(file.path, originalFileName);
+      } catch (fileError) {
+        console.error('处理文件时出错:', fileError);
+        return res.status(500).send({ code: 500, message: '文件处理失败', error: fileError.message });
+      }
     });
 
-    res.status(200).send({
-      code: 200,
-      msg: '图片上传成功',
-      data: uploadedFiles, // 返回上传的文件信息
+    Promise.all(uploadedFiles).then(results => {
+      res.status(200).send({
+        code: 200,
+        msg: '图片上传并压缩成功',
+        data: results, // 返回上传的文件信息
+      });
+    }).catch(err => {
+      console.error('文件处理失败:', err);
+      res.status(500).send({ code: 500, message: '文件处理失败', error: err.message });
     });
   });
 });
+
+// 图片压缩函数
+function compressImage(filePath, originalFileName) {
+  const webpFileName = originalFileName.replace(path.extname(originalFileName), '.webp'); // 将文件扩展名替换为 .webp
+  const webpPath = path.join(uploadDir, webpFileName);
+
+  return sharp(filePath)
+    .toFormat('webp') // 转换为 webp 格式
+    .toBuffer()
+    .then((buffer) => {
+      try {
+        // 将压缩后的图片写回文件
+        fs.writeFileSync(webpPath, buffer);
+        console.log('图片压缩并保存成功:', webpPath);
+        return {
+          originalName: originalFileName,
+          path: webpPath,
+        };
+      } catch (writeErr) {
+        console.error('写入文件时出错:', writeErr);
+        throw writeErr;
+      }
+    })
+    .catch((err) => {
+      console.error('图片压缩失败:', err);
+      throw err;
+    });
+}
 
 module.exports = router;

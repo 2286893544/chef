@@ -4,6 +4,7 @@ var path = require('path'); // 用于处理文件路径
 var cookieParser = require('cookie-parser'); // 用于解析 Cookie
 var logger = require('morgan'); // 用于日志记录
 var cors = require('cors'); // 解决跨域问题
+const bodyParser = require('body-parser'); // 解析请求体
 
 // 引入路由文件
 const indexRouter = require('./routes/web/index'); // 默认首页路由
@@ -20,6 +21,10 @@ const detailRouter = require('./routes/app/detail');        // 详情
 
 // 初始化 Express 应用
 var app = express();
+
+// 使用 body-parser 中间件来解析请求体
+app.use(bodyParser.json({ limit: '500mb' }));
+app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
 
 // 引入任务系统的重新加载功能
 const { reloadTasks, scheduleDailyVoteReset } = require('./utils/task');

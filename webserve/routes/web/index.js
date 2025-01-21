@@ -160,11 +160,24 @@ router.post("/upload", (req, res) => {
       let imgSrc = data.file[0].path
       let patharr = imgSrc.split("\\")
       let imgpath = patharr.join("/")
-      res.status(200).send({
-        code: 200,
-        msg: "图片上传成功",
-        path: imgpath
-      });
+
+      // 压缩图片
+      const sharp = require('sharp');
+      const compressedImgPath = imgpath.replace(/(\.\w+)$/, '_compressed$1');
+
+      sharp(imgpath)
+        .resize(800) // 调整图片大小
+        .toFile(compressedImgPath, (err, info) => {
+          if (err) {
+            res.status(500).json({ code: 500, msg: '图片压缩失败', err })
+          } else {
+            res.status(200).send({
+              code: 200,
+              msg: "图片上传并压缩成功",
+              path: compressedImgPath
+            });
+          }
+        });
     }
   })
 })

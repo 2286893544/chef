@@ -118,7 +118,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import service from '@/utils/request'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElLoading } from 'element-plus'
 import loading from '@/components/loading.vue'
 import { compressImage } from '@/utils/compressImage'
 
@@ -373,8 +373,53 @@ const handleFileChange = async (event: Event) => {
   }
 };
 
+// 定义一个全局变量来存储进度信息
+let uploadProgress: number = 0;
+let loadingInstance: any = null;
 
+// 上传进度更新函数
+const updateProgress = (percentCompleted: number) => {
+  uploadProgress = percentCompleted;
 
+  if (!loadingInstance) {
+    // 如果没有实例，创建一个新的
+    loadingInstance = ElLoading.service({
+      lock: true,
+      text: `上传进度: ${uploadProgress}%`,
+      background: 'rgba(0, 0, 0, 0.7)',
+    });
+  } else {
+    // 更新现有实例
+    loadingInstance.setText(`上传进度: ${uploadProgress}%`);
+  }
+};
+
+// 上传文件的请求
+const uploadFiles = async (formData: FormData) => {
+  try {
+    const response: any = await service.post('/uploadFile/uploadImage', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (progressEvent: ProgressEvent) => {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        updateProgress(percentCompleted);
+      },
+    });
+
+    if (response.code === 200) {
+      ElMessage.success(`图片上传成功！已上传${response.data.length}个图片`);
+    } else {
+      ElMessage.error('图片上传失败！');
+    }
+  } catch (error) {
+    ElMessage.error('上传失败，请重试！');
+  } finally {
+    // 上传完成后关闭实例
+    if (loadingInstance) {
+      loadingInstance.close();
+      loadingInstance = null;
+    }
+  }
+};
 
 // 隐藏的文件输入控件
 const imageInput = ref<HTMLInputElement | null>(null);
@@ -408,23 +453,8 @@ const handleImageUploadChange = async (event: Event) => {
       }
 
       // 发送上传请求
-      const response: any = await service.post('/uploadFile/uploadImage', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          console.log(`上传进度: ${percentCompleted}%`);
-        },
-      });
-
-      if (response.code === 200) {
-        ElMessage.success('图片上传成功！');
-        // 上传成功后，更新页面数据
-        getdusers();
-      } else {
-        ElMessage.error('图片上传失败！');
-      }
+      uploadFiles(formData);
     } catch (error) {
-      console.error('上传失败:', error);
       ElMessage.error('上传失败，请重试！');
     } finally {
       // 清空文件输入框
@@ -434,11 +464,6 @@ const handleImageUploadChange = async (event: Event) => {
     ElMessage.error('请选择文件！');
   }
 };
-
-
-
-
-
 
 //onMounted
 onMounted(() => {

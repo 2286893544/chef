@@ -79,6 +79,15 @@ app.use(function (req, res, next) {
   next(createError(404)); // 创建 404 错误
 });
 
+// 设置请求超时为 10 分钟
+app.use((req, res, next) => {
+  res.setTimeout(600000, () => { // 10分钟
+    console.log('Request timed out');
+    res.status(408).send({ code: 408, message: '请求超时' });
+  });
+  next();
+});
+
 // ** 错误处理中间件 **
 app.use(function (err, req, res, next) {
   // 设置本地变量，仅在开发环境中提供错误信息

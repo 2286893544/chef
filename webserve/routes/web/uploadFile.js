@@ -94,7 +94,11 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
 // 上传图片并压缩
 router.post('/uploadImage', async (req, res) => {
-  const form = new multiparty.Form();
+  const form = new multiparty.Form({
+    maxFilesSize: 5000 * 1024 * 1024, // 允许最大文件大小 20MB
+    uploadDir: uploadDir, // 设置文件上传目录
+    timeout: 600000, // 设置超时为10分钟
+  });
 
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -102,11 +106,12 @@ router.post('/uploadImage', async (req, res) => {
       return res.status(500).send({ code: 500, message: '文件上传失败' });
     }
 
+    console.log('接收到的文件:', files.files); // 添加日志
+
     if (!files.files || files.files.length === 0) {
       return res.status(400).send({ code: 400, message: '未上传文件' });
     }
 
-    console.log(files.files);
     const uploadedFiles = files.files.map(file => {
       const originalFileName = file.originalFilename; // 获取原始文件名
 
@@ -115,7 +120,7 @@ router.post('/uploadImage', async (req, res) => {
         return compressImage(file.path, originalFileName);
       } catch (fileError) {
         console.error('处理文件时出错:', fileError);
-        return res.status(500).send({ code: 500, message: '文件处理失败', error: fileError.message });
+        return Promise.reject(fileError); // 确保返回 Promise
       }
     });
 
@@ -134,6 +139,7 @@ router.post('/uploadImage', async (req, res) => {
 
 // 图片压缩函数
 function compressImage(filePath, originalFileName) {
+  console.log('开始压缩图片:', originalFileName, filePath);
   const webpFileName = originalFileName.replace(path.extname(originalFileName), '.webp'); // 将文件扩展名替换为 .webp
   const webpPath = path.join(uploadDir, webpFileName);
 

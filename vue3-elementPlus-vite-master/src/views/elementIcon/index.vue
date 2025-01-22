@@ -377,38 +377,100 @@ const handleFileChange = async (event: Event) => {
 let uploadProgress: number = 0;
 let loadingInstance: any = null;
 
+// 隐藏的文件输入控件
+const imageInput = ref<HTMLInputElement | null>(null);
+
+// 点击上传图片按钮时触发
+const handleImageUploadClick = () => {
+  imageInput.value?.click(); // 激活文件选择框
+};
+
 // 上传进度更新函数
 const updateProgress = (percentCompleted: number) => {
-  uploadProgress = percentCompleted;
+  if (uploadProgress !== percentCompleted) {
+    uploadProgress = percentCompleted;
 
-  if (!loadingInstance) {
-    // 如果没有实例，创建一个新的
-    loadingInstance = ElLoading.service({
-      lock: true,
-      text: `上传进度: ${uploadProgress}%`,
-      background: 'rgba(0, 0, 0, 0.7)',
-    });
-  } else {
-    // 更新现有实例
-    loadingInstance.setText(`上传进度: ${uploadProgress}%`);
+    if (!loadingInstance) {
+      // 如果没有实例，创建一个新的
+      loadingInstance = ElLoading.service({
+        lock: true,
+        text: `上传进度: ${uploadProgress}%`,
+        background: 'rgba(0, 0, 0, 0.7)',
+      });
+    } else {
+      // 更新现有实例
+      loadingInstance.setText(`上传进度: ${uploadProgress}%`);
+    }
   }
 };
 
 // 上传文件的请求
-const uploadFiles = async (formData: FormData) => {
+const uploadFiles = async (formData: FormData): Promise<void> => {
   try {
-    const response: any = await service.post('/uploadFile/uploadImage', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      onUploadProgress: (progressEvent: ProgressEvent) => {
-        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        updateProgress(percentCompleted);
-      },
-    });
+    const files: File[] = formData.getAll('files') as File[];
+    let failedUploads: string[] = []; // 存储上传失败的文件名
+    let successfulUploads: string[] = []; // 存储上传成功的文件名
 
-    if (response.code === 200) {
-      ElMessage.success(`图片上传成功！已上传${response.data.length}个图片`);
-    } else {
-      ElMessage.error('图片上传失败！');
+    // 定义重试机制
+    const retryUpload = async (file: File, retries: number = 3): Promise<void> => {
+      const singleFileFormData: FormData = new FormData();
+      singleFileFormData.append('files', file);
+
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          const response: any = await service.post('/uploadFile/uploadImage', singleFileFormData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            onUploadProgress: (progressEvent: ProgressEvent) => {
+              const percentCompleted: number = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              console.log(`已加载: ${progressEvent.loaded}, 总共: ${progressEvent.total}`);
+              console.log(`上传进度: ${percentCompleted}%`);
+              updateProgress(percentCompleted);
+
+              // 解决卡在63%的问题，确保进度条更新
+              if (percentCompleted === 100) {
+                setTimeout(() => {
+                  updateProgress(100);
+                }, 500); // 延迟更新以确保进度条到达100%
+              }
+            },
+          });
+
+          if (response.code === 200) {
+            successfulUploads.push(file.name); // 记录成功的文件名
+            return; // 成功后退出重试循环
+          } else {
+            throw new Error(`图片 ${file.name} 上传失败！`);
+          }
+        } catch (error) {
+          console.error(`尝试 ${attempt} 上传图片 ${file.name} 失败:`, error);
+          if (attempt === retries) {
+            ElMessage.error(`图片 ${file.name} 上传失败！`);
+            failedUploads.push(file.name); // 记录失败的文件名
+          }
+        }
+      }
+    };
+
+    // 使用 Promise.all 并行上传所有文件以提高速度
+    const uploadPromises = files.map((file: File) => retryUpload(file));
+
+    // 确保只创建一个 loading 实例
+    if (!loadingInstance) {
+      loadingInstance = ElLoading.service({
+        lock: true,
+        text: '上传中...',
+        background: 'rgba(0, 0, 0, 0.7)',
+      });
+    }
+
+    await Promise.all(uploadPromises);
+
+    if (successfulUploads.length > 0) {
+      ElMessage.success(`以下图片上传成功: ${successfulUploads.join(', ')}`);
+    }
+
+    if (failedUploads.length > 0) {
+      ElMessage.error(`以下图片上传失败: ${failedUploads.join(', ')}`);
     }
   } catch (error) {
     ElMessage.error('上传失败，请重试！');
@@ -419,14 +481,6 @@ const uploadFiles = async (formData: FormData) => {
       loadingInstance = null;
     }
   }
-};
-
-// 隐藏的文件输入控件
-const imageInput = ref<HTMLInputElement | null>(null);
-
-// 点击上传图片按钮时触发
-const handleImageUploadClick = () => {
-  imageInput.value?.click(); // 激活文件选择框
 };
 
 // 文件选择改变时触发

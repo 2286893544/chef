@@ -222,7 +222,7 @@ router.delete("/delCarousel/:_id", async (req, res) => {
 
     // 解析文件路径
     const imgFileName = path.basename(data.imgPath); // 获取文件名
-    const filePath = path.join(__dirname, '../upload', imgFileName);
+    const filePath = path.join(__dirname, '../../upload', imgFileName);
 
     // 删除文件
     fs.unlink(filePath, async (err) => {
@@ -451,7 +451,8 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   // 添加排序：先显示 isAudit 为 true 的，后显示 false 的
   pieline.push({
     $sort: {
-      isAudit: -1 // -1 为降序，即先显示 true 的
+      isAudit: -1, // -1 为降序，即先显示 true 的
+      mark: 1 // 1 为升序，即先显示 mark 小的
     }
   });
 

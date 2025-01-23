@@ -36,9 +36,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   const filePath = req.file.path;
 
   // 获取环境变量，构建图片 URL 地址
-  const htp = 'http';
-  const host = 'zcgjcy.com/api';  // 默认为 127.0.0.1
-  const baseUrl = `${htp}://${host}/img/`;
+  const baseUrl = `https://zcgjcy.com/api/img/`;
 
   try {
     // 使用 xlsx 解析文件
@@ -56,15 +54,26 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     });
 
     for (const data of jsonData) {
-      const newUser = new userInfoModel({
-        name: data.姓名,
-        introduce: data.简介,
-        position: data.position,
-        avtor: baseUrl + data.图片,
-        isApply: true,
-        isAudit: false
-      });
-      await newUser.save(); // 触发 pre('save') 钩子
+      const existingUser = await userInfoModel.findOne({ name: data.姓名, avtor: baseUrl + data.图片 });
+      if (existingUser) {
+        // 如果用户已存在，更新用户信息
+        existingUser.introduce = data.简介;
+        existingUser.position = data.position;
+        existingUser.isApply = true;
+        existingUser.isAudit = true;
+        await existingUser.save();
+      } else {
+        // 如果用户不存在，创建新用户
+        const newUser = new userInfoModel({
+          name: data.姓名,
+          introduce: data.简介,
+          position: data.position,
+          avtor: baseUrl + data.图片,
+          isApply: true,
+          isAudit: true
+        });
+        await newUser.save(); // 触发 pre('save') 钩子
+      }
     }
     console.log('批量保存用户成功！');
 

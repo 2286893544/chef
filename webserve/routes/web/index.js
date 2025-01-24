@@ -451,7 +451,7 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   // 添加排序：先显示 isAudit 为 true 的，后显示 false 的
   pieline.push({
     $sort: {
-      isAudit: -1, // -1 为降序，即先显示 true 的
+      isAudit: 1, // -1 为降序，即先显示 true 的
       mark: 1 // 1 为升序，即先显示 mark 小的
     }
   });

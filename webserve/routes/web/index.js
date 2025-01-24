@@ -44,11 +44,6 @@ const updateVotesMiddleware = async (req, res, next) => {
   });
 };
 
-// 微信读取文件
-router.get('/MP_verify_ulasuNxVJtR5WPTA.txt', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../MP_verify_ulasuNxVJtR5WPTA.txt'))
-})
-
 //注册
 router.post('/register', async (req, res) => {
   let { phoneNum, pwd, avtor } = req.body

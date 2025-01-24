@@ -238,7 +238,8 @@ const resetForm = () => {
 const addactive = async () => {
   let res: any = await service.post('/adduser', {
     ...ruleForm,
-    isApply: true
+    isApply: true,
+    isAudit: true
   })
   if (res.code == 200) {
     centerDialogVisible.value = false

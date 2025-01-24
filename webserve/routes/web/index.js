@@ -456,22 +456,33 @@ router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   // 添加排序：先显示 isAudit 为 true 的，后显示 false 的
   pieline.push({
     $sort: {
-      isAudit: -1, // -1 为降序，即先显示 true 的
+      isAudit: 1, // -1 为降序，即先显示 true 的
       mark: 1 // 1 为升序，即先显示 mark 小的
     }
   });
-
   pieline.push({
-    $skip: (nowPage - 1) * pageSize
-  });
+    $facet: {
+      users: [
+        { $skip: (Number(nowPage) - 1) * Number(pageSize) },
+        { $limit: Number(pageSize) }
+      ],
+      totalCount: [
+        { $count: "count" }
+      ]
+    }
+  })
+  // pieline.push({
+  //   $skip: (nowPage - 1) * pageSize
+  // });
 
-  pieline.push({
-    $limit: Number(pageSize)
-  });
+  // pieline.push({
+  //   $limit: Number(pageSize)
+  // });
 
-  let users = await userInfoModel.aggregate(pieline);
-  let userstotal = await userInfoModel.find({ isApply: true }).countDocuments();
-
+  let result = await userInfoModel.aggregate(pieline);
+  // let userstotal = await userInfoModel.find({ isApply: true }).countDocuments();
+  const users = result[0].users;
+  const userstotal = result[0].totalCount.length > 0 ? result[0].totalCount[0].count : 0;
   res.send({
     code: 200,
     users: users,

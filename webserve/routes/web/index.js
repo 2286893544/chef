@@ -148,38 +148,43 @@ router.post("/saveUserInfo", async (req, res) => {
 })
 // 上传图片
 router.post("/upload", (req, res) => {
-  //创建一个表单对象
-  let form = new multiparty.Form()
-  //设计图片上传路径
-  form.uploadDir = 'upload'
-  //解析form对象
-  form.parse(req, (err, file, data) => {
+  // 创建一个表单对象
+  let form = new multiparty.Form();
+  // 设计图片上传路径
+  form.uploadDir = 'upload';
+  
+  // 解析form对象
+  form.parse(req, async (err, file, data) => {
     if (err) {
-      res.status(500).json({ code: 500, msg: err })
-    } else {
-      let imgSrc = data.file[0].path
-      let patharr = imgSrc.split("\\")
-      let imgpath = patharr.join("/")
-
-      // 压缩图片
-      const sharp = require('sharp');
-      const compressedImgPath = imgpath.replace(/(\.\w+)$/, '_compressed$1');
-
-      sharp(imgpath)
-        .resize(800) // 调整图片大小
-        .toFile(compressedImgPath, (err, info) => {
-          if (err) {
-            res.status(500).json({ code: 500, msg: '图片压缩失败', err })
-          } else {
-            res.status(200).send({
-              code: 200,
-              msg: "图片上传并压缩成功",
-              path: compressedImgPath
-            });
-          }
-        });
+      return res.status(500).json({ code: 500, msg: '表单解析失败', error: err.message });
     }
-  })
+
+    if (!data.file || data.file.length === 0) {
+      return res.status(400).json({ code: 400, msg: '未上传文件' });
+    }
+
+    try {
+      let imgSrc = data.file[0].path;
+      let imgpath = imgSrc.replace(/\\/g, "/"); // 统一路径分隔符
+
+      // 压缩图片为webp格式
+      const sharp = require('sharp');
+      console.log(imgpath)
+      const compressedImgPath = imgpath.replace(/(\.\w+)$/, '.webp');
+
+      await sharp(imgpath)
+        .resize(800) // 调整图片大小
+        .toFile(compressedImgPath);
+
+      res.status(200).send({
+        code: 200,
+        msg: "图片上传并压缩成功",
+        path: compressedImgPath
+      });
+    } catch (error) {
+      res.status(500).json({ code: 500, msg: '图片压缩失败', error: error.message });
+    }
+  });
 })
 
 // 添加轮播图

@@ -12,6 +12,7 @@ const paymentRouter = require('./routes/web/payment');      // 支付
 const orderFormRouter = require('./routes/web/orderForm');  // 订单系统
 const loginRouter = require('./routes/web/login');         // 登录
 const uoloadFileRouter = require('./routes/web/uploadFile');   // 上传文件
+const signatureRouter = require('./routes/web/signature');   // 签名
 
 const homePageRouter = require('./routes/app/homePage');    // 首页
 const applyRouter = require('./routes/app/apply');          // 报名
@@ -32,6 +33,7 @@ const { reloadTasks, scheduleDailyVoteReset } = require('./utils/task');
 const { orderDispose } = require('./utils/orderDispose');
 // 引入投票更新中间件
 const { updateActivityInfo } = require('./utils/visitNum');
+const { clearImages } = require('./utils/clearImage');
 
 // ** 任务重启时重新加载未完成任务 **
 reloadTasks()
@@ -47,6 +49,9 @@ scheduleDailyVoteReset();
 orderDispose();
 // ** 调度每3秒更新活动信息的票数和参赛人数任务 **
 updateActivityInfo();
+
+// ** 定时任务：每天���� 12 点清理图片 **
+clearImages()
 
 // ** 配置视图引擎 ** 
 app.set('views', path.join(__dirname, 'views')); // 设置视图文件路径
@@ -73,6 +78,7 @@ app.use('/payment', paymentRouter); // 支付模块
 app.use('/orderForm', orderFormRouter); // 订单模块
 app.use('/login', loginRouter); // 登录模块
 app.use('/uploadFile', uoloadFileRouter); // 上传文件模块
+app.use('/signature', signatureRouter); // 签名模块
 
 // ** 捕获 404 错误，并交由错误处理中间件处理 **
 app.use(function (req, res, next) {

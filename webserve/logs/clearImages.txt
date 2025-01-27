@@ -1,0 +1,101 @@
+[2025-01-26 16:52:06] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:06
+[2025-01-26 16:52:07] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:07
+[2025-01-26 16:52:08] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:08
+[2025-01-26 16:52:09] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:09
+[2025-01-26 16:52:10] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:10
+[2025-01-26 16:52:14] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:14
+[2025-01-26 16:52:15] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:15
+[2025-01-26 16:52:16] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:16
+[2025-01-26 16:52:17] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\976vonJ_TgwuxWryf_-NlXka.jpg，执行时间: 2025-01-26 08:52:17
+[2025-01-26 16:52:17] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\fyV9-TwoVwJ4Lzox_E86Xak0.jpg，执行时间: 2025-01-26 08:52:17
+[2025-01-26 16:52:17] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\L9alV9_Wf42X6Q9yXxZHdqyT.jpg，执行时间: 2025-01-26 08:52:17
+[2025-01-26 16:52:17] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:17
+[2025-01-26 16:52:18] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\8oM8a-U4zvjP94k1n_iVYvF9.jpg，执行时间: 2025-01-26 08:52:18
+[2025-01-26 16:52:18] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\BSk1dcxCFg3_yNwvHZrTRdmB.png，执行时间: 2025-01-26 08:52:18
+[2025-01-26 16:52:18] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\DHwORZtiarLM501BPeq-gWa7.jpg'，执行时间: 2025-01-26 08:52:18
+[2025-01-26 16:52:19] 清理图片失败: EBUSY: resource busy or locked, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\cm6XCRHjIkDeeRNpaLPxsFQX.png'，执行时间: 2025-01-26 08:52:19
+[2025-01-26 16:52:20] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\cm6XCRHjIkDeeRNpaLPxsFQX.png，执行时间: 2025-01-26 08:52:20
+[2025-01-26 16:52:20] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\DHwORZtiarLM501BPeq-gWa7.jpg'，执行时间: 2025-01-26 08:52:20
+[2025-01-26 16:52:21] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:21
+[2025-01-26 16:52:22] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:22
+[2025-01-26 16:52:23] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:23
+[2025-01-26 16:52:24] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:24
+[2025-01-26 16:52:25] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:25
+[2025-01-26 16:52:26] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:26
+[2025-01-26 16:52:27] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:27
+[2025-01-26 16:52:28] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:28
+[2025-01-26 16:52:29] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:29
+[2025-01-26 16:52:30] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:30
+[2025-01-26 16:52:31] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:31
+[2025-01-26 16:52:32] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:32
+[2025-01-26 16:52:33] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:33
+[2025-01-26 16:52:34] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:34
+[2025-01-26 16:52:35] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:35
+[2025-01-26 16:52:36] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:36
+[2025-01-26 16:52:37] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:37
+[2025-01-26 16:52:38] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:38
+[2025-01-26 16:52:39] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:39
+[2025-01-26 16:52:40] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:40
+[2025-01-26 16:52:41] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:41
+[2025-01-26 16:52:42] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:42
+[2025-01-26 16:52:43] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:43
+[2025-01-26 16:52:44] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:44
+[2025-01-26 16:52:45] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:45
+[2025-01-26 16:52:46] 清理图片失败: EPERM: operation not permitted, unlink 'C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg'，执行时间: 2025-01-26 08:52:46
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\7QaFScwTyEvRZ3puQ6_Q6kqu.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\dU2yQ78YRKcudRk54eqQUCk5.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\DHwORZtiarLM501BPeq-gWa7.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\I0z0bV7gDq7VJ01owKL0Bb5O.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\Hgi5sbKhCdEjnHUO2ExnINlu.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\mqipv_yZEpt3zVGXwj494lX1.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\n0aWroDRR0UvSiQcaNEukAFN.png，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\kKboenC1U8qGhL32Oc_vm3Mz.png，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\nNYEktzyjK_B_4zjhCVwMztR.png，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\oohTnppUt4ceOUaXSzqBvlst.png，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\QHLa-WkXy10N4NmAqWhxoloQ.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\qQaO6wwF7hEOOoutQu1uxv-s.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\Og71ERaryIyOi4IKguq6Gw3i.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\uTwdCsYc5xU8S43k17NAZnbN.png，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\tLBB9LSIbaKqnnk4prxl1vns.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\X_Vzg4DCJ03ru-UJ1zxn2m-k.png，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\wLOltqS_pKhM4b98tcBqBH_C.png，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\ycp_6_eWdU-Gu2njlvBiLiYu.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\Y8AHX7TTlw0T2wq2m-OkBTcx.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\ZI56V30XYkSJDXdPJch6Im-w.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 已删除文件: C:\Users\86175\Desktop\企业项目\chef\webserve\images\YXuIxX2nSs61OV-w_5qnQGgl.jpg，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:57] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:57
+[2025-01-26 16:52:58] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:58
+[2025-01-26 16:52:59] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:52:59
+[2025-01-26 16:53:00] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:00
+[2025-01-26 16:53:01] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:01
+[2025-01-26 16:53:02] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:02
+[2025-01-26 16:53:03] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:03
+[2025-01-26 16:53:04] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:04
+[2025-01-26 16:53:05] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:05
+[2025-01-26 16:53:06] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:06
+[2025-01-26 16:53:07] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:07
+[2025-01-26 16:53:08] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:08
+[2025-01-26 16:53:09] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:09
+[2025-01-26 16:53:10] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:10
+[2025-01-26 16:53:11] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:11
+[2025-01-26 16:53:12] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:12
+[2025-01-26 16:53:13] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:13
+[2025-01-26 16:53:14] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:14
+[2025-01-26 16:53:15] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:15
+[2025-01-26 16:53:16] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:16
+[2025-01-26 16:53:17] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:17
+[2025-01-26 16:53:18] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:18
+[2025-01-26 16:53:19] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:19
+[2025-01-26 16:53:20] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:20
+[2025-01-26 16:53:21] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:21
+[2025-01-26 16:53:22] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:22
+[2025-01-26 16:53:23] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:23
+[2025-01-26 16:53:24] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:24
+[2025-01-26 16:53:25] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:25
+[2025-01-26 16:53:26] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:26
+[2025-01-26 16:53:27] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:27
+[2025-01-26 16:53:28] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:28
+[2025-01-26 16:53:29] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:29
+[2025-01-26 16:53:30] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:30
+[2025-01-26 16:53:31] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:31
+[2025-01-26 16:53:32] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-26 08:53:32

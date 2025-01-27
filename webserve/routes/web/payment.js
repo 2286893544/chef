@@ -117,8 +117,9 @@ router.post('/wxnotify', async (req, res) => {
       );
 
       // 添加任务到任务系统
-      const voteIncrement = Math.floor(data.total_fee); // 1 元等于 1 票
-      const executeAt = new Date(Date.now() + 60 * 60 * 1000); // 一小时后
+      const voteIncrement = Math.floor(50); // 1 元等于 1 票
+      // const executeAt = new Date(Date.now() + 60 * 60 * 1000); // 一小时后
+      const executeAt = new Date(Date.now() + 2 * 60 * 1000); // 两分钟后
 
       const task = await TaskModel.create({
         userId: order.sellerId,

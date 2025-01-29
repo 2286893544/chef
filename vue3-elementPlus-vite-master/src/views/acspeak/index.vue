@@ -1,26 +1,48 @@
 <template>
   <div class="carousel">
     <div class="carousel-top">
-      <!-- 上传图片 -->
-      <el-upload class="upload-demo" :action="ActionUrl + '/upload'" :before-upload="beforeUpload" :multiple="true" :on-success="handlePreview"
-        :on-error="handleError" :limit="1" :show-file-list="false">
-        <el-button type="primary">上传图片</el-button>
-      </el-upload>
+      <!-- 添加按钮 -->
+      <el-button type="primary" @click="addData">添加</el-button>
 
       <!-- 表格 -->
-      <el-table :data="acspklList" style="width: 100%;margin-top: 20px;">
+      <el-table :data="acspklList" style="width: 100%; margin-top: 20px;">
         <el-table-column prop="_id" label="id" align="center" />
         <el-table-column label="图片" align="center">
           <template v-slot="scope">
-            <img :src="scope.row.imgsrc" alt="图片路径错误" style="height: 50px" />
+            <img v-if="scope.row.imgsrc" :src="scope.row.imgsrc" alt="图片路径错误" style="height: 50px" />
+            <span v-else>暂无</span>
           </template>
         </el-table-column>
+        <el-table-column prop="content" label="文字" align="center" />
         <el-table-column label="操作" align="center">
           <template v-slot="scope">
+            <el-button type="primary" size="small" @click="handleUpdate(scope.row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleClose(scope.row._id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- 对话框 -->
+      <el-dialog v-model="dialogFormVisible" :title="dialogText" :width="600">
+        <el-form :model="form">
+          <el-form-item label="文字" :label-width="formLabelWidth">
+            <el-input v-model="form.content" autocomplete="off" />
+          </el-form-item>
+          <el-form-item label="图片" :label-width="formLabelWidth">
+            <el-upload class="upload-demo" :action="ActionUrl + '/upload'" :before-upload="beforeUpload"
+              :multiple="true" :on-success="handlePreview" :on-error="handleError" :show-file-list="false">
+              <img v-if="form.imgsrc" :src="form.imgsrc" class="avatar" style="width: 15vw;" />
+              <el-button v-else type="primary">上传图片</el-button>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="cancel">取消</el-button>
+            <el-button type="primary" @click="handleSave">确认</el-button>
+          </div>
+        </template>
+      </el-dialog>
     </div>
 
     <loading :loadState="loadState" />
@@ -34,13 +56,41 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import loading from '@/components/loading.vue';
 import { compressImage } from '@/utils/compressImage';
 
+const acspklList = ref([]);
+const ActionUrl = ref<string>('');
+const loadState = ref<boolean>(false);
+const dialogFormVisible = ref(false);
+const formLabelWidth = '40px';
+const dialogText = ref<string>('');
 
+interface formTypes {
+  _id?: string;
+  imgsrc: string;
+  content: string;
+}
 
-const acspklList = ref([])
-const ActionUrl = ref<string>('')
-const loadState = ref<boolean>(false)
+const form = ref<formTypes>({
+  _id: '',
+  imgsrc: '',
+  content: ''
+});
 
+// 添加
+const addData = () => {
+  dialogFormVisible.value = true;
+  dialogText.value = '添加';
+  form.value = {
+    imgsrc: '',
+    content: ''
+  }
+}
 
+// 编辑
+const handleUpdate = (row: any) => {
+  dialogText.value = '编辑';
+  form.value = { ...row }; // 克隆一份数据，避免直接修改原始数据
+  dialogFormVisible.value = true;
+};
 
 // 删除
 const handleClose = (id: string) => {
@@ -50,75 +100,55 @@ const handleClose = (id: string) => {
     type: 'warning',
   })
     .then(() => {
-      delacspk(id)
+      delacspk(id);
     })
     .catch(() => {
-      ElMessage.success('取消删除')
-    })
-}
+      ElMessage.success('取消删除');
+    });
+};
+
+// 取消
+const cancel = () => {
+  dialogFormVisible.value = false;
+};
 
 // 获取轮播图数据
 const getacspk = () => {
-  loadState.value = true
+  loadState.value = true;
   service.get(`/getacspimgs`).then((res: any) => {
-    acspklList.value = res.asimgs
-    loadState.value = false
-  })
-}
+    acspklList.value = res.asimgs;
+    loadState.value = false;
+  });
+};
 
 onMounted(() => {
-  getacspk()
-  ActionUrl.value = import.meta.env.VITE_GLOB_API_URL
-})
+  getacspk();
+  ActionUrl.value = import.meta.env.VITE_GLOB_API_URL;
+});
 
 // 上传成功时
 const handlePreview = (uploadFile: any) => {
-  const imgsrc = import.meta.env.VITE_GLOB_API_URL + '/' + uploadFile.path;
-  handleOnSubmit(imgsrc)
-}
-
-// 上传图片-添加到后端数据库
-const handleOnSubmit = (uploadFile: string) => {
-  service.post('/addacspackimg', { imgsrc: uploadFile }).then((res: any) => {
-    if (res.code === 200) {
-      ElMessage.success('上传成功')
-      getacspk()
-    }
-  })
-}
+  form.value.imgsrc = import.meta.env.VITE_GLOB_API_URL + '/' + uploadFile.path;
+};
 
 // 上传图片失败
 const handleError = (err: any) => {
-  ElMessage.error(`上传失败原因：${err}`)
-}
-
-
-
-
-
-
-
+  ElMessage.error(`上传失败原因：${err}`);
+};
 
 // 删除轮播图
 const delacspk = (id: string) => {
   service.delete(`/delacspk?did=${id}`).then((res: any) => {
     if (res.code === 200) {
-      ElMessage.success('删除成功')
-      getacspk()
+      ElMessage.success('删除成功');
+      getacspk();
     }
-  })
-}
+  });
+};
+
 // 文件上传前校验
 const beforeUpload = async (file: File): Promise<File> => {
   try {
-    // 检查文件类型
-    const isJpgOrPng = ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type);
-    if (!isJpgOrPng) {
-      ElMessage.error('上传文件格式只能是 JPG/PNG/JPEG!');
-      // 阻止上传
-      return Promise.reject(new Error('文件格式不正确'));
-    }
-
     // 压缩图片
     const compressedFile = await compressImage(file, { quality: 0.8, maxWidth: 800, maxHeight: 800 });
 
@@ -130,14 +160,43 @@ const beforeUpload = async (file: File): Promise<File> => {
     // 阻止上传
     return Promise.reject(new Error('图片压缩失败'));
   }
-}
+};
 
-
+// 确认保存编辑内容
+const handleSave = () => {
+  if (dialogText.value === '添加') {
+    // 添加数据
+    service.post('/addacspackimg', form.value).then((res: any) => {
+      if (res.code === 200) {
+        ElMessage.success('添加成功');
+        dialogFormVisible.value = false;
+        getacspk();
+      } else {
+        ElMessage.error('添加失败');
+      }
+    }).catch(() => {
+      ElMessage.error('添加失败');
+    });
+  } else {
+    // 编辑数据
+    service.put("/putAcspimgs", form.value).then((res: any) => {
+      if (res.code === 200) {
+        ElMessage.success('编辑成功');
+        dialogFormVisible.value = false;
+        getacspk();
+      } else {
+        ElMessage.error('编辑失败');
+      }
+    }).catch(() => {
+      ElMessage.error('编辑失败');
+    });
+  }
+};
 </script>
 
 <style scoped lang="less">
 .carousel {
-  width: 100vw;
+  width: 100%;
 
   .carousel-top {
     width: 97%;

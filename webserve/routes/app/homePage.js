@@ -66,7 +66,7 @@ router.post("/addtourist", async (req, res) => {
 
     // 创建新的用户记录
     const newUser = await userInfoModel.create({ deviceid: deviceid });
-    
+
     // 返回创建的用户的 _id
     return res.send({
       code: 200,
@@ -483,15 +483,15 @@ router.get("/voteshistory", async (req, res) => {
   // })
   let result = [];
   let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
-  
+
   sends.forEach((item) => {
     const send = item.dovoter.toString();
     const acp = item.actvoter.toString();
     const vote = 1; // 这里的投票数为 1，按需修改
-  
+
     // 生成一个唯一的键来标识 `send` 和 `acp` 的组合
     const key = `${send}-${acp}`;
-  
+
     // 检查该组合是否已经存在
     if (voteMap.has(key)) {
       // 如果存在，累加投票数
@@ -507,7 +507,7 @@ router.get("/voteshistory", async (req, res) => {
       });
     }
   });
-  
+
   // 将 Map 转换为结果数组
   voteMap.forEach((value) => {
     result.push(value);
@@ -605,36 +605,36 @@ router.get("/sinaplyvotes", async (req, res) => {
   //   )
   // })
   let result = [];
-let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
+  let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
 
-sends.forEach((item) => {
-  const send = item.dovoter.toString();
-  const acp = item.actvoter.toString();
-  const vote = 1; // 这里的投票数为 1，按需修改
+  sends.forEach((item) => {
+    const send = item.dovoter.toString();
+    const acp = item.actvoter.toString();
+    const vote = 1; // 这里的投票数为 1，按需修改
 
-  // 生成一个唯一的键来标识 `send` 和 `acp` 的组合
-  const key = `${send}-${acp}`;
+    // 生成一个唯一的键来标识 `send` 和 `acp` 的组合
+    const key = `${send}-${acp}`;
 
-  // 检查该组合是否已经存在
-  if (voteMap.has(key)) {
-    // 如果存在，累加投票数
-    voteMap.get(key).vote += vote;
-  } else {
-    // 如果不存在，创建新的记录
-    voteMap.set(key, {
-      send: item.dovoter,
-      acp: item.actvoter,
-      vote: vote,
-      desc: item.desc,
-      desc2: item.desc2
-    });
-  }
-});
+    // 检查该组合是否已经存在
+    if (voteMap.has(key)) {
+      // 如果存在，累加投票数
+      voteMap.get(key).vote += vote;
+    } else {
+      // 如果不存在，创建新的记录
+      voteMap.set(key, {
+        send: item.dovoter,
+        acp: item.actvoter,
+        vote: vote,
+        desc: item.desc,
+        desc2: item.desc2
+      });
+    }
+  });
 
-// 将 Map 转换为结果数组
-voteMap.forEach((value) => {
-  result.push(value);
-});
+  // 将 Map 转换为结果数组
+  voteMap.forEach((value) => {
+    result.push(value);
+  });
   flowers.forEach((item) => {
     result.push(
       {

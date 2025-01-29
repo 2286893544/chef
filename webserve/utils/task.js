@@ -29,17 +29,15 @@ async function scheduleTask(taskId, executeAt, callback) {
     return;
   }
 
+  // 过期任务立即执行
   const now = new Date();
   if (executeAt < now) {
     console.log('----- 调度任务日志 -----')
     console.log(`任务 ${taskId} 的时间 ${executeAt} 已过期，立即执行任务逻辑`);
-    callback().then(() => {
-      console.log(`任务 ${taskId} 已立即执行完成`);
-      writeLog('vote.txt', `任务 ${taskId} 已过期，立即执行完成`);
-      updateTaskStatus(taskId, 'completed');
-    }).catch((err) => {
-      console.error(`任务 ${taskId} 执行失败:`, err);
-    });
+    await callback(); // 直接执行回调
+    console.log(`任务 ${taskId} 已立即执行完成`);
+    writeLog('vote.txt', `任务 ${taskId} 已过期，立即执行完成`);
+    await updateTaskStatus(taskId, 'completed'); // 更新任务状态
     return;
   }
 
@@ -91,19 +89,50 @@ async function reloadTasks() {
   console.log('----- 调度任务日志 -----')
   console.log("重新加载未完成任务...");
   const pendingTasks = await TaskModel.find({ status: 'pending' });
+  console.log(`共找到 ${pendingTasks.length} 个未完成的任务`);
 
-  pendingTasks.forEach((task) => {
+  // 使用 for...of 循环来处理每个任务，确保异步任务按顺序执行
+  for (const task of pendingTasks) {
     scheduleTask(task._id.toString(), task.executeAt, async () => {
-      await userInfoModel.updateOne(
-        { _id: task.userId },
-        { $inc: { vote: task.voteIncrement } }
-      );
-      const logMessage = `用户 ${task.userId} 的票数增加了 ${task.voteIncrement}`;
-      console.log('----- 调度任务日志 -----')
-      console.log(logMessage);
-      writeLog('vote.txt', logMessage);
+      try {
+        // 确保票数增量是有效的数字
+        const voteIncrement = Number(task.voteIncrement);
+        if (isNaN(voteIncrement)) {
+          console.error(`无效的票数增量: ${task.voteIncrement}`);
+          return;
+        }
+
+        // 打印调度任务的信息
+        console.log(`开始处理任务: ${task._id}, 用户: ${task.userId}, 票数增量: ${voteIncrement}`);
+
+        // 更新用户的票数
+        const result = await userInfoModel.updateOne(
+          { _id: task.userId },
+          { $inc: { vote: voteIncrement } }
+        );
+        console.log(`更新结果: ${result}`);
+
+        // 如果没有任何记录被修改，打印警告
+        if (result.nModified === 0) {
+          console.warn(`用户 ${task.userId} 的票数没有被修改`);
+        }
+
+        // 获取更新后的用户信息
+        const updatedUser = await userInfoModel.findById(task.userId);
+        console.log(`更新后的用户票数: ${updatedUser.vote}`);
+
+        // 记录日志信息
+        const logMessage = `用户 ${task.userId} 的票数增加了 ${voteIncrement}`;
+        console.log('----- 调度任务日志 -----');
+        console.log(logMessage);
+        writeLog('vote.txt', logMessage);
+
+      } catch (error) {
+        // 捕获并打印错误信息
+        console.error(`任务处理失败: ${error.message}`);
+      }
     });
-  });
+  }
 
   const reloadMessage = `重新加载了 ${pendingTasks.length} 个未完成的任务`;
   console.log('----- 调度任务日志 -----')

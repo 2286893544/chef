@@ -402,14 +402,43 @@ router.post("/adduser", (req, res) => {
   })
 })
 //删除
+// router.delete("/deluser/:userid", async (req, res) => {
+//   let { userid } = req.params
+//   console.log(userid)
+//   await userInfoModel.deleteOne({ _id: userid })
+//   res.send({
+//     code: 200
+//   })
+// })
 router.delete("/deluser/:userid", async (req, res) => {
-  let { userid } = req.params
-  console.log(userid)
-  await userInfoModel.deleteOne({ _id: userid })
-  res.send({
-    code: 200
-  })
-})
+  let { userid } = req.params;
+  console.log(userid);
+
+  try {
+    // 删除 userInfoModel 中的记录
+    await userInfoModel.deleteOne({ _id: userid });
+
+    // 删除 aftdoorModel 中 apid 为 userid 的记录
+    await aftdoorModel.deleteMany({ apid: userid });
+
+    // 删除 voteModel 中 actvoter 为 userid 的记录
+    await voteModel.deleteMany({ actvoter: userid });
+
+    // 返回成功响应
+    res.send({
+      code: 200,
+      message: "User and related data deleted successfully"
+    });
+  } catch (error) {
+    // 错误处理
+    console.error(error);
+    res.status(500).send({
+      code: 500,
+      message: "删除错误"
+    });
+  }
+});
+
 //获取所有用户
 router.get("/getuser", updateVotesMiddleware, async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query;

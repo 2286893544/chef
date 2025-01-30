@@ -11,33 +11,33 @@ const jwt = require('jsonwebtoken');
 const updateVotesMiddleware = async (req, res, next) => {
   // 使用 setImmediate 将异步任务放入下一轮事件循环，确保不阻塞响应
   setImmediate(async () => {
-    try {
-      // 获取所有申请的用户
-      let aplyusers = await userInfoModel.find({ isApply: true }).lean();
+    // try {
+    //   // 获取所有申请的用户
+    //   let aplyusers = await userInfoModel.find({ isApply: true }).lean();
 
-      // 并行执行所有用户的投票更新任务
-      const updatePromises = aplyusers.map(async (item) => {
-        // 获取 actvotes
-        let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments();
+    //   // 并行执行所有用户的投票更新任务
+    //   const updatePromises = aplyusers.map(async (item) => {
+    //     // 获取 actvotes
+    //     let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments();
 
-        // 获取 aftdoorvotels
-        let aftdoorvotels = await aftdoorModel.find({ apid: item._id }).lean();
+    //     // 获取 aftdoorvotels
+    //     let aftdoorvotels = await aftdoorModel.find({ apid: item._id }).lean();
 
-        // 计算 apuallvotes
-        let apuallvotes = actvotes;
-        for (let aftdoor of aftdoorvotels) {
-          apuallvotes += aftdoor.opa;
-        }
+    //     // 计算 apuallvotes
+    //     let apuallvotes = actvotes;
+    //     for (let aftdoor of aftdoorvotels) {
+    //       apuallvotes += aftdoor.opa;
+    //     }
 
-        // 更新用户的投票数
-        await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes });
-      });
+    //     // 更新用户的投票数
+    //     await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes });
+    //   });
 
-      // 等待所有投票更新任务完成
-      await Promise.all(updatePromises);
-    } catch (error) {
-      console.error('Error updating votes:', error);
-    }
+    //   // 等待所有投票更新任务完成
+    //   await Promise.all(updatePromises);
+    // } catch (error) {
+    //   console.error('Error updating votes:', error);
+    // }
 
     // 不影响接口响应速度，继续传递控制权
     next();
@@ -440,7 +440,7 @@ router.delete("/deluser/:userid", async (req, res) => {
 });
 
 //获取所有用户
-router.get("/getuser", updateVotesMiddleware, async (req, res) => {
+router.get("/getuser", async (req, res) => {
   let { nowPage = 1, pageSize = 6, positionid, searchcontent } = req.query;
 
   // 调用函数修改选手票数
@@ -840,7 +840,15 @@ router.post("/addaftdoorvote", async (req, res) => {
 //修改用户信息
 router.post("/upduserinfo", async (req, res) => {
   let { uid } = req.query
-  await userInfoModel.updateOne({ _id: uid }, req.body)
+  let { name, avtor, introduce, position } = req.body.ruleForm
+  let { vote } = req.body
+  console.log(req.body);
+  await userInfoModel.updateOne({ _id: uid }, { name, avtor, introduce, position})
+  await userInfoModel.findOneAndUpdate(
+    { _id: uid },
+    { $inc: { vote } },
+    { new: true }
+  );
   res.send({
     code: 200
   })
@@ -942,4 +950,34 @@ router.get("/totalrpf", async (req, res) => {
     totalt: visitNum
   })
 })
+//删除dovoter为null的数据
+router.get("/delvotenull", async(req, res) => {
+  await voteModel.deleteMany({dovoter: null})
+  res.send({
+    code: 200,
+    msg: '已删除'
+  })
+})
+//票数在三千以上的都改为3000其他的不动
+router.get('/update-votes', async (req, res) => {
+  try {
+    // 使用 updateMany 方法更新所有 vote 大于 3000 的文档
+    const result = await userInfoModel.updateMany(
+      { vote: { $gt: 3000 } }, // 查询条件：vote 大于 3000
+      { $set: { vote: 3000 } } // 更新操作：将 vote 设置为 3000
+    );
+
+    res.json({
+      message: '更新成功',
+      modifiedCount: result.modifiedCount
+    });
+  } catch (error) {
+    console.error('更新过程中出现错误:', error);
+    res.status(500).json({
+      message: '更新失败',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

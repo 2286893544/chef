@@ -15,33 +15,33 @@ const { ObjectId } = require('mongodb');
 const updateVotesMiddleware = async (req, res, next) => {
   // 使用 setImmediate 将异步任务放入下一轮事件循环，确保不阻塞响应
   setImmediate(async () => {
-    try {
-      // 获取所有申请的用户
-      let aplyusers = await userInfoModel.find({ isApply: true }).lean();
+    // try {
+    //   // 获取所有申请的用户
+    //   let aplyusers = await userInfoModel.find({ isApply: true }).lean();
 
-      // 并行执行所有用户的投票更新任务
-      const updatePromises = aplyusers.map(async (item) => {
-        // 获取 actvotes
-        let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments();
+    //   // 并行执行所有用户的投票更新任务
+    //   const updatePromises = aplyusers.map(async (item) => {
+    //     // 获取 actvotes
+    //     let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments();
 
-        // 获取 aftdoorvotels
-        let aftdoorvotels = await aftdoorModel.find({ apid: item._id }).lean();
+    //     // 获取 aftdoorvotels
+    //     let aftdoorvotels = await aftdoorModel.find({ apid: item._id }).lean();
 
-        // 计算 apuallvotes
-        let apuallvotes = actvotes;
-        for (let aftdoor of aftdoorvotels) {
-          apuallvotes += aftdoor.opa;
-        }
+    //     // 计算 apuallvotes
+    //     let apuallvotes = actvotes;
+    //     for (let aftdoor of aftdoorvotels) {
+    //       apuallvotes += aftdoor.opa;
+    //     }
 
-        // 更新用户的投票数
-        await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes });
-      });
+    //     // 更新用户的投票数
+    //     await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes });
+    //   });
 
-      // 等待所有投票更新任务完成
-      await Promise.all(updatePromises);
-    } catch (error) {
-      console.error('Error updating votes:', error);
-    }
+    //   // 等待所有投票更新任务完成
+    //   await Promise.all(updatePromises);
+    // } catch (error) {
+    //   console.error('Error updating votes:', error);
+    // }
 
     // 不影响接口响应速度，继续传递控制权
     next();
@@ -84,7 +84,7 @@ router.post("/addtourist", async (req, res) => {
 
 
 
-router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
+router.get("/getaplyuser", async (req, res) => {
   try {
     let { nowPage = 1, pageSize = 6, positionid = '', searchcontent = '', fsc = '' } = req.query;
 
@@ -118,7 +118,7 @@ router.get("/getaplyuser", updateVotesMiddleware, async (req, res) => {
       pipeline.push({
         $match: {
           $or: [
-            { name: { $regex: searchcontent, $options: 'i' } }, // 模糊匹配名称，忽略大小写
+            { name: { $regex: searchcontent} }, // 模糊匹配名称，忽略大小写
             { mark: !isNaN(mark) ? mark : null }, // 精确匹配编号，如果不是数字则忽略
           ].filter(condition => condition.mark !== null) // 过滤掉无效的mark条件
         }
@@ -253,53 +253,116 @@ router.put('/addVisit', async (req, res) => {
 })
 
 //投票接口
+// router.post('/udvote', async (req, res) => {
+//   const { voter_id, candidate_ids, vtime } = req.body;
+
+//   // 步骤 1: 验证 candidate_ids 数组的长度，确保最多包含两个候选人 ID
+//   if (!Array.isArray(candidate_ids) || candidate_ids.length === 0 || candidate_ids.length > 2) {
+//     return res.status(400).json({ message: '至少投一个' });
+//   }
+
+//   // 获取当前日期（YYYY-MM-DD格式）
+//   const today = new Date().toISOString().split('T')[0];
+
+//   try {
+//     // 步骤 2: 查找当前用户今天投票的记录
+//     const voteRecords = await voteModel.find({
+//       dovoter: voter_id,
+//       votetime: { $gte: new Date(today) } // 查找今天的投票记录
+//     });
+
+//     // 步骤 3: 判断用户是否已投票超过两个候选人
+//     if (voteRecords.length === 10) {
+//       return res.status(400).json({ message: '每天只能投十次' });
+//     }
+
+//     // 步骤 4: 如果用户已投票一次，检查第二次是否传递了多个候选人
+//     if (voteRecords.length === 1 && candidate_ids.length > 1) {
+//       return res.status(400).json({ message: '今天还能投一次' });
+//     }
+
+//     // 步骤 5: 检查重复投票
+//     const votedCandidates = voteRecords.map(record => record.candidate_id);
+//     const newVotes = candidate_ids.filter(id => !votedCandidates.includes(id));
+
+//     // 如果有已经投过票的候选人，提示不能重复投票
+//     if (candidate_ids.length !== newVotes.length) {
+//       return res.status(400).json({ message: '同一个选手一天只能投一次' });
+//     }
+
+//     // 步骤 6: 记录新的投票
+//     const votesToInsert = newVotes.map(candidate_id => ({
+//       dovoter: voter_id,
+//       actvoter: candidate_id,
+//       votetime: vtime,
+//     }));
+
+//     // 步骤 7: 获取所有被投票的候选人票数
+//     await voteModel.insertMany(votesToInsert);
+
+//     // 步骤 8: 计算当前用户已投票的总数
+//     const totalVotes = await voteModel.find({
+//       dovoter: voter_id,
+//       votetime: { $gte: new Date(today) }
+//     }).countDocuments();
+
+//     // 步骤 9: 计算剩余可投票数
+//     const remainingVotes = 10 - totalVotes;
+
+//     return res.status(200).json({
+//       message: '投票成功',
+//       totalVotes,        // 用户当前已投的票数
+//       remainingVotes     // 用户还可以投的票数
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ message: '错误' });
+//   }
+// });
 router.post('/udvote', async (req, res) => {
   const { voter_id, candidate_ids, vtime } = req.body;
-
-  // 步骤 1: 验证 candidate_ids 数组的长度，确保最多包含两个候选人 ID
-  if (!Array.isArray(candidate_ids) || candidate_ids.length === 0 || candidate_ids.length > 2) {
-    return res.status(400).json({ message: '至少投一个' });
+  console.log(req.body);
+  
+  // 步骤 1: 验证 voter_id 不能为空或 null
+  if (!voter_id || voter_id.trim() === '') {
+    return res.status(400).json({ message: 'voter_id 不能为空' });
   }
 
+  // 步骤 2: 验证 candidate_ids 数组的长度，确保只能包含一个候选人 ID
+  if (!Array.isArray(candidate_ids) || candidate_ids.length !== 1) {
+    return res.status(400).json({ message: '每次只能投一个选手' });
+  }
+  const candidateId = candidate_ids[0];
   // 获取当前日期（YYYY-MM-DD格式）
   const today = new Date().toISOString().split('T')[0];
 
   try {
-    // 步骤 2: 查找当前用户今天投票的记录
+    // 步骤 3: 查找当前用户今天投票的记录
     const voteRecords = await voteModel.find({
       dovoter: voter_id,
       votetime: { $gte: new Date(today) } // 查找今天的投票记录
     });
 
-    // 步骤 3: 判断用户是否已投票超过两个候选人
-    if (voteRecords.length === 10) {
+    // 步骤 4: 判断用户是否已投票超过十次
+    if (voteRecords.length >= 10) {
       return res.status(400).json({ message: '每天只能投十次' });
     }
 
-    // 步骤 4: 如果用户已投票一次，检查第二次是否传递了多个候选人
-    if (voteRecords.length === 1 && candidate_ids.length > 1) {
-      return res.status(400).json({ message: '今天还能投一次' });
-    }
-
-    // 步骤 5: 检查重复投票
-    const votedCandidates = voteRecords.map(record => record.candidate_id);
-    const newVotes = candidate_ids.filter(id => !votedCandidates.includes(id));
-
-    // 如果有已经投过票的候选人，提示不能重复投票
-    if (candidate_ids.length !== newVotes.length) {
-      return res.status(400).json({ message: '同一个选手一天只能投一次' });
-    }
-
     // 步骤 6: 记录新的投票
-    const votesToInsert = newVotes.map(candidate_id => ({
+    const voteToInsert = {
       dovoter: voter_id,
-      actvoter: candidate_id,
+      actvoter: candidateId,
       votetime: vtime,
-    }));
+    };
 
-    // 步骤 7: 获取所有被投票的候选人票数
-    await voteModel.insertMany(votesToInsert);
-
+    // 步骤 7: 插入新的投票记录
+    await voteModel.create(voteToInsert);
+    // 步骤 7.5: 给候选人的 vote 字段加一
+    await userInfoModel.findOneAndUpdate(
+      { _id: candidateId },
+      { $inc: { vote: 1 } },
+      { new: true }
+    );
     // 步骤 8: 计算当前用户已投票的总数
     const totalVotes = await voteModel.find({
       dovoter: voter_id,
@@ -316,7 +379,7 @@ router.post('/udvote', async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: '错误' });
+    return res.status(500).json({ message: '服务器错误' });
   }
 });
 
@@ -417,128 +480,348 @@ router.get("/getapuservotes", async (req, res) => {
 })
 
 //获取所有投票记录
-router.get("/voteshistory", async (req, res) => {
-  let { page, pageSize } = req.query
-  let sends = await voteModel.aggregate([
-    {
-      $addFields: {
-        dovoter: { $toObjectId: "$dovoter" }, // 将字符串转换为 ObjectId
-        actvoter: { $toObjectId: "$actvoter" } // 同理转换另一个字段
-      }
-    },
-    {
-      $lookup: {
-        from: "userInfo",
-        localField: "dovoter",
-        foreignField: "_id",
-        as: "desc"
-      }
-    },
-    {
-      $lookup: {
-        from: "userInfo",
-        localField: "actvoter",
-        foreignField: "_id",
-        as: "desc2"
-      }
-    }
-  ])
-  let flowers = await aftdoorModel.aggregate([
-    {
-      $match: { nid: { $exists: true } }
-    },
-    {
-      $addFields: {
-        nid: { $toObjectId: "$nid" }, // 将字符串转换为 ObjectId
-      }
-    },
-    {
-      $lookup: {
-        from: "userInfo",
-        localField: "nid",
-        foreignField: "_id",
-        as: "desc"
-      }
-    },
-    {
-      $lookup: {
-        from: "userInfo",
-        localField: "apid",
-        foreignField: "_id",
-        as: "desc2"
-      }
-    }
-  ])
-  // let result = []
-  // sends.forEach((item) => {
-  //   result.push(
-  //     {
-  //       send: item.dovoter,
-  //       acp: item.actvoter,
-  //       vote: 1,
-  //       desc: item.desc,
-  //       desc2: item.desc2
-  //     }
-  //   )
-  // })
-  let result = [];
-  let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
+// router.get("/voteshistory", async (req, res) => {
+//   let { page, pageSize } = req.query
+//   let sends = await voteModel.aggregate([
+//     {
+//       $addFields: {
+//         dovoter: { $toObjectId: "$dovoter" }, // 将字符串转换为 ObjectId
+//         actvoter: { $toObjectId: "$actvoter" } // 同理转换另一个字段
+//       }
+//     },
+//     {
+//       $lookup: {
+//         from: "userInfo",
+//         localField: "dovoter",
+//         foreignField: "_id",
+//         as: "desc"
+//       }
+//     },
+//     {
+//       $lookup: {
+//         from: "userInfo",
+//         localField: "actvoter",
+//         foreignField: "_id",
+//         as: "desc2"
+//       }
+//     }
+//   ])
+//   let result = [];
+//   let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
 
-  sends.forEach((item) => {
-    const send = item.dovoter.toString();
-    const acp = item.actvoter.toString();
-    const vote = 1; // 这里的投票数为 1，按需修改
+//   sends.forEach((item) => {
+//     const send = item.dovoter ? item.dovoter.toString() : ''; // 如果 dovoter 为 null 或 undefined，返回空字符串
+//     const acp = item.actvoter ? item.actvoter.toString() : ''; // 同理，检查 actvoter
+//     const vote = 1; // 这里的投票数为 1，按需修改
 
-    // 生成一个唯一的键来标识 `send` 和 `acp` 的组合
-    const key = `${send}-${acp}`;
+//     // 生成一个唯一的键来标识 `send` 和 `acp` 的组合
+//     const key = `${send}-${acp}`;
 
-    // 检查该组合是否已经存在
-    if (voteMap.has(key)) {
-      // 如果存在，累加投票数
-      voteMap.get(key).vote += vote;
-    } else {
-      // 如果不存在，创建新的记录
-      voteMap.set(key, {
-        send: item.dovoter,
-        acp: item.actvoter,
-        vote: vote,
-        desc: item.desc,
-        desc2: item.desc2
-      });
-    }
-  });
+//     // 检查该组合是否已经存在
+//     if (voteMap.has(key)) {
+//       // 如果存在，累加投票数
+//       voteMap.get(key).vote += vote;
+//     } else {
+//       // 如果不存在，创建新的记录
+//       voteMap.set(key, {
+//         send: item.dovoter,
+//         acp: item.actvoter,
+//         vote: vote,
+//         desc: item.desc,
+//         desc2: item.desc2
+//       });
+//     }
+//   });
 
-  // 将 Map 转换为结果数组
-  voteMap.forEach((value) => {
-    result.push(value);
-  });
-  flowers.forEach((item) => {
-    result.push(
-      {
-        send: item.dovoter,
-        acp: item.actvoter,
-        vote: item.opa,
-        desc: item.desc,
-        desc2: item.desc2
-      }
-    )
-  })
-  const skip = (page - 1) * pageSize;
-  const limit = parseInt(pageSize);
+//   // 将 Map 转换为结果数组
+//   voteMap.forEach((value) => {
+//     result.push(value);
+//   });
 
-  // 获取当前页的数据
-  const pageData = result.slice(skip, skip + limit);
+//   const skip = (page - 1) * pageSize;
+//   const limit = parseInt(pageSize);
 
-  // 获取总数据条数
-  const totalItems = result.length;
-  res.send({
-    code: 200,
-    pageData,
-    totalItems,
-    totallen: pageData.length
-  })
-})
+//   // 获取当前页的数据
+//   const pageData = result.slice(skip, skip + limit);
+
+//   // 获取总数据条数
+//   const totalItems = result.length;
+//   res.send({
+//     code: 200,
+//     pageData,
+//     totalItems,
+//     totallen: pageData.length
+//   })
+// })
+// router.get("/voteshistory", async (req, res) => {
+//   let { page = 1, pageSize = 10 } = req.query;
+//   page = parseInt(page);
+//   pageSize = parseInt(pageSize);
+
+//   try {
+//     // 计算跳过的记录数
+//     const skip = (page - 1) * pageSize;
+
+//     // 聚合管道
+//     const sends = await voteModel.aggregate([
+//       {
+//         $addFields: {
+//           dovoter: { $toObjectId: "$dovoter" },
+//           actvoter: { $toObjectId: "$actvoter" }
+//         }
+//       },
+//       {
+//         $group: {
+//           _id: {
+//             dovoter: "$dovoter",
+//             actvoter: "$actvoter"
+//           },
+//           vote: { $sum: 1 },
+//           // 保留其他需要的字段，这里假设不需要保留原始文档的其他字段
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: "userInfo",
+//           localField: "dovoter",
+//           foreignField: "_id",
+//           as: "desc"
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: "userInfo",
+//           localField: "actvoter",
+//           foreignField: "_id",
+//           as: "desc2"
+//         }
+//       },
+//       {
+//         $skip: skip
+//       },
+//       {
+//         $limit: pageSize
+//       },
+//       {
+//         $project: {
+//           _id: 0,
+//           send: "$_id.dovoter",
+//           acp: "$_id.actvoter",
+//           vote: 1,
+//           desc: 1,
+//           desc2: 1
+//         }
+//       }
+//     ]);
+
+//     // 计算总记录数
+//     const totalItems = await voteModel.aggregate([
+//       {
+//         $addFields: {
+//           dovoter: { $toObjectId: "$dovoter" },
+//           actvoter: { $toObjectId: "$actvoter" }
+//         }
+//       },
+//       {
+//         $group: {
+//           _id: {
+//             dovoter: "$dovoter",
+//             actvoter: "$actvoter"
+//           },
+//           vote: { $sum: 1 }
+//         }
+//       },
+//       {
+//         $count: "total"
+//       }
+//     ]).then(result => result.length > 0 ? result[0].total : 0);
+
+//     res.send({
+//       code: 200,
+//       pageData: sends,
+//       totalItems,
+//       totallen: sends.length
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send({
+//       code: 500,
+//       message: "服务器内部错误"
+//     });
+//   }
+// });
 //获取某个选手的投票送礼，或者被投的记录
+//获取所有投票记录
+// router.get("/voteshistory", async (req, res) => {
+//   let { page, pageSize } = req.query
+//   let sends = await voteModel.aggregate([
+//     {
+//       $addFields: {
+//         dovoter: { $toObjectId: "$dovoter" }, // 将字符串转换为 ObjectId
+//         actvoter: { $toObjectId: "$actvoter" } // 同理转换另一个字段
+//       }
+//     },
+//     {
+//       $lookup: {
+//         from: "userInfo",
+//         localField: "dovoter",
+//         foreignField: "_id",
+//         as: "desc"
+//       }
+//     },
+//     {
+//       $lookup: {
+//         from: "userInfo",
+//         localField: "actvoter",
+//         foreignField: "_id",
+//         as: "desc2"
+//       }
+//     }
+//   ])
+//   let result = [];
+//   let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
+
+//   sends.forEach((item) => {
+//     const send = item.dovoter.toString();
+//     const acp = item.actvoter.toString();
+//     const vote = 1; // 这里的投票数为 1，按需修改
+
+//     // 生成一个唯一的键来标识 `send` 和 `acp` 的组合
+//     const key = `${send}-${acp}`;
+
+//     // 检查该组合是否已经存在
+//     if (voteMap.has(key)) {
+//       // 如果存在，累加投票数
+//       voteMap.get(key).vote += vote;
+//     } else {
+//       // 如果不存在，创建新的记录
+//       voteMap.set(key, {
+//         send: item.dovoter,
+//         acp: item.actvoter,
+//         vote: vote,
+//         desc: item.desc,
+//         desc2: item.desc2
+//       });
+//     }
+//   });
+
+//   // 将 Map 转换为结果数组
+//   voteMap.forEach((value) => {
+//     result.push(value);
+//   });
+
+//   const skip = (page - 1) * pageSize;
+//   const limit = parseInt(pageSize);
+
+//   // 获取当前页的数据
+//   const pageData = result.slice(skip, skip + limit);
+
+//   // 获取总数据条数
+//   const totalItems = result.length;
+//   res.send({
+//     code: 200,
+//     pageData,
+//     totalItems,
+//     totallen: pageData.length
+//   })
+// })
+router.get("/voteshistory", async (req, res) => {
+  try {
+      // 获取查询参数，设置默认值
+      let { page = 1, pageSize = 10 } = req.query;
+      page = parseInt(page);
+      pageSize = parseInt(pageSize);
+
+      // 计算跳过的记录数
+      const skip = (page - 1) * pageSize;
+
+      const sends = await voteModel.aggregate([
+          // 阶段 1: 将字符串转换为 ObjectId
+          {
+              $addFields: {
+                  dovoter: { $toObjectId: "$dovoter" },
+                  actvoter: { $toObjectId: "$actvoter" }
+              }
+          },
+          // 阶段 2: 累加相同 send 和 acp 的投票
+          {
+              $group: {
+                  _id: {
+                      send: "$dovoter",
+                      acp: "$actvoter"
+                  },
+                  vote: { $sum: 1 },
+                  descFirst: { $first: "$dovoter" },
+                  desc2First: { $first: "$actvoter" }
+              }
+          },
+          // 阶段 3: 执行第一次 $lookup
+          {
+              $lookup: {
+                  from: "userInfo",
+                  localField: "_id.send",
+                  foreignField: "_id",
+                  as: "desc"
+              }
+          },
+          // 阶段 4: 执行第二次 $lookup
+          {
+              $lookup: {
+                  from: "userInfo",
+                  localField: "_id.acp",
+                  foreignField: "_id",
+                  as: "desc2"
+              }
+          },
+          // 阶段 5: 格式化输出
+          {
+              $project: {
+                  _id: 0,
+                  send: "$_id.send",
+                  acp: "$_id.acp",
+                  vote: 1,
+                  desc: 1,
+                  desc2: 1
+              }
+          },
+          // 阶段 6: 分页操作
+          { $skip: skip },
+          { $limit: pageSize }
+      ]);
+
+      // 计算总数据条数
+      const totalItems = await voteModel.aggregate([
+          {
+              $addFields: {
+                  dovoter: { $toObjectId: "$dovoter" },
+                  actvoter: { $toObjectId: "$actvoter" }
+              }
+          },
+          {
+              $group: {
+                  _id: {
+                      send: "$dovoter",
+                      acp: "$actvoter"
+                  }
+              }
+          },
+          { $count: "total" }
+      ]).then((result) => result.length > 0 ? result[0].total : 0);
+
+      res.send({
+          code: 200,
+          pageData: sends,
+          totalItems,
+          totallen: sends.length
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({
+          code: 500,
+          message: "Internal Server Error"
+      });
+  }
+});
 router.get("/sinaplyvotes", async (req, res) => {
   let { vid, voice, page, pageSize } = req.query
   //所有的记录
@@ -566,44 +849,8 @@ router.get("/sinaplyvotes", async (req, res) => {
       }
     }
   ])
-  let flowers = await aftdoorModel.aggregate([
-    {
-      $match: { nid: { $exists: true } }
-    },
-    {
-      $addFields: {
-        nid: { $toObjectId: "$nid" }, // 将字符串转换为 ObjectId
-      }
-    },
-    {
-      $lookup: {
-        from: "userInfo",
-        localField: "nid",
-        foreignField: "_id",
-        as: "desc"
-      }
-    },
-    {
-      $lookup: {
-        from: "userInfo",
-        localField: "apid",
-        foreignField: "_id",
-        as: "desc2"
-      }
-    }
-  ])
-  // let result = []
-  // sends.forEach((item) => {
-  //   result.push(
-  //     {
-  //       send: item.dovoter,
-  //       acp: item.actvoter,
-  //       vote: 1,
-  //       desc: item.desc,
-  //       desc2: item.desc2
-  //     }
-  //   )
-  // })
+
+
   let result = [];
   let voteMap = new Map(); // 使用 Map 来累加相同 send 和 acp 的投票
 

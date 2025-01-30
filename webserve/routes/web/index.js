@@ -152,7 +152,7 @@ router.post("/upload", (req, res) => {
   let form = new multiparty.Form();
   // 设计图片上传路径
   form.uploadDir = 'upload';
-  
+
   // 解析form对象
   form.parse(req, async (err, file, data) => {
     if (err) {
@@ -797,6 +797,17 @@ router.get("/getacspimgs", async (req, res) => {
     asimgs
   })
 })
+// 修改活动说明图片信息
+router.put('/putAcspimgs', async (req, res) => {
+  try {
+    let { _id, imgsrc, content } = req.body
+    await acspeakModel.updateOne({ _id }, { imgsrc, content })
+    res.send({ code: 200, msg: "修改成功" })
+  } catch (err) {
+    res.status(500).json({ code: 500, msg: Error.message })
+  }
+})
+
 //删除说明活动图片
 router.delete("/delacspk", async (req, res) => {
   let { did } = req.query

@@ -228,7 +228,8 @@ const voteSchema = new mongoose.Schema({
 const voteModel = mongoose.model("vote", voteSchema, 'vote')
 //活动说明页
 const acspeakSchema = new mongoose.Schema({
-  imgsrc: String
+  imgsrc: String,
+  content: String
 })
 const acspeakModel = mongoose.model("acspeak", acspeakSchema, 'acspeak')
 //后门票数库

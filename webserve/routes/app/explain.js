@@ -18,10 +18,9 @@ router.get('/getExplain', async (req, res) => {
   try {
     data = await activityMsgModel.find();
     acspeak = await acspeakModel.find()
+    res.send({ msg: '查询成功', code: 200, data, acspeak })
   } catch (err) {
     res.status(500).send({ msg: '服务器错误', code: 500, err })
-  } finally {
-    res.send({ msg: '查询成功', code: 200, data, acspeak })
   }
 })
 

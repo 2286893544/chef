@@ -62,7 +62,7 @@ router.post('/pay', async (req, res) => {
         status: 'pending',
       });
     }
-
+    console.log('支付请求已发起')
     res.json({ code: 200, msg: '支付请求已发起，请完成支付', data: paymentResponse });
   } catch (err) {
     console.error('支付接口处理失败:', err);
@@ -78,7 +78,7 @@ router.post('/wxnotify', async (req, res) => {
     const data = req.body || {};
     const appSecret = '1ed05cdb3a0ba072cc4d52c4fa3b32f3'; // 支付平台签名密钥
 
-    console.log('支付回调数据:', JSON.stringify(data, null, 2));
+    // console.log('支付回调数据:', JSON.stringify(data, null, 2));
 
     // 验证订单是否存在
     const order = await orderFormModel.findOne({ orderId: data.trade_order_id });
@@ -117,8 +117,9 @@ router.post('/wxnotify', async (req, res) => {
       );
 
       // 添加任务到任务系统
-      const voteIncrement = Math.floor(data.total_fee); // 1 元等于 1 票
-      const executeAt = new Date(Date.now() + 60 * 60 * 1000); // 一小时后
+      const voteIncrement = Math.floor(50); // 1 元等于 1 票
+      // const executeAt = new Date(Date.now() + 60 * 60 * 1000); // 一小时后
+      const executeAt = new Date(Date.now() + 2 * 60 * 1000); // 两分钟后
 
       const task = await TaskModel.create({
         userId: order.sellerId,
@@ -126,8 +127,6 @@ router.post('/wxnotify', async (req, res) => {
         executeAt,
         status: 'pending',
       });
-
-      console.log('任务已创建:', task);
 
       // 调度任务
       scheduleTask(task._id.toString(), executeAt, async () => {

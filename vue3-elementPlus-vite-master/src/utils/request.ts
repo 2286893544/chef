@@ -18,7 +18,7 @@ export const PATH_URL: string = import.meta.env.VITE_GLOB_API_URL as string
 // 配置新建一个 axios 实例
 const service: AxiosInstance = axios.create({
   baseURL: PATH_URL,
-  timeout: 50000,
+  timeout: 500000,
   headers: { 'Content-Type': 'application/json;charset=UTF-8' }
 })
 

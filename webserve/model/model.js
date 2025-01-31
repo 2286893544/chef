@@ -174,6 +174,35 @@ userInfoSchema.pre('save', async function (next) {
   next();
 });
 const userInfoModel = mongoose.model("userInfo", userInfoSchema, "userInfo")
+userInfoModel.createIndexes([
+  // 创建 isApply 和 isAudit 字段的复合索引
+  {
+    key: { isApply: 1, isAudit: 1 },
+    name: "isApply_isAudit_index", // 可以设置索引名称
+    background: true, // 设置为背景索引，避免阻塞其他操作
+  },
+
+  // 针对 position 字段创建单字段索引
+  {
+    key: { position: 1 },
+    name: "position_index",
+    background: true,
+  },
+
+  // 针对 name 字段创建单字段索引
+  {
+    key: { name: 1 },
+    name: "name_index",
+    background: true,
+  },
+
+  // 针对 mark 字段创建单字段索引
+  {
+    key: { mark: 1 },
+    name: "mark_index",
+    background: true,
+  },
+]);
 
 
 // 留言板

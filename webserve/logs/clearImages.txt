@@ -1,0 +1,18 @@
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\9RpC5yqiCG6wlkv0bvjwM0ah.png，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\6t4db7uvG-Vm8rjGUZMEzXJ3.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\dAS6RpVgGDbn66X29hsHZ37k.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\a26c5CL7QV8i-MxX-hAJ7IX4.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\E6-Zb_INsbyGn_hnxhuZ-ylQ.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\Iwy4pYRwONdoSk8SpUjZMBHX.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\ejd-WkDnmkEHJ4uRgQjIYEaM.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\M2Op94V-zmaCJssD5PWFqpBf.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\m8PbiRUn9_4f1xztYs9lReyE.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\lPGqnYNx5wJ9mL3E6iw_EDzn.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\o0Z9a6T98faKocOv9tCvK7VO.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\s5vJVyM5idbH154U7MSe32yN.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\wIFv45saLSbeK4tanwRucViR.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\x7wEcEIoLqXwj928AilQMrLK.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\yhFfZTjEsuiq2Jzf7FqFhNfr.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 清理任务完成，所有非webp文件已删除，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\XIoFlmRdcURiuj6gmN4wHHCw.jpg，执行时间: 2025-01-30 16:00:00
+[2025-01-31 00:00:00] 已删除文件: E:\LastStudy\chef\chef\webserve\upload\OuZXaoP9PpBk5E5TmeZAdeha.jpg，执行时间: 2025-01-30 16:00:00

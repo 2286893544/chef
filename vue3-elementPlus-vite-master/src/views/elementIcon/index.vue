@@ -260,12 +260,12 @@ const deluser = async (userid: any) => {
 }
 //修改
 const updactive = async () => {
+  let vote = ruleForm.vote - prevote.value
   let res: any = await service.post(
     `/upduserinfo?uid=${updid.value}`,
-    ruleForm
+    {ruleForm, vote}
   )
   if (res.code == 200) {
-    let vote = ruleForm.vote - prevote.value
     let res2: any = await service.post('addaftdoorvote', {
       apid: updid.value,
       opa: vote

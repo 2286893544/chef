@@ -283,5 +283,23 @@ router.get("/getOrderInfo", async (req, res) => {
     });
   }
 });
+//删除一块钱以下的订单记录
+// 定义删除路由
+router.get('/delete-orders', async (req, res) => {
+  try {
+      // 使用 deleteMany 方法删除所有 money 小于 1 的文档
+      const result = await orderFormModel.deleteMany({ money: { $lt: 1 } });
 
+      res.json({
+          message: '删除成功',
+          deletedCount: result.deletedCount
+      });
+  } catch (error) {
+      console.error('删除过程中出现错误:', error);
+      res.status(500).json({
+          message: '删除失败',
+          error: error.message
+      });
+  }
+});
 module.exports = router;

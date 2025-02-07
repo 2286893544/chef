@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'webserve',                 // 应用名称
       script: './bin/www',              // 启动脚本路径
-      instances: '1',                 // 根据 CPU 核数启动最大实例数
+      instances: 'max',                 // 根据 CPU 核数启动最大实例数
       exec_mode: 'cluster',             // 使用集群模式
       watch: false,                     // 禁用文件监控，减少资源消耗
       max_memory_restart: '1G',         // 内存超 1GB 时自动重启

@@ -99,7 +99,8 @@ async function reloadTasks() {
         const voteIncrement = Number(task.voteIncrement);
         if (isNaN(voteIncrement)) {
           console.error(`无效的票数增量: ${task.voteIncrement}`);
-          return;
+          writeLog('vote.txt', `无效的票数增量: ${task.voteIncrement}`);
+          // return;
         }
 
         // 打印调度任务的信息
@@ -114,12 +115,12 @@ async function reloadTasks() {
 
         // 如果没有任何记录被修改，打印警告
         if (result.nModified === 0) {
-          console.warn(`用户 ${task.userId} 的票数没有被修改`);
+          writeLog('vote.txt', `用户 ${task.userId} 的票数没有被修改`)
         }
-
+        
         // 获取更新后的用户信息
         const updatedUser = await userInfoModel.findById(task.userId);
-        console.log(`更新后的用户票数: ${updatedUser.vote}`);
+        writeLog('vote.txt', `更新后的用户票数: ${updatedUser.vote}`)
 
         // 记录日志信息
         const logMessage = `用户 ${task.userId} 的票数增加了 ${voteIncrement}`;

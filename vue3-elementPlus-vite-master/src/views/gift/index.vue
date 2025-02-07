@@ -22,7 +22,7 @@
       <el-table-column label="支付时间" align="center">
         <template v-slot="scope">
           <!-- {{ changeTimeFormat(scope.row.updated_at) }} -->
-          {{ scope.row.updated_at !== scope.row.created_at ? changeTimeFormat(scope.row.updated_at) : '未支付' }}
+          {{ scope.row.status === 'paid' ? changeTimeFormat(scope.row.updated_at) : '未支付' }}
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">

@@ -49,6 +49,8 @@ async function wxPay(options) {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+      maxContentLength:Infinity,
+      maxBodyLength:Infinity
     });
     // 返回支付接口的响应数据
     return response.data;
@@ -58,12 +60,6 @@ async function wxPay(options) {
     throw new Error(error.response ? error.response.data : '支付请求失败');
   }
 }
-// wxPay({
-//   order_id: 1,
-//   money: 1,
-//   title: 'test',
-//   backendUrl: 'http://fyxyw.top',
-// });
 
 
 module.exports = { wxPay, getHash };

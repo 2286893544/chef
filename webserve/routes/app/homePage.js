@@ -465,78 +465,138 @@ router.put('/addVisit', async (req, res) => {
 //     return res.status(500).json({ message: '服务器错误' });
 //   }
 // });
-router.post('/udvote', async (req, res) => {
-  const { voter_id, candidate_ids, vtime } = req.body;
-  console.log(req.body);
+// router.post('/udvote', async (req, res) => {
+//   const { voter_id, candidate_ids, vtime } = req.body;
+//   console.log(req.body);
 
-  // 步骤 1: 验证 voter_id 不能为空或 null
-  if (!voter_id || voter_id.trim() === '') {
+//   // 步骤 1: 验证 voter_id 不能为空或 null
+//   if (!voter_id || voter_id.trim() === '') {
+//     return res.status(400).json({ message: 'voter_id 不能为空' });
+//   }
+
+//   // 步骤 2: 验证 candidate_ids 数组的长度，确保只能包含一个候选人 ID
+//   if (!Array.isArray(candidate_ids) || candidate_ids.length !== 1) {
+//     return res.status(400).json({ message: '每次只能投一个选手' });
+//   }
+//   const candidateId = candidate_ids[0];
+
+//   // 获取当前日期（基于时区），确保时间范围是从 00:00:00 到 23:59:59
+//   const todayStart = moment().startOf('day').toDate();
+//   const todayEnd = moment().endOf('day').toDate();
+
+//   try {
+//     // 步骤 3: 查找当前用户今天投票的记录，确保时间在当天的 00:00:00 到 23:59:59 之间
+//     const voteRecords = await voteModel.find({
+//       dovoter: voter_id,
+//       votetime: { $gte: todayStart, $lte: todayEnd }
+//     });
+
+//     // 步骤 4: 判断用户是否已投票超过十次
+//     if (voteRecords.length >= 10) {
+//       return res.status(400).json({ message: '每天只能投十次' });
+//     }
+
+//     // 步骤 6: 记录新的投票
+//     const voteToInsert = {
+//       dovoter: voter_id,
+//       actvoter: candidateId,
+//       votetime: vtime,
+//     };
+
+//     try {
+//       // 步骤 7: 插入新的投票记录
+//       await voteModel.create([voteToInsert]);
+
+//       // 步骤 7.5: 给候选人的 vote 字段加一
+//       await userInfoModel.findOneAndUpdate(
+//         { _id: candidateId },
+//         { $inc: { vote: 1 } },
+//         { new: true }
+//       );
+
+//       // 步骤 8: 计算当前用户已投票的总数
+//       const totalVotes = voteRecords.length + 1; // 包含新投的一票
+
+//       // 步骤 9: 计算剩余可投票数
+//       const remainingVotes = 10 - totalVotes;
+
+//       return res.status(200).json({
+//         message: '投票成功',
+//         totalVotes,        // 用户当前已投的票数
+//         remainingVotes     // 用户还可以投的票数
+//       });
+//     } catch (err) {
+//       // 插入投票记录或更新候选人票数时出错
+//       console.error('投票操作失败:', err);
+//       return res.status(500).json({ message: '服务器错误!' });
+//     }
+//   } catch (err) {
+//     // 查找投票记录时出错
+//     console.error('查询投票记录失败:', err);
+//     return res.status(500).json({ message: '服务器错误' });
+//   }
+// });
+
+router.post('/udvote', async (req, res) => {
+  const { voter_id, candidate_ids } = req.body; // 不再接收客户端时间
+
+  // 参数校验
+  if (!voter_id?.trim()) {
     return res.status(400).json({ message: 'voter_id 不能为空' });
   }
 
-  // 步骤 2: 验证 candidate_ids 数组的长度，确保只能包含一个候选人 ID
   if (!Array.isArray(candidate_ids) || candidate_ids.length !== 1) {
     return res.status(400).json({ message: '每次只能投一个选手' });
   }
+
   const candidateId = candidate_ids[0];
-
-  // 获取当前日期（基于时区），确保时间范围是从 00:00:00 到 23:59:59
-  const todayStart = moment().startOf('day').toDate();
-  const todayEnd = moment().endOf('day').toDate();
-
+  
   try {
-    // 步骤 3: 查找当前用户今天投票的记录，确保时间在当天的 00:00:00 到 23:59:59 之间
-    const voteRecords = await voteModel.find({
+    // 设置时区（示例使用上海时区）
+    const tz = 'Asia/Shanghai';
+    const todayStart = moment().tz(tz).startOf('day').toDate();
+    const todayEnd = moment().tz(tz).endOf('day').toDate();
+
+    // 查询当日已投票次数（不使用事务）
+    const voteCount = await voteModel.countDocuments({
       dovoter: voter_id,
       votetime: { $gte: todayStart, $lte: todayEnd }
     });
 
-    // 步骤 4: 判断用户是否已投票超过十次
-    if (voteRecords.length >= 10) {
-      return res.status(400).json({ message: '每天只能投十次' });
+    if (voteCount >= 10) {
+      return res.status(400).json({ message: '每日投票已达上限' });
     }
 
-    // 步骤 6: 记录新的投票
-    const voteToInsert = {
+    // 插入投票记录（使用服务端时间）
+    const voteDoc = new voteModel({
       dovoter: voter_id,
       actvoter: candidateId,
-      votetime: vtime,
-    };
+      votetime: new Date() // 强制使用服务端时间
+    });
+    await voteDoc.save();
 
-    try {
-      // 步骤 7: 插入新的投票记录
-      await voteModel.create([voteToInsert]);
+    // 更新候选人票数（不使用事务）
+    const candidate = await userInfoModel.findByIdAndUpdate(
+      candidateId,
+      { $inc: { vote: 1 } },
+      { new: true }
+    );
 
-      // 步骤 7.5: 给候选人的 vote 字段加一
-      await userInfoModel.findOneAndUpdate(
-        { _id: candidateId },
-        { $inc: { vote: 1 } },
-        { new: true }
-      );
-
-      // 步骤 8: 计算当前用户已投票的总数
-      const totalVotes = voteRecords.length + 1; // 包含新投的一票
-
-      // 步骤 9: 计算剩余可投票数
-      const remainingVotes = 10 - totalVotes;
-
-      return res.status(200).json({
-        message: '投票成功',
-        totalVotes,        // 用户当前已投的票数
-        remainingVotes     // 用户还可以投的票数
-      });
-    } catch (err) {
-      // 插入投票记录或更新候选人票数时出错
-      console.error('投票操作失败:', err);
-      return res.status(500).json({ message: '服务器错误!' });
+    if (!candidate) {
+      return res.status(404).json({ message: '候选人不存在' });
     }
+
+    return res.status(200).json({
+      message: '投票成功',
+      totalVotes: voteCount + 1,
+      remainingVotes: 9 - voteCount // 实时剩余票数
+    });
+
   } catch (err) {
-    // 查找投票记录时出错
-    console.error('查询投票记录失败:', err);
-    return res.status(500).json({ message: '服务器错误' });
+    console.error(`投票流程异常: ${err.message}`);
+    return res.status(500).json({ message: '系统繁忙，请稍后重试' });
   }
 });
-
 
 // 获取选手信息 -- 测试接口 待定
 router.get('/getUsers', async (req, res) => {

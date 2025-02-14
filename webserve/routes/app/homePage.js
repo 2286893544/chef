@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const mongoose = require('mongoose');
 const moment = require('moment-timezone'); // 使用 moment-timezone 处理时区
 var {
   carouselModel,  //  轮播图
@@ -537,11 +538,150 @@ router.put('/addVisit', async (req, res) => {
 //   }
 // });
 
+// router.post('/udvote', async (req, res) => {
+//   const { voter_id, candidate_ids } = req.body; // 不再接收客户端时间
+
+//   // 参数校验
+//   if (!voter_id?.trim()) {
+//     return res.status(400).json({ message: 'voter_id 不能为空' });
+//   }
+
+//   if (!Array.isArray(candidate_ids) || candidate_ids.length !== 1) {
+//     return res.status(400).json({ message: '每次只能投一个选手' });
+//   }
+
+//   const candidateId = candidate_ids[0];
+  
+//   try {
+//     // 设置时区（示例使用上海时区）
+//     const tz = 'Asia/Shanghai';
+//     const todayStart = moment().tz(tz).startOf('day').toDate();
+//     const todayEnd = moment().tz(tz).endOf('day').toDate();
+
+//     // 查询当日已投票次数（不使用事务）
+//     const voteCount = await voteModel.countDocuments({
+//       dovoter: voter_id,
+//       votetime: { $gte: todayStart, $lte: todayEnd }
+//     });
+
+//     if (voteCount >= 10) {
+//       return res.status(400).json({ message: '每日投票已达上限' });
+//     }
+
+//     // 插入投票记录（使用服务端时间）
+//     const voteDoc = new voteModel({
+//       dovoter: voter_id,
+//       actvoter: candidateId,
+//       votetime: new Date() // 强制使用服务端时间
+//     });
+//     await voteDoc.save();
+
+//     // 更新候选人票数（不使用事务）
+//     const candidate = await userInfoModel.findByIdAndUpdate(
+//       candidateId,
+//       { $inc: { vote: 1 } },
+//       { new: true }
+//     );
+
+//     if (!candidate) {
+//       return res.status(404).json({ message: '候选人不存在' });
+//     }
+
+//     return res.status(200).json({
+//       message: '投票成功',
+//       totalVotes: voteCount + 1,
+//       remainingVotes: 9 - voteCount // 实时剩余票数
+//     });
+
+//   } catch (err) {
+//     console.error(`投票流程异常: ${err.message}`);
+//     return res.status(500).json({ message: '系统繁忙，请稍后重试' });
+//   }
+// });
+// router.post('/udvote', async (req, res) => {
+//   // 强化voter_id处理（前端+后端双重校验）
+//   const voter_id = req.body.voter_id ? req.body.voter_id.toString().trim() : '';
+//   const candidate_ids = req.body.candidate_ids;
+
+//   // 参数校验
+//   if (!voter_id) {
+//     return res.status(400).json({ message: 'voter_id 不能为空' });
+//   }
+
+//   if (!Array.isArray(candidate_ids) || candidate_ids.length !== 1) {
+//     return res.status(400).json({ message: '每次只能投一个选手' });
+//   }
+
+//   const candidateId = candidate_ids[0];
+  
+//   try {
+//     // 时区标准化方案（上海时区日期存储）
+//     const tz = 'Asia/Shanghai';
+//     const currentDate = moment().tz(tz).format('YYYY-MM-DD');
+
+//     // 查询当日投票（使用日期快照）
+//     const voteCount = await voteModel.countDocuments({
+//       dovoter: voter_id,
+//       voteDate: currentDate // 新增日期维度字段
+//     });
+
+//     if (voteCount >= 10) {
+//       return res.status(400).json({ message: '每日投票已达上限' });
+//     }
+
+//     // 事务化操作（保证数据一致性）
+//     const session = await voteModel.startSession();
+//     session.startTransaction();
+    
+//     try {
+//       // 插入投票记录（带时区日期）
+//       const voteDoc = new voteModel({
+//         dovoter: voter_id,
+//         actvoter: candidateId,
+//         votetime: new Date(), // 维持UTC时间戳
+//         voteDate: currentDate // 新增上海时区日期
+//       });
+//       await voteDoc.save({ session });
+
+//       // 原子化更新候选人票数
+//       const candidate = await userInfoModel.findByIdAndUpdate(
+//         candidateId,
+//         { $inc: { vote: 1 } },
+//         { new: true, session }
+//       );
+
+//       if (!candidate) {
+//         await session.abortTransaction();
+//         return res.status(404).json({ message: '候选人不存在' });
+//       }
+
+//       await session.commitTransaction();
+      
+//       return res.status(200).json({
+//         message: '投票成功',
+//         totalVotes: voteCount + 1,
+//         remainingVotes: 9 - voteCount
+//       });
+
+//     } catch (err) {
+//       await session.abortTransaction();
+//       throw err;
+//     } finally {
+//       session.endSession();
+//     }
+
+//   } catch (err) {
+//     console.error(`投票流程异常: ${err.message}`);
+//     return res.status(500).json({ message: '系统繁忙，请稍后重试' });
+//   }
+// });
 router.post('/udvote', async (req, res) => {
-  const { voter_id, candidate_ids } = req.body; // 不再接收客户端时间
+  // 强化voter_id处理（前端+后端双重校验）
+  const voter_id = req.body.voter_id ? req.body.voter_id.toString().trim() : '';
+  const candidate_ids = req.body.candidate_ids;
 
   // 参数校验
-  if (!voter_id?.trim()) {
+  if (!voter_id) {
     return res.status(400).json({ message: 'voter_id 不能为空' });
   }
 
@@ -550,32 +690,33 @@ router.post('/udvote', async (req, res) => {
   }
 
   const candidateId = candidate_ids[0];
-  
-  try {
-    // 设置时区（示例使用上海时区）
-    const tz = 'Asia/Shanghai';
-    const todayStart = moment().tz(tz).startOf('day').toDate();
-    const todayEnd = moment().tz(tz).endOf('day').toDate();
 
-    // 查询当日已投票次数（不使用事务）
+  try {
+    // 时区标准化方案（上海时区日期存储）
+    const tz = 'Asia/Shanghai';
+    const currentDate = moment().tz(tz).format('YYYY-MM-DD');
+
+    // 查询当日投票数量
     const voteCount = await voteModel.countDocuments({
       dovoter: voter_id,
-      votetime: { $gte: todayStart, $lte: todayEnd }
+      voteDate: currentDate // 新增日期维度字段
     });
 
+    // 每日最多投票 10 次
     if (voteCount >= 10) {
       return res.status(400).json({ message: '每日投票已达上限' });
     }
 
-    // 插入投票记录（使用服务端时间）
+    // 插入投票记录（带时区日期）
     const voteDoc = new voteModel({
       dovoter: voter_id,
       actvoter: candidateId,
-      votetime: new Date() // 强制使用服务端时间
+      votetime: new Date(), // 维持UTC时间戳
+      voteDate: currentDate // 新增上海时区日期
     });
     await voteDoc.save();
 
-    // 更新候选人票数（不使用事务）
+    // 更新候选人票数
     const candidate = await userInfoModel.findByIdAndUpdate(
       candidateId,
       { $inc: { vote: 1 } },
@@ -586,10 +727,13 @@ router.post('/udvote', async (req, res) => {
       return res.status(404).json({ message: '候选人不存在' });
     }
 
+    // 计算剩余票数
+    const remainingVotes = 10 - voteCount - 1;  // 当前已经投的票 + 新投的一票
+
     return res.status(200).json({
       message: '投票成功',
-      totalVotes: voteCount + 1,
-      remainingVotes: 9 - voteCount // 实时剩余票数
+      totalVotes: voteCount + 1, // 当前已投票数量
+      remainingVotes: remainingVotes // 剩余票数
     });
 
   } catch (err) {
@@ -597,6 +741,7 @@ router.post('/udvote', async (req, res) => {
     return res.status(500).json({ message: '系统繁忙，请稍后重试' });
   }
 });
+
 
 // 获取选手信息 -- 测试接口 待定
 router.get('/getUsers', async (req, res) => {

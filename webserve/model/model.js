@@ -252,6 +252,10 @@ const voteSchema = new mongoose.Schema({
   votetime: {
     type: Date,
     default: Date.now()
+  },
+  voteDate: {
+    type: String,
+    default: ''
   }
 })
 const voteModel = mongoose.model("vote", voteSchema, 'vote')

@@ -1,4 +1,5 @@
 var express = require('express');
+var axios = require("axios")
 var router = express.Router();
 var { carouselModel, activityMsgModel, positionModel, userInfoModel, voteModel, commentModel, acspeakModel, aftdoorModel, ctrlModel } = require("../../model/model")
 var multiparty = require('multiparty')
@@ -7,43 +8,94 @@ const { ObjectId } = require('mongodb');
 var fs = require('fs')
 var path = require('path')
 const jwt = require('jsonwebtoken');
-// 异步中间件：获取投票数据并更新用户的投票数
-const updateVotesMiddleware = async (req, res, next) => {
-  // 使用 setImmediate 将异步任务放入下一轮事件循环，确保不阻塞响应
-  setImmediate(async () => {
-    // try {
-    //   // 获取所有申请的用户
-    //   let aplyusers = await userInfoModel.find({ isApply: true }).lean();
+//h5微信一键授权登录接口
+// 微信公众号的 AppID 和 AppSecret
+const APP_ID = 'wxc84327f9bba81aff';
+const APP_SECRET = '22314139308c82d14fc443f005443bd8';
 
-    //   // 并行执行所有用户的投票更新任务
-    //   const updatePromises = aplyusers.map(async (item) => {
-    //     // 获取 actvotes
-    //     let actvotes = await voteModel.find({ actvoter: item._id }).countDocuments();
+// 后端获取微信用户信息接口
 
-    //     // 获取 aftdoorvotels
-    //     let aftdoorvotels = await aftdoorModel.find({ apid: item._id }).lean();
+router.get('/wechat-login', async (req, res) => {
+  const code = req.query.code;
 
-    //     // 计算 apuallvotes
-    //     let apuallvotes = actvotes;
-    //     for (let aftdoor of aftdoorvotels) {
-    //       apuallvotes += aftdoor.opa;
-    //     }
+  if (!code) {
+    return res.status(400).send({
+      message: '授权码为空',
+    });
+  }
 
-    //     // 更新用户的投票数
-    //     await userInfoModel.updateOne({ _id: item._id }, { vote: apuallvotes });
-    //   });
+  try {
+    // 1. 使用授权码 (code) 获取 access_token 和 openid
+    const response = await axios.get('https://api.weixin.qq.com/sns/oauth2/access_token', {
+      params: {
+        appid: APP_ID,
+        secret: APP_SECRET,
+        code,
+        grant_type: 'authorization_code',
+      },
+    });
 
-    //   // 等待所有投票更新任务完成
-    //   await Promise.all(updatePromises);
-    // } catch (error) {
-    //   console.error('Error updating votes:', error);
-    // }
+    const { access_token, openid, errcode, errmsg } = response.data;
 
-    // 不影响接口响应速度，继续传递控制权
-    next();
-  });
-};
+    // 检查是否返回了错误
+    if (errcode) {
+      return res.status(500).json({
+        message: `微信授权失败，错误码：${errcode}`,
+        error: errmsg || '未提供错误信息',
+      });
+    }
 
+    // 2. 使用 access_token 和 openid 获取用户信息
+    const userInfoResponse = await axios.get('https://api.weixin.qq.com/sns/userinfo', {
+      params: {
+        access_token,
+        openid,
+        lang: 'zh_CN',
+      },
+    });
+
+    const userInfo = userInfoResponse.data;
+
+    // 再次检查是否返回了错误
+    if (userInfo.errcode) {
+      return res.status(500).json({
+        message: `获取用户信息失败，错误码：${userInfo.errcode}`,
+        error: userInfo.errmsg || '未提供错误信息',
+      });
+    }
+
+    // 3. 查询数据库中是否已有此 openid 的用户
+    let user = await userInfoModel.findOne({ openid });
+
+    if (!user) {
+      // 4. 如果没有找到用户，创建新用户
+      user = new User({
+        name: userInfo.nickname,
+        avtor: userInfo.headimgurl,
+        openid,
+      });
+      await user.save(); // 保存新用户
+    } else {
+      // 5. 如果用户已存在，可以选择更新用户信息
+      user.avtor = userInfo.headimgurl;
+      user.name = userInfo.nickname;
+      await user.save(); // 更新用户
+    }
+
+    // 6. 返回微信用户信息
+    res.json({
+      message: '微信授权登录成功',
+      data: user,
+    });
+  } catch (error) {
+    console.error(error);
+    // 如果 catch 发生错误，返回500错误并详细记录错误信息
+    res.status(500).json({
+      message: '微信授权登录失败',
+      error: error.message,
+    });
+  }
+});
 //注册
 router.post('/register', async (req, res) => {
   let { phoneNum, pwd, avtor } = req.body

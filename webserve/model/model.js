@@ -150,9 +150,11 @@ const userInfoSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  deviceid: String,//设备指纹游客唯一id
+  // deviceid: String,//设备指纹游客唯一id
   introduce: String,//简介
-  openid: String,//微信openid
+  // openid: String,//微信openid
+  phone: String,
+  pwd: String
 })
 const counterSchema = new mongoose.Schema({
   _id: { type: String, required: true }, // 计数器名称

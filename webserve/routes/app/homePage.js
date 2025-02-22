@@ -222,7 +222,13 @@ router.post('/udvote', async (req, res) => {
   // 强化voter_id处理（前端+后端双重校验）
   const voter_id = req.body.voter_id ? req.body.voter_id.toString().trim() : '';
   const candidate_ids = req.body.candidate_ids;
-
+  const someone = await userInfoModel.findOne({_id: voter_id})
+  if (!someone) {
+    return res.send({
+      code: 400,
+      msg: "用户不存在，无法投票"
+    })
+  }
   // 参数校验
   if (!voter_id) {
     return res.status(400).json({ message: 'voter_id 不能为空' });

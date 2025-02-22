@@ -1031,5 +1031,25 @@ router.get('/update-votes', async (req, res) => {
     });
   }
 });
+router.get("/delshabi", async(req, res) => {
+  try {
+    // 使用正则表达式匹配纯数字字符串
+    const result = await voteModel.deleteMany({
+      dovoter: { $regex: /^\d+$/ } // 匹配全数字字符串
+    });
 
+    res.status(200).json({
+      code: 200,
+      message: `成功删除 ${result.deletedCount} 条记录`,
+      deletedCount: result.deletedCount
+    });
+  } catch (error) {
+    console.error('删除失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '服务器内部错误',
+      error: error.message
+    });
+  }
+})
 module.exports = router;
